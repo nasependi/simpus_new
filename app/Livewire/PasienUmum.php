@@ -70,7 +70,6 @@ class PasienUmum extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
-        dd(JenisKelamin::all());
 
         return view('livewire.pasien', [
             'jks' => JenisKelamin::all(),

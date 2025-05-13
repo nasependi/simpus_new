@@ -71,7 +71,6 @@ return new class extends Migration
             $table->foreign('domisili_kab')->references('id')->on('regencies');
             $table->foreign('domisili_kec')->references('id')->on('districts');
             $table->foreign('domisili_kel')->references('id')->on('villages');
-
         });
     }
 

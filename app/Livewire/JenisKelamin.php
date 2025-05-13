@@ -42,8 +42,7 @@ class JenisKelamin extends Component
 
     public function render()
     {
-        $data = JenisKelaminModel::
-            where('nama_jk', 'like', '%' . $this->search . '%')
+        $data = JenisKelaminModel::where('nama_jk', 'like', '%' . $this->search . '%')
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
@@ -82,18 +81,20 @@ class JenisKelamin extends Component
             text: 'Your changes have been saved.',
             variant: 'success',
         );
+
         $this->resetForm();
     }
 
-    public function deleteConfirm ($id){
+    public function deleteConfirm($id)
+    {
         $this->deleteId = $id;
-        Flux::modal('delete-post')->show(); 
+        Flux::modal('delete-post')->show();
     }
 
     public function delete()
     {
         JenisKelaminModel::findOrFail($this->deleteId)->delete();
-        Flux::toast(variant: 'success', heading:'Hapus data', text:'Data sudah terhapus.');
+        Flux::toast(variant: 'success', heading: 'Hapus data', text: 'Data sudah terhapus.');
         Flux::modal('delete-post')->close();
     }
 

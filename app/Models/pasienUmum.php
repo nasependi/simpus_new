@@ -12,41 +12,7 @@ class PasienUmum extends Model
 
     protected $table = 'pasien_umum';
 
-    protected $fillable = [
-        'nama_lengkap',
-        'no_rekamedis',
-        'nik',
-        'paspor',
-        'ibu_kandung',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'jk_id',
-        'agama_id',
-        'suku',
-        'bahasa_dikuasai',
-        'alamat_lengkap',
-        'rt_id',
-        'rw_id',
-        'kel_id',
-        'kec_id',
-        'kab_id',
-        'kodepos_id',
-        'prov_id',
-        'alamat_domisili',
-        'domisili_rt',
-        'domisili_rw',
-        'domisili_kel',
-        'domisili_kec',
-        'domisili_kab',
-        'domisili_kodepos',
-        'domisili_prov',
-        'domisili_negara',
-        'no_rumah',
-        'no_hp',
-        'pendidikan_id',
-        'pekerjaan_id',
-        'statusnikah_id'
-    ];
+    protected $guarded = [];
 
     public function jenisKelamin()
     {
@@ -71,5 +37,10 @@ class PasienUmum extends Model
     public function statusPernikahan()
     {
         return $this->belongsTo(StatusPernikahan::class, 'statusnikah_id');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'prov_id');
     }
 }

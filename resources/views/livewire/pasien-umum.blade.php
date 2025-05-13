@@ -3,7 +3,7 @@
         <div class="flex justify-between mb-4">
             <flux:heading size="xl">Data Pasien Umum</flux:heading>
             <div class="flex gap-4 items-center">
-                <flux:input wire:model.live="search" placeholder="Cari pasien..."  size="md" />
+                <flux:input wire:model.live="search" placeholder="Cari pasien..." size="md" />
                 <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
             </div>
         </div>
@@ -17,9 +17,11 @@
                     @endif
                 </flux:table.column>
                 <flux:table.column>NIK</flux:table.column>
+                <flux:table.column>Provinsi</flux:table.column>
                 <flux:table.column>Jenis Kelamin</flux:table.column>
                 <flux:table.column>Agama</flux:table.column>
                 <flux:table.column>Aksi</flux:table.column>
+
             </flux:table.columns>
 
             <flux:table.rows>
@@ -27,8 +29,9 @@
                     <flux:table.row>
                         <flux:table.cell>{{ $item->nama_lengkap }}</flux:table.cell>
                         <flux:table.cell>{{ $item->nik }}</flux:table.cell>
-                        {{-- <flux:table.cell>{{ $item->jenisKelamin->nama }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->agama->nama_agama }}</flux:table.cell> --}}
+                        <flux:table.cell>{{ $item->province->name }}</flux:table.cell>
+                        <flux:table.cell>{{ $item->jenisKelamin->nama_jk }}</flux:table.cell>
+                        <flux:table.cell>{{ $item->agama->nama_agama }}</flux:table.cell>
                         <flux:table.cell>
                             <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" />
                             <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
@@ -39,7 +42,7 @@
         </flux:table>
 
         {{-- Modal Tambah/Edit --}}
-        <flux:modal name="pasienModal" class="space-y-4 md:w-[60rem] overflow-y-auto max-h-[85vh]">
+        <flux:modal name="pasienModal" class="space-y-4 w-3/4 !max-w-none overflow-y-auto max-h-[85vh]">
             <flux:heading class="text-lg font-semibold">
                 {{ $editId ? 'Edit' : 'Tambah' }} Pasien
             </flux:heading>
@@ -51,14 +54,51 @@
                 <flux:input wire:model="paspor" label="Paspor" />
                 <flux:input wire:model="ibu_kandung" label="Nama Ibu Kandung" required />
                 <flux:input wire:model="tempat_lahir" label="Tempat Lahir" required />
-                {{-- <flux:input wire:model="tanggal_lahir" label="Tanggal Lahir" type="date" required /> --}}
+                <flux:select wire:model.live="prov_id" label="Provinsi" required>
+                    <flux:select.option value="">Pilih Provinsi</flux:select.option>
+                    @foreach ($province as $key => $index)
+                        <flux:select.option value="{{ $key }}">{{ $index }}</flux:select.option>
+                    @endforeach
+                </flux:select>
 
-                <flux:select wire:model="jk_id" label="Jenis Kelamin" :options="$jks->pluck('nama', 'id')" required />
-                <flux:select wire:model="agama_id" label="Agama" :options="$agamas->pluck('nama_agama', 'id')" required />
-                {{-- <flux:input wire:model="suku" label="Suku" />
-                <flux:input wire:model="bahasa_dikuasai" label="Bahasa Dikuasai" />
-                <flux:input wire:model="alamat_lengkap" label="Alamat Lengkap" required /> --}}
-                {{-- ... Tambahkan input lain sesuai kebutuhan --}}
+                <flux:select wire:model.live="kab_id" label="Kabupaten/Kota">
+                    <flux:select.option value="">Pilih Kabupaten/Kota</flux:select.option>
+                    @foreach ($regencies as $id => $name)
+                        <flux:select.option value="{{ $id }}">{{ $name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                {{-- <flux:date-picker wire:model="tanggal_lahir" label="Tanggal Lahir" required /> --}}
+                <flux:select wire:model="jk_id" label="Jenis Kelamin" required>
+                    <flux:select.option value="">Pilih Jenis Kelamin</flux:select.option>
+                    @foreach ($jenis_kelamin as $i)
+                        <flux:select.option value="{{ $i->id }}">{{ $i->nama_jk }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:select wire:model="agama_id" label="Agama" required>
+                    <flux:select.option value="">Pilih Agama</flux:select.option>
+                    @foreach ($agama as $a)
+                        <flux:select.option value="{{ $a->id }}">{{ $a->nama_agama }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:select wire:model="pendidikan_id" label="Pendidikan" required>
+                    <flux:select.option value="">Pilih Pendidikan</flux:select.option>
+                    @foreach ($pendidikan as $pen)
+                        <flux:select.option value="{{ $pen->id }}">{{ $pen->nama_pendidikan }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:select wire:model="pekerjaan_id" label="Pekerjaan" required>
+                    <flux:select.option value="">Pilih Pekerjaan</flux:select.option>
+                    @foreach ($pekerjaan as $pek)
+                        <flux:select.option value="{{ $pek->id }}">{{ $pek->nama_pekerjaan }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:select wire:model="statusnikah_id" label="Status Pernikahan" required>
+                    <flux:select.option value="">Pilih Status Pernikahan</flux:select.option>
+                    @foreach ($status_pernikahan as $sn)
+                        <flux:select.option value="{{ $sn->id }}">{{ $sn->status }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:textarea wire:model="alamat_lengkap" label="Alamat Lengkap" required />
             </div>
 
             <div class="flex justify-end gap-2">
