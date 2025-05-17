@@ -19,7 +19,7 @@
           wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
         <flux:navlist.item href="{{ route('pasien-umum') }}" :active="request()->routeIs('pasien-umum')" icon="user">
           Pasien Umum</flux:navlist.item>
-        <flux:navlist.item href="" :active="request()->routeIs('pasien-umum')" icon="heart">
+        <flux:navlist.item href="{{ route('bayi-baru-lahir') }}" :active="request()->routeIs('bayi-baru-lahir')" icon="heart">
           Bayi Baru Lahir</flux:navlist.item>
       </flux:navlist.group>
     </flux:navlist>

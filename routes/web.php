@@ -11,8 +11,10 @@ use App\Livewire\PasienUmumCrud;
 use app\livewire\RegisterPasien;
 use App\Models\StatusPernikahan;
 use App\Livewire\Auth\PermissionCrud;
+use App\Livewire\BayiBaruLahirIndex;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\StatusPernikahan as LivewireStatusPernikahan;
+use App\Models\BayiBaruLahir;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,7 +27,7 @@ Route::view('dashboard', 'dashboard')
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/pasien-umum', PasienUmumCrud::class)->name('pasien-umum');
-    // Route::get('/registerpasien', RegisterPasien::class)->name('registerpasien');
+    Route::get('/bayi-baru-lahir', BayiBaruLahirIndex::class)->name('bayi-baru-lahir');
 
     Route::redirect('settings', 'settings/profile');
     Route::get('/permissions', PermissionCrud::class)->name('permissions');

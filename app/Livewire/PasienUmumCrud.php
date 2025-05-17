@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use Flux\Flux;  
+use Flux\Flux;
 use App\Models\Agama;
 use App\Models\Regency;
 use App\Models\Village;
@@ -15,6 +15,7 @@ use App\Models\Pendidikan;
 use App\Models\JenisKelamin;
 use Livewire\WithPagination;
 use App\Models\StatusPernikahan;
+
 
 class PasienUmumCrud extends Component
 {
@@ -32,18 +33,16 @@ class PasienUmumCrud extends Component
 
     // public $regencies = [];
     public $search_provinsi = '';
-    public $provinsiOptions = [];
-    public $prov_id, $prov_name;
+    public $prov_id, $prov_name, $provinsiOptions = [];
 
     public $search_kabupaten = '';
-    public $kabupatenOptions = [];
-    public $kab_id, $kab_name;
+    public $kab_id, $kab_name, $kabupatenOptions = [];
 
     public $search_kecamatan = '';
-    public $kecamatanOptions = [];
-    public $kec_id, $kec_name;
+    public $kec_id, $kec_name, $kecamatanOptions = [];
 
     public $search_kelurahan, $kel_id, $kel_name, $kelurahanOptions = [];
+
 
     public $umur, $hitungan = 'tahun';
 
@@ -51,15 +50,15 @@ class PasienUmumCrud extends Component
 
     public function next()
     {
-        if ($this->halaman<3) {
-            $this->halaman +=1;
+        if ($this->halaman < 3) {
+            $this->halaman += 1;
         }
     }
 
     public function back()
     {
-        if ($this->halaman>1) {
-            $this->halaman -=1;
+        if ($this->halaman > 1) {
+            $this->halaman -= 1;
         }
     }
 
@@ -105,6 +104,17 @@ class PasienUmumCrud extends Component
         'pendidikan_id' => 'required|exists:pendidikan,id',
         'pekerjaan_id' => 'required|exists:pekerjaan,id',
         'statusnikah_id' => 'required|exists:status_pernikahan,id',
+        'domisili_prov' => 'required|exists:provinces,id',
+        'domisili_kab' => 'required|exists:regencies,id',
+        'domisili_kec' => 'required|exists:districts,id',
+        'domisili_kel' => 'required|exists:villages,id',
+        'no_rekamedis' => 'nullable|string|max:50',
+        'ibu_kandung' => 'nullable|string|max:255',
+        'tempat_lahir' => 'nullable|string|max:100',
+        'suku' => 'nullable|string|max:100',
+        'bahasa_dikuasai' => 'nullable|string|max:100',
+        'alamat_lengkap' => 'nullable|string',
+        'no_rumah' => 'nullable|string|max:20',
     ];
 
     public function updatedSearchProvinsi()
@@ -153,13 +163,14 @@ class PasienUmumCrud extends Component
         $this->search_kecamatan = '';
     }
 
-    public function updatedSearchKecamatan() {
-    if ($this->kab_id) {
-        $this->kecamatanOptions = District::where('regency_id', $this->kab_id)
-            ->where('name', 'like', '%' . $this->search_kecamatan . '%')
-            ->limit(10)
-            ->get()
-            ->toArray();
+    public function updatedSearchKecamatan()
+    {
+        if ($this->kab_id) {
+            $this->kecamatanOptions = District::where('regency_id', $this->kab_id)
+                ->where('name', 'like', '%' . $this->search_kecamatan . '%')
+                ->limit(10)
+                ->get()
+                ->toArray();
         }
     }
 
@@ -175,7 +186,8 @@ class PasienUmumCrud extends Component
         $this->search_kelurahan = '';
     }
 
-    public function updatedSearchKelurahan() {
+    public function updatedSearchKelurahan()
+    {
         if ($this->kec_id) {
             $this->kelurahanOptions = Village::where('district_id', $this->kec_id)
                 ->where('name', 'like', '%' . $this->search_kelurahan . '%')
@@ -185,12 +197,151 @@ class PasienUmumCrud extends Component
         }
     }
 
-    public function selectKelurahan($id, $name) {
+    public function selectKelurahan($id, $name)
+    {
         $this->kel_id = $id;
         $this->kel_name = $name;
         $this->search_kelurahan = $name;
         $this->kelurahanOptions = [];
     }
+
+    // DOMISLI
+
+    public $sama_domisili = false;
+
+    public $search_domisili_prov, $domisili_prov_id, $domisili_prov_nama, $domisiliProvinsiOptions = [];
+    public $search_domisili_kab, $domisili_kab_id, $domisili_kab_nama, $domisiliKabupatenOptions = [];
+    public $search_domisili_kec, $domisili_kec_id, $domisili_kec_nama, $domisiliKecamatanOptions = [];
+    public $search_domisili_kel, $domisili_kel_id, $domisili_kel_nama, $domisiliKelurahanOptions = [];
+
+    public function updatedSamaDomisili()
+    {
+        if ($this->sama_domisili) {
+            $this->domisili_prov = $this->prov_id;
+            $this->domisili_prov_nama = $this->prov_name;
+            $this->search_domisili_prov = $this->prov_name;
+            $this->domisili_kab = $this->kab_id;
+            $this->domisili_kab_nama = $this->kab_name;
+            $this->domisili_kec = $this->kec_id;
+            $this->domisili_kec_nama = $this->kec_name;
+            $this->domisili_kel = $this->kel_id;
+            $this->domisili_kel_nama = $this->kel_name;
+        } else {
+            $this->reset([
+                'domisili_prov',
+                'domisili_prov_nama',
+                'domisili_kab',
+                'domisili_kab_nama',
+                'domisili_kec',
+                'domisili_kec_nama',
+                'domisili_kel',
+                'domisili_kel_nama',
+                'search_domisili_prov',
+                'search_domisili_kab',
+                'search_domisili_kec',
+                'search_domisili_kel'
+            ]);
+        }
+    }
+
+    public function updatedSearchDomisiliProv()
+    {
+        $this->domisiliProvinsiOptions = Province::where('name', 'like', '%' . $this->search_domisili_prov . '%')
+            ->limit(10)->get(['id', 'name'])->toArray();
+    }
+
+    public function updatedSearchDomisiliKab()
+    {
+        if ($this->domisili_prov_id) {
+            $this->domisiliKabupatenOptions = Regency::where('province_id', $this->domisili_prov_id)
+                ->where('name', 'like', '%' . $this->search_domisili_kab . '%')
+                ->limit(10)->get(['id', 'name'])->toArray();
+        }
+    }
+
+    public function updatedSearchDomisiliKec()
+    {
+        if ($this->domisili_kab_id) {
+            $this->domisiliKecamatanOptions = District::where('regency_id', $this->domisili_kab_id)
+                ->where('name', 'like', '%' . $this->search_domisili_kec . '%')
+                ->limit(10)->get(['id', 'name'])->toArray();
+        }
+    }
+
+    public function updatedSearchDomisiliKel()
+    {
+        if ($this->domisili_kec_id) {
+            $this->domisiliKelurahanOptions = Village::where('district_id', $this->domisili_kec_id)
+                ->where('name', 'like', '%' . $this->search_domisili_kel . '%')
+                ->limit(10)->get(['id', 'name'])->toArray();
+        }
+    }
+
+    public function selectDomisiliProvinsi($id, $nama)
+    {
+        $this->domisili_prov_id = $id;
+        $this->domisili_prov_nama = $nama;
+        $this->search_domisili_prov = $nama;
+
+        // Reset kabupaten ke bawah
+        $this->reset([
+            'domisili_kab_id',
+            'domisili_kab_nama',
+            'domisili_kec_id',
+            'domisili_kec_nama',
+            'domisili_kel_id',
+            'domisili_kel_nama',
+            'search_domisili_kab',
+            'search_domisili_kec',
+            'search_domisili_kel',
+            'domisiliKabupatenOptions',
+            'domisiliKecamatanOptions',
+            'domisiliKelurahanOptions'
+        ]);
+    }
+
+    public function selectDomisiliKabupaten($id, $nama)
+    {
+        $this->domisili_kab_id = $id;
+        $this->domisili_kab_nama = $nama;
+        $this->search_domisili_kab = $nama;
+
+        // Reset kecamatan ke bawah
+        $this->reset([
+            'domisili_kec_id',
+            'domisili_kec_nama',
+            'domisili_kel_id',
+            'domisili_kel_nama',
+            'search_domisili_kec',
+            'search_domisili_kel',
+            'domisiliKecamatanOptions',
+            'domisiliKelurahanOptions'
+        ]);
+    }
+
+    public function selectDomisiliKecamatan($id, $nama)
+    {
+        $this->domisili_kec_id = $id;
+        $this->domisili_kec_nama = $nama;
+        $this->search_domisili_kec = $nama;
+
+        // Reset kelurahan
+        $this->reset([
+            'domisili_kel_id',
+            'domisili_kel_nama',
+            'search_domisili_kel',
+            'domisiliKelurahanOptions'
+        ]);
+    }
+
+    public function selectDomisiliKelurahan($id, $nama)
+    {
+        $this->domisili_kel_id = $id;
+        $this->domisili_kel_nama = $nama;
+        $this->search_domisili_kel = $nama;
+    }
+
+    // END DOMISLI
 
     public function sortBy($field)
     {
@@ -258,11 +409,11 @@ class PasienUmumCrud extends Component
         $this->alamat_domisili = $data->alamat_domisili;
         $this->domisili_rt = $data->domisili_rt;
         $this->domisili_rw = $data->domisili_rw;
-        $this->domisili_kel = $data->domisili_kel;
-        $this->domisili_kec = $data->domisili_kec;
-        $this->domisili_kab = $data->domisili_kab;
-        $this->domisili_kodepos = $data->domisili_kodepos;
         $this->domisili_prov = $data->domisili_prov;
+        $this->domisili_kab = $data->domisili_kab;
+        $this->domisili_kec = $data->domisili_kec;
+        $this->domisili_kel = $data->domisili_kel;
+        $this->domisili_kodepos = $data->domisili_kodepos;
         $this->domisili_negara = $data->domisili_negara;
         $this->no_rumah = $data->no_rumah;
         $this->no_hp = $data->no_hp;
@@ -297,17 +448,17 @@ class PasienUmumCrud extends Component
                 'kel_id' => $this->kel_id,
                 'kec_id' => $this->kec_id,
                 'kab_id' => $this->kab_id,
-                'kodepos_id' => '41161',
+                'kodepos_id' => $this->kodepos_id,
                 'prov_id' => $this->prov_id,
                 'alamat_domisili' => $this->alamat_domisili,
                 'domisili_rt' => $this->domisili_rt,
                 'domisili_rw' => $this->domisili_rw,
-                'domisili_kel' => '1101010001',
-                'domisili_kec' => '1101010',
-                'domisili_kab' => '1101',
-                'domisili_kodepos' => '41161',
-                'domisili_prov' => '11',
-                'domisili_negara' => 'example',
+                'domisili_kel' => $this->domisili_kel,
+                'domisili_kec' => $this->domisili_kec,
+                'domisili_kab' => $this->domisili_kab,
+                'domisili_prov' => $this->domisili_prov,
+                'domisili_kodepos' => $this->domisili_kodepos,
+                'domisili_negara' => $this->domisili_negara,
                 'no_rumah' => $this->no_rumah,
                 'no_hp' => $this->no_hp,
                 'pendidikan_id' => $this->pendidikan_id,
