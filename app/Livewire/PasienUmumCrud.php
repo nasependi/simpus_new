@@ -2,18 +2,23 @@
 
 namespace App\Livewire;
 
+use DateTime;
 use Flux\Flux;
+use Throwable;
+use App\Models\Poli;
 use App\Models\Agama;
 use App\Models\Regency;
 use App\Models\Village;
 use Livewire\Component;
 use App\Models\District;
 use App\Models\Province;
+use App\Models\Kunjungan;
 use App\Models\Pekerjaan;
 use App\Models\PasienUmum;
 use App\Models\Pendidikan;
 use App\Models\JenisKelamin;
 use Livewire\WithPagination;
+use App\Models\CaraPembayaran;
 use App\Models\StatusPernikahan;
 
 
@@ -43,8 +48,13 @@ class PasienUmumCrud extends Component
 
     public $search_kelurahan, $kel_id, $kel_name, $kelurahanOptions = [];
 
-
     public $umur, $hitungan = 'tahun';
+
+    public $umur_tahun, $umur_bulan, $umur_hari, $selectedPasienId;
+    public $tanggal_kunjungan, $poli_id, $carapembayaran_id;
+    public $filterTanggal, $filterPasien, $filterPoli, $filterCara, $filterUmur;
+
+
 
     public $halaman = 1;
 
@@ -365,6 +375,8 @@ class PasienUmumCrud extends Component
             'agama' => Agama::get(),
             'pendidikan' => Pendidikan::get(),
             'pekerjaan' => Pekerjaan::get(),
+            'poli' => Poli::get(),
+            'cara_pembayaran' => CaraPembayaran::get(),
             'status_pernikahan' => StatusPernikahan::get(),
         ]);
     }
@@ -426,51 +438,134 @@ class PasienUmumCrud extends Component
 
     public function save()
     {
-        $this->validate();
+        try {
+            $this->validate();
+            //code...
+            PasienUmum::updateOrCreate(
+                ['id' => $this->editId],
+                [
+                    'nama_lengkap' => $this->nama_lengkap,
+                    'no_rekamedis' => $this->no_rekamedis,
+                    'nik' => $this->nik,
+                    'paspor' => $this->paspor,
+                    'ibu_kandung' => $this->ibu_kandung,
+                    'tempat_lahir' => $this->tempat_lahir,
+                    'tanggal_lahir' => $this->tanggal_lahir,
+                    'jk_id' => $this->jk_id,
+                    'agama_id' => $this->agama_id,
+                    'suku' => $this->suku,
+                    'bahasa_dikuasai' => $this->bahasa_dikuasai,
+                    'alamat_lengkap' => $this->alamat_lengkap,
+                    'rt' => $this->rt,
+                    'rw' => $this->rw,
+                    'kel_id' => $this->kel_id,
+                    'kec_id' => $this->kec_id,
+                    'kab_id' => $this->kab_id,
+                    'kodepos_id' => $this->kodepos_id,
+                    'prov_id' => $this->prov_id,
+                    'alamat_domisili' => $this->alamat_domisili,
+                    'domisili_rt' => $this->domisili_rt,
+                    'domisili_rw' => $this->domisili_rw,
+                    'domisili_kel' => $this->domisili_kel,
+                    'domisili_kec' => $this->domisili_kec,
+                    'domisili_kab' => $this->domisili_kab,
+                    'domisili_prov' => $this->domisili_prov,
+                    'domisili_kodepos' => $this->domisili_kodepos,
+                    'domisili_negara' => $this->domisili_negara,
+                    'no_rumah' => $this->no_rumah,
+                    'no_hp' => $this->no_hp,
+                    'pendidikan_id' => $this->pendidikan_id,
+                    'pekerjaan_id' => $this->pekerjaan_id,
+                    'statusnikah_id' => $this->statusnikah_id,
+                ]
+            );
 
-        PasienUmum::updateOrCreate(
-            ['id' => $this->editId],
-            [
-                'nama_lengkap' => $this->nama_lengkap,
-                'no_rekamedis' => $this->no_rekamedis,
-                'nik' => $this->nik,
-                'paspor' => $this->paspor,
-                'ibu_kandung' => $this->ibu_kandung,
-                'tempat_lahir' => $this->tempat_lahir,
-                'tanggal_lahir' => $this->tanggal_lahir,
-                'jk_id' => $this->jk_id,
-                'agama_id' => $this->agama_id,
-                'suku' => $this->suku,
-                'bahasa_dikuasai' => $this->bahasa_dikuasai,
-                'alamat_lengkap' => $this->alamat_lengkap,
-                'rt' => $this->rt,
-                'rw' => $this->rw,
-                'kel_id' => $this->kel_id,
-                'kec_id' => $this->kec_id,
-                'kab_id' => $this->kab_id,
-                'kodepos_id' => $this->kodepos_id,
-                'prov_id' => $this->prov_id,
-                'alamat_domisili' => $this->alamat_domisili,
-                'domisili_rt' => $this->domisili_rt,
-                'domisili_rw' => $this->domisili_rw,
-                'domisili_kel' => $this->domisili_kel,
-                'domisili_kec' => $this->domisili_kec,
-                'domisili_kab' => $this->domisili_kab,
-                'domisili_prov' => $this->domisili_prov,
-                'domisili_kodepos' => $this->domisili_kodepos,
-                'domisili_negara' => $this->domisili_negara,
-                'no_rumah' => $this->no_rumah,
-                'no_hp' => $this->no_hp,
-                'pendidikan_id' => $this->pendidikan_id,
-                'pekerjaan_id' => $this->pekerjaan_id,
-                'statusnikah_id' => $this->statusnikah_id,
-            ]
-        );
-
-        Flux::modal('pasienModal')->close();
-        Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
-        $this->resetForm();
+            Flux::modal('pasienModal')->close();
+            Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
+            $this->resetForm();
+        } catch (Throwable $th) {
+            Flux::toast(heading: 'Sukses', text: 'Data gagal disimpan.' . $th->getMessage(), variant: 'danger');
+        }
     }
+
+
+    //KUNJUNGAN
+
+    public function modalKunjungan($id)
+    {
+        $this->resetForm();
+        $pasien = PasienUmum::findOrFail($id);
+        // dd($pasien);
+        $this->selectedPasienId = $pasien->id;
+        $this->nama_lengkap = $pasien->nama_lengkap;
+        $this->hitungUmur($pasien->tanggal_lahir);
+        Flux::modal('kunjunganModal')->show();
+    }
+
+    public function hitungUmur($tanggal_lahir)
+    {
+        $tgl_lahir = new DateTime($tanggal_lahir);
+        $sekarang = new DateTime();
+        // dd($tanggal_lahir);
+
+        $diff = $sekarang->diff($tgl_lahir);
+
+        $this->umur_tahun = $diff->y;
+        $this->umur_bulan = $diff->m;
+        $this->umur_hari = $diff->d;
+    }
+
+
+    public function saveKunjungan()
+    {
+
+        try {
+            $this->validate([
+                'selectedPasienId' => 'required|exists:pasien_umum,id',
+                'tanggal_kunjungan' => 'required|date',
+                'umur_tahun' => 'required|integer|min:0',
+                'umur_bulan' => 'required|integer|min:0',
+                'umur_hari' => 'required|integer|min:0',
+                'poli_id' => 'required|exists:poli,id',
+                'carapembayaran_id' => 'required|exists:cara_pembayaran,id',
+            ]);
+            Kunjungan::updateOrCreate(
+                ['id' => $this->editId],
+                [
+                    'pasien_id' => $this->selectedPasienId,
+                    'umur_tahun' => $this->umur_tahun,
+                    'umur_bulan' => $this->umur_bulan,
+                    'umur_hari' => $this->umur_hari,
+                    'tanggal_kunjungan' => $this->tanggal_kunjungan,
+                    'poli_id' => $this->poli_id,
+                    'carapembayaran_id' => $this->carapembayaran_id,
+                ]
+            );
+
+            Flux::modal('kunjunganModal')->close();
+            Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
+            $this->resetForm();
+        } catch (Throwable $th) {
+            Flux::toast(heading: 'Sukses', text: 'Data gagal disimpan.' . $th->getMessage(), variant: 'danger');
+        }
+    }
+
+    public function getDataProperty()
+    {
+        return Kunjungan::with(['pasien', 'poli', 'caraPembayaran'])
+            ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
+            ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
+            ->when($this->filterPoli, fn($q) => $q->whereHas('poli', fn($p) => $p->where('nama', 'like', '%' . $this->filterPoli . '%')))
+            ->when($this->filterCara, fn($q) => $q->whereHas('caraPembayaran', fn($c) => $c->where('nama', 'like', '%' . $this->filterCara . '%')))
+            ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
+                $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
+                    ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
+                    ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
+            }))
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
+    }
+
 
     public function deleteConfirm($id)
     {
@@ -487,6 +582,6 @@ class PasienUmumCrud extends Component
 
     public function resetForm()
     {
-        $this->reset(['editId', 'nama_lengkap', 'no_hp', 'jk_id', 'agama_id', 'pendidikan_id', 'pekerjaan_id', 'statusnikah_id']);
+        $this->reset(['editId', 'nama_lengkap', 'no_hp', 'jk_id', 'agama_id', 'pendidikan_id', 'pekerjaan_id', 'statusnikah_id', 'umur_tahun', 'umur_bulan', 'umur_hari', 'tanggal_kunjungan', 'poli_id', 'carapembayaran_id']);
     }
 }

@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pekerjaan', function (Blueprint $table) {
+        Schema::create('cara_pembayaran', function (Blueprint $table) {
             $table->id();
-            $table->string('kode', 2);
-            $table->string('nama_pekerjaan', 30);
+            $table->string('nama'); // Contoh: Mandiri, JKN, Asuransi XYZ
+            $table->text('keterangan')->nullable();
+            $table->boolean('status')->default(true); // Aktif/Nonaktif
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pekerjaan');
+        Schema::dropIfExists('cara_pembayaran');
     }
 };

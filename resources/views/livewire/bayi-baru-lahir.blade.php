@@ -5,14 +5,16 @@
             <div class="flex gap-4 items-center">
                 <flux:input wire:model.live="search" placeholder="Cari nama bayi..." icon="magnifying-glass"
                     size="md" />
-                <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                @can('tambah')
+                    <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                @endcan
             </div>
         </div>
 
         <flux:table :paginate="$data">
             <flux:table.columns>
                 <flux:table.column>Nama Bayi</flux:table.column>
-                <flux:table.column>NIK Ibuk</flux:table.column>
+                <flux:table.column>NIK Ibu</flux:table.column>
                 <flux:table.column>No. Rekam Medis</flux:table.column>
                 <flux:table.column>Tempat Lahir</flux:table.column>
                 <flux:table.column>Tanggal Lahir</flux:table.column>
@@ -28,14 +30,21 @@
                         <flux:table.cell>{{ $item->nik_ibuk }}</flux:table.cell>
                         <flux:table.cell>{{ $item->no_rekamedis }}</flux:table.cell>
                         <flux:table.cell>{{ $item->tempat_lahir }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->tanggal_lahir }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->jam_lahir }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->jenisKelamin->nama_jk}}</flux:table.cell>
+                        <flux:table.cell>{{ \Carbon\Carbon::parse($item->tanggal_lahir)->translatedFormat('l, d F Y') }}
+                        </flux:table.cell>
                         <flux:table.cell>
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
-                                class="mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
-                                variant="danger" />
+                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->jam_lahir)->format('H:i') }} WIB
+                        </flux:table.cell>
+                        <flux:table.cell>{{ $item->jenisKelamin->nama_jk }}</flux:table.cell>
+                        <flux:table.cell>
+                            @can('edit')
+                                <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
+                                    class="mr-2" />
+                            @endcan
+                            @can('hapus')
+                                <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
+                                    variant="danger" />
+                            @endcan
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

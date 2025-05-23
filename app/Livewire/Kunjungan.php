@@ -1,0 +1,184 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Kunjungan as KunjunganModel;
+use App\Models\PasienUmum;
+use App\Models\Poli;
+use App\Models\CaraPembayaran as CaraPembayaranModel;
+use Flux\Flux;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+class Kunjungan extends Component
+{
+    use WithPagination;
+
+    public $pasien_id, $poli_id, $carapembayaran_id, $tanggal_kunjungan, $umur;
+    public $editId = null;
+    public $deleteId = null;
+    public $search = '';
+    public $sortField = 'tanggal_kunjungan';
+    public $sortDirection = 'desc';
+
+    // Data referensi dropdown
+    public $listPasien = [];
+    public $listPoli = [];
+    public $listCaraPembayaran = [];
+
+    public $filterTanggal;
+    public $filterPasien;
+    public $filterUmur;
+    public $filterPoli = '';
+    public $filterCara = '';
+
+
+
+    protected $rules = [
+        'pasien_id' => 'required|exists:pasien_umum,id',
+        'poli_id' => 'required|exists:poli,id',
+        'carapembayaran_id' => 'required|exists:cara_pembayaran,id',
+        'tanggal_kunjungan' => 'required|date',
+        'umur' => 'required|integer|min:0',
+    ];
+
+    public function mount()
+    {
+        $this->loadReferences();
+    }
+
+    public function loadReferences()
+    {
+        $this->listPasien = PasienUmum::orderBy('nama_lengkap')->get();
+        $this->listPoli = Poli::orderBy('nama')->get();
+        $this->listCaraPembayaran = CaraPembayaranModel::orderBy('nama')->get();
+    }
+
+    public function render()
+    {
+        $query = KunjunganModel::with(['pasien', 'poli', 'caraPembayaran'])
+            ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
+            ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
+            ->when($this->filterPoli, fn($q) => $q->where('poli_id', $this->filterPoli))
+            ->when($this->filterCara, fn($q) => $q->where('cara_pembayaran_id', $this->filterCara))
+            ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
+                $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
+                    ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
+                    ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
+            }))
+            ->orderBy($this->sortField, $this->sortDirection);
+
+        $data = $query->paginate(10);
+
+        return view('livewire.kunjungan', [
+            'data' => $data,
+            'poliList' => \App\Models\Poli::pluck('nama', 'id')->toArray(),
+            'caraPembayaranList' => \App\Models\CaraPembayaran::pluck('nama', 'id')->toArray(),
+        ]);
+    }
+
+
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    public function updated($property)
+    {
+        $this->resetPage(); // agar pagination tetap sinkron
+    }
+
+
+    // public function getDataProperty()
+    // {
+
+    //     dd($this->filterTanggal);
+    //     return Kunjungan::with(['pasien', 'poli', 'caraPembayaran'])
+    //         ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
+    //         ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
+    //         ->when($this->filterPoli, fn($q) => $q->whereHas('poli', fn($p) => $p->where('nama', 'like', '%' . $this->filterPoli . '%')))
+    //         ->when($this->filterCara, fn($q) => $q->whereHas('caraPembayaran', fn($c) => $c->where('nama', 'like', '%' . $this->filterCara . '%')))
+    //         ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
+    //             $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
+    //                 ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
+    //                 ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
+    //         }))
+    //         ->orderBy($this->sortField, $this->sortDirection)
+    //         ->paginate(10);
+    // }
+
+
+    public function modalKunjungan($id)
+    {
+        $this->resetForm();
+        $this->loadReferences();
+        Flux::modal('kunjunganModal')->show();
+    }
+
+    public function edit($id)
+    {
+        $item = KunjunganModel::findOrFail($id);
+        $this->editId = $item->id;
+        $this->pasien_id = $item->pasien_id;
+        $this->poli_id = $item->poli_id;
+        $this->carapembayaran_id = $item->carapembayaran_id;
+        $this->tanggal_kunjungan = $item->tanggal_kunjungan->format('Y-m-d');
+        $this->umur = $item->umur;
+
+        $this->loadReferences();
+        Flux::modal('kunjunganModal')->show();
+    }
+
+    public function save()
+    {
+        $this->validate();
+
+        try {
+            KunjunganModel::updateOrCreate(
+                ['id' => $this->editId],
+                [
+                    'pasien_id' => $this->pasien_id,
+                    'poli_id' => $this->poli_id,
+                    'carapembayaran_id' => $this->carapembayaran_id,
+                    'tanggal_kunjungan' => $this->tanggal_kunjungan,
+                    'umur' => $this->umur,
+                ]
+            );
+
+            Flux::modal('kunjunganModal')->close();
+            Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
+            $this->resetForm();
+        } catch (\Exception $e) {
+            Flux::toast(heading: 'Gagal', text: 'Terjadi kesalahan saat menyimpan data.', variant: 'destructive');
+        }
+    }
+
+    public function deleteConfirm($id)
+    {
+        $this->deleteId = $id;
+        Flux::modal('delete-kunjungan')->show();
+    }
+
+    public function delete()
+    {
+        try {
+            KunjunganModel::findOrFail($this->deleteId)->delete();
+            Flux::toast(heading: 'Terhapus', text: 'Data berhasil dihapus.', variant: 'success');
+        } catch (\Exception $e) {
+            Flux::toast(heading: 'Gagal', text: 'Gagal menghapus data.', variant: 'destructive');
+        }
+
+        Flux::modal('delete-kunjungan')->close();
+    }
+
+    public function resetForm()
+    {
+        $this->reset(['pasien_id', 'poli_id', 'carapembayaran_id', 'tanggal_kunjungan', 'umur', 'editId']);
+    }
+}

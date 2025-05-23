@@ -17,15 +17,21 @@
       <flux:navlist.group :heading="__('Platform')" class="grid">
         <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
           wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-        <flux:navlist.item href="{{ route('pasien-umum') }}" :active="request()->routeIs('pasien-umum')" icon="user">
+        <flux:navlist.item href="{{ route('pasien-umum') }}" :active="request()->routeIs('pasien-umum')"
+          icon="user">
           Pasien Umum</flux:navlist.item>
-        <flux:navlist.item href="{{ route('bayi-baru-lahir') }}" :active="request()->routeIs('bayi-baru-lahir')" icon="heart">
+        <flux:navlist.item href="{{ route('bayi-baru-lahir') }}" :active="request()->routeIs('bayi-baru-lahir')"
+          icon="heart">
           Bayi Baru Lahir</flux:navlist.item>
+          <flux:navlist.item href="{{ route('kunjungan') }}" :active="request()->routeIs('kunjungan')"
+          icon="user">
+          Kunjungan</flux:navlist.item>
       </flux:navlist.group>
     </flux:navlist>
 
     <flux:spacer />
 
+    @role('admin')
     <flux:navlist variant="outline">
       <flux:navlist.group expandable heading="Kategori" class="grid">
         <flux:navlist.item href="{{ route('jenis-kelamin') }}">Jenis Kelamin</flux:navlist.item>
@@ -33,21 +39,26 @@
         <flux:navlist.item href="{{ route('pendidikan') }}">Pendidikan</flux:navlist.item>
         <flux:navlist.item href="{{ route('pekerjaan') }}">Pekerjaan</flux:navlist.item>
         <flux:navlist.item href="{{ route('status-pernikahan') }}">Status Pernikahan</flux:navlist.item>
+        <flux:navlist.item href="{{ route('poli') }}">Poli</flux:navlist.item>
+        <flux:navlist.item href="{{ route('cara') }}">Cara Pembayaran</flux:navlist.item>
       </flux:navlist.group>
 
       <flux:navlist.group expandable heading="Manajemen Akses" class="grid">
-        <flux:navlist.item :href="route('userscrud')" :current="request()->routeIs('userscrud.*')" wire:navigate>Users
+        <flux:navlist.item :href="route('userscrud')" :current="request()->routeIs('userscrud.*')"
+          wire:navigate>Users
         </flux:navlist.item>
         <flux:navlist.item :href="route('roles')" :current="request()->routeIs('roles.*')" wire:navigate>Role
         </flux:navlist.item>
-        <flux:navlist.item :href="route('permissions')" :current="request()->routeIs('permissions.*')" wire:navigate>
+        <flux:navlist.item :href="route('permissions')" :current="request()->routeIs('permissions.*')"
+          wire:navigate>
           Permission</flux:navlist.item>
       </flux:navlist.group>
     </flux:navlist>
+    @endrole
 
     <!-- Desktop User Menu -->
     <flux:dropdown position="bottom" align="start">
-      <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
+      <flux:profile :name="auth()-> user()->name" :initials="auth()->user()->initials()"
         icon-trailing="chevrons-up-down" />
 
       <flux:menu class="w-[220px]">
@@ -72,7 +83,8 @@
         <flux:menu.separator />
 
         <flux:menu.radio.group>
-          <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}
+          <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+            {{ __('Settings') }}
           </flux:menu.item>
         </flux:menu.radio.group>
 
@@ -119,7 +131,8 @@
         <flux:menu.separator />
 
         <flux:menu.radio.group>
-          <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}
+          <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+            {{ __('Settings') }}
           </flux:menu.item>
         </flux:menu.radio.group>
 

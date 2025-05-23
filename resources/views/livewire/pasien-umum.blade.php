@@ -4,7 +4,9 @@
             <flux:heading size="xl">Data Pasien Umum</flux:heading>
             <div class="flex gap-4 items-center">
                 <flux:input wire:model.live="search" placeholder="Cari pasien..." size="md" />
-                <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                @can('tambah')
+                    <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                @endcan
             </div>
         </div>
 
@@ -21,6 +23,7 @@
                 <flux:table.column>Jenis Kelamin</flux:table.column>
                 <flux:table.column>Agama</flux:table.column>
                 <flux:table.column>Aksi</flux:table.column>
+                <flux:table.column>Kunjungan</flux:table.column>
 
             </flux:table.columns>
 
@@ -33,9 +36,58 @@
                         <flux:table.cell>{{ $item->jenisKelamin->nama_jk }}</flux:table.cell>
                         <flux:table.cell>{{ $item->agama->nama_agama }}</flux:table.cell>
                         <flux:table.cell>
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
-                                variant="danger" />
+                            @can('edit')
+                                <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" />
+                            @endcan
+                            @can('hapus')
+                                <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
+                                    variant="danger" />
+                            @endcan
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <flux:button wire:click="modalKunjungan({{ $item->id }})">Kunjungan</flux:button>
+
+                            <flux:modal name="kunjunganModal" class="space-y-4 md:w-[90rem]">
+                                <flux:heading class="text-lg font-semibold">
+                                    {{ $editId ? 'Edit' : 'Tambah' }} Kunjungan
+                                </flux:heading>
+
+                                <flux:input label="Nama" disabled wire:model="nama_lengkap" />
+                                <div class="grid grid-cols-3 gap-3">
+                                    <flux:input wire:model="umur_tahun" label="Umur Tahun" type="number"
+                                        required />
+                                    <flux:input wire:model="umur_bulan" label="Umur Bulan" type="number"
+                                        required />
+                                    <flux:input wire:model="umur_hari" label="Umur Hari" type="number"
+                                        required />
+                                </div>
+
+                                <flux:input wire:model="tanggal_kunjungan" label="Tanggal Kunjungan" type="date"
+                                    required />
+
+                                <flux:select wire:model="poli_id" label="Poli" required>
+                                    <flux:select.option value="">Pilih Poli</flux:select.option>
+                                    @foreach ($poli as $pol)
+                                        <flux:select.option value="{{ $pol->id }}">{{ $pol->nama }}
+                                        </flux:select.option>
+                                    @endforeach
+                                </flux:select>
+
+                                <flux:select wire:model="carapembayaran_id" label="Cara Pembayaran" required>
+                                    <flux:select.option value="">Pilih Cara Pembayaran</flux:select.option>
+                                    @foreach ($cara_pembayaran as $em)
+                                        <flux:select.option value="{{ $em->id }}">{{ $em->nama }}
+                                        </flux:select.option>
+                                    @endforeach
+                                </flux:select>
+
+                                <div class="flex justify-end gap-2">
+                                    <flux:modal.close>
+                                        <flux:button variant="ghost">Batal</flux:button>
+                                    </flux:modal.close>
+                                    <flux:button wire:click="saveKunjungan" variant="primary">Simpan</flux:button>
+                                </div>
+                            </flux:modal>
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach
@@ -180,8 +232,8 @@
                         </div>
                     @endif
                     <flux:input wire:model="kodepos_id" label="Kode Pos" required />
-                    @endif
-                    @if ($halaman === 3)
+                @endif
+                @if ($halaman === 3)
                     <flux:input wire:model="alamat_domisili" label="Alamat Domisili" required />
                     <div class="grid grid-cols-2 gap-3 item-center">
                         <flux:input wire:model="domisili_rt" label="Domisil RT" required />
