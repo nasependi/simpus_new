@@ -34,8 +34,10 @@
                             </span>
                         </flux:table.cell>
                         <flux:table.cell>
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
+                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
+                                class="mr-2" />
+                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
+                                variant="danger" />
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach
@@ -77,4 +79,3 @@
         </flux:modal>
     </flux:card>
 </div>
-x

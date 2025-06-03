@@ -20,8 +20,8 @@ class CreateProvincesTables extends Migration
      */
     public function up()
     {
-        Schema::create('provinces', function (Blueprint $table) {
-            $table->char('id', 2)->primary();
+        Schema::create('provinces', function(Blueprint $table){
+            $table->char('id', 2)->index();
             $table->string('name');
         });
     }

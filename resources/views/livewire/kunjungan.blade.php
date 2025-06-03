@@ -65,6 +65,9 @@
                             {{ $item->umur_tahun }} th, {{ $item->umur_bulan }} bln, {{ $item->umur_hari }} hr
                         </flux:table.cell>
                         <flux:table.cell>
+                            <flux:button
+                                wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })"
+                                icon="clipboard" label="Consent" />
                             <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
                                 class="mr-2" />
                             <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
@@ -74,6 +77,8 @@
                 @endforeach
             </flux:table.rows>
         </flux:table>
+
+        {{-- <livewire:General-Consent /> --}}
 
         {{-- Modal Tambah/Edit --}}
         <flux:modal name="kunjunganModal" class="space-y-4 md:w-[50rem]">
@@ -140,4 +145,5 @@
             </div>
         </flux:modal>
     </flux:card>
+    <livewire:general-consent />
 </div>
