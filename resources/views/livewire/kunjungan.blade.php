@@ -92,6 +92,7 @@
                     @if ($kunjungan_id)
                         @livewire('anamnesis', ['kunjungan_id' => $kunjungan_id])
                         @livewire('pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                        @livewire('pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
                     @endif
                 </flux:tab.panel>
                 <flux:tab.panel name="pemeriksaan">
