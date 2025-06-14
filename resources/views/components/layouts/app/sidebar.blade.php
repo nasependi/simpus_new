@@ -41,6 +41,7 @@
         <flux:navlist.item href="{{ route('status-pernikahan') }}">Status Pernikahan</flux:navlist.item>
         <flux:navlist.item href="{{ route('poli') }}">Poli</flux:navlist.item>
         <flux:navlist.item href="{{ route('cara') }}">Cara Pembayaran</flux:navlist.item>
+        <flux:navlist.item href="{{ route('tingkat-kesadaran') }}">Tingkat Kesadaran</flux:navlist.item>
       </flux:navlist.group>
 
       <flux:navlist.group expandable heading="Manajemen Akses" class="grid">

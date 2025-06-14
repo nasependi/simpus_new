@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Livewire\PersetujuanTindakanForm;
 use App\Livewire\Poli;
 use App\Livewire\Agama;
 use Livewire\Volt\Volt;
@@ -18,6 +19,8 @@ use App\Livewire\BayiBaruLahirIndex;
 use App\Livewire\Auth\PermissionCrud;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\StatusPernikahan as LivewireStatusPernikahan;
+use App\Livewire\TingkatKesadaran as LivewireTingkatKesadaran;
+use App\Models\TingkatKesadaran;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/status-pernikahan', LivewireStatusPernikahan::class)->name('status-pernikahan');
     Route::get('/poli', Poli::class)->name('poli');
     Route::get('/cara-pembayaran', CaraPembayaran::class)->name('cara');
+    Route::get('/tingkat-kesadaran', LivewireTingkatKesadaran::class)->name('tingkat-kesadaran');
+    // Route::get('/persetujuantindakan', PersetujuanTindakanForm::class)->name('persetujuantindakan');
 
 
 

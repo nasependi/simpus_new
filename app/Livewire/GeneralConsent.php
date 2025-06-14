@@ -2,20 +2,25 @@
 
 namespace App\Livewire;
 
-use App\Models\GeneralConsent as ModelsGeneralConsent;
-use App\Models\Kunjungan;
 use Flux\Flux;
+use Throwable;
 use Livewire\Component;
+use App\Models\Kunjungan;
 use App\Models\PasienUmum;
 use Livewire\Attributes\On;
-use Livewire\Volt\Compilers\Mount;
 use Livewire\WithPagination;
+use Livewire\Volt\Compilers\Mount;
+use App\Models\GeneralConsent as ModelsGeneralConsent;
 
 class GeneralConsent extends Component
 {
     use WithPagination;
 
-    protected $listeners = ['open-modal-generalconsent' => 'openModal'];
+    protected $listeners = [
+        'open-modal-generalconsent' => 'openModal',
+        'cetak-generalconsent' => 'cetakConsent',
+    ];
+
     public $search = '';
     public $editId, $deleteId, $data, $nama_pasien;
 
@@ -30,7 +35,11 @@ class GeneralConsent extends Component
     public $showModal = false;
     public $kunjungan_id;
 
-
+    public function mount()
+    {
+        $this->tanggal = now()->format('Y-m-d');
+        $this->jam = now()->setTimezone('Asia/Jakarta')->format('H:i');
+    }
     public function render()
     {
 
@@ -45,6 +54,7 @@ class GeneralConsent extends Component
         if ($kunjungan_id != null) {
             $pasien = Kunjungan::with('pasien')->where('id', $kunjungan_id)->first();
             $this->nama_pasien = $pasien->pasien->nama_lengkap;
+            $this->kunjungan_id = $kunjungan_id;
             $this->showModal = true;
             Flux::modal('consentModal')->show();
         } else {
@@ -74,22 +84,42 @@ class GeneralConsent extends Component
 
     public function save()
     {
-        $this->validate([
-            'pasien_id' => 'required|exists:pasien_umum,id',
-            'tanggal' => 'required|date',
-            'jam' => 'required',
-            'penanggung_jawab' => 'required|string',
-            'petugas_pemberi_penjelasan' => 'required|string',
-        ]);
+        try {
+            $validated = $this->validate([
+                'kunjungan_id' => 'required|exists:kunjungan,id',
+                'tanggal' => 'required|date',
+                'jam' => 'required',
+                'persetujuan_pasien' => 'nullable|boolean',
+                'informasi_ketentuan_pembayaran' => 'nullable|boolean',
+                'informasi_hak_kewajiban' => 'nullable|boolean',
+                'informasi_tata_tertib_rs' => 'nullable|boolean',
+                'kebutuhan_penerjemah_bahasa' => 'nullable|boolean',
+                'kebutuhan_rohaniawan' => 'nullable|boolean',
+                'kerahasiaan_informasi' => 'nullable|boolean',
+                'pemeriksaan_ke_pihak_penjamin' => 'nullable|boolean',
+                'pemeriksaan_diakses_peserta_didik' => 'nullable|boolean',
+                'anggota_keluarga_dapat_akses' => 'nullable|string',
+                'akses_fasyankes_rujukan' => 'nullable|boolean',
+                'penanggung_jawab' => 'required|string',
+                'petugas_pemberi_penjelasan' => 'required|string',
+            ]);
 
-        ModelsGeneralConsent::updateOrCreate(
-            ['id' => $this->editId],
-            $this->getPublicVars()
-        );
+            ModelsGeneralConsent::updateOrCreate(
+                ['id' => $this->editId],
+                $validated
+            );
 
-        Flux::modal('consentModal')->close();
-        Flux::toast('Berhasil', 'Data General Consent disimpan.', 'success');
-        $this->resetForm();
+            Flux::modal('consentModal')->close();
+            Flux::toast('Berhasil', 'Data General Consent disimpan.', 'success');
+
+            $this->resetForm();
+        } catch (Throwable $th) {
+            Flux::toast(
+                heading: 'Gagal',
+                text: 'Data General Consent gagal disimpan. ' . $th->getMessage(),
+                variant: 'danger'
+            );
+        }
     }
 
     public function deleteConfirm($id)
@@ -126,12 +156,5 @@ class GeneralConsent extends Component
             'petugas_pemberi_penjelasan',
             'editId'
         ]);
-    }
-
-    protected function getPublicVars()
-    {
-        return collect(get_object_vars($this))
-            ->filter(fn($_, $key) => in_array($key, (new GeneralConsent)->getFillable()))
-            ->toArray();
     }
 }

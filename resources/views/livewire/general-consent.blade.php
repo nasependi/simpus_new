@@ -11,22 +11,89 @@
             <flux:input wire:model="jam" label="Jam" type="time" required />
         </div>
 
+        <div class="text-sm space-y-3">
+            <!-- Judul -->
+            <div class="grid grid-cols-[10px_1fr]">
+                <div></div>
+                <flux:switch wire:model="persetujuan_pasien" label="Persetujuan Pasien" />
+            </div>
 
-        {{-- Gunakan switch untuk setiap opsi --}}
-        <flux:switch wire:model="persetujuan_pasien" label="Persetujuan Pasien" />
-        <flux:switch wire:model="informasi_ketentuan_pembayaran" label="Informasi Ketentuan Pembayaran" />
-        <flux:switch wire:model="informasi_hak_kewajiban" label="Informasi tentang Hak dan Kewajiban Pasien" />
-        <flux:switch wire:model="informasi_tata_tertib_rs" label="Informasi tentang Tata Tertib RS" />
-        <flux:switch wire:model="kebutuhan_penerjemah_bahasa" label="Kebutuhan Penterjemah Bahasa" />
-        <flux:switch wire:model="kebutuhan_rohaniawan" label="Kebutuhan Rohaniawan" />
-        <flux:switch wire:model="kerahasiaan_informasi" label="Pelepasan Informasi / Kerahasiaan Informasi" />
-        <flux:switch wire:model="pemeriksaan_ke_pihak_penjamin"
-            label="Hasil Pemeriksaan Penunjang dapat Diberikan kepada Pihak Penjamin" />
-        <flux:switch wire:model="pemeriksaan_diakses_peserta_didik"
-            label="Hasil Pemeriksaan Penunjang dapat Diakses oleh Peserta Didik" />
-        <flux:input wire:model="anggota_keluarga_dapat_akses"
-            label="Anggota Keluarga Lain yang dapat Diberikan Informasi Datadata Pasien" />
-        <flux:switch wire:model="akses_fasyankes_rujukan" label="Fasyankes tertentu dalam rangka rujukan" />
+            <!-- a -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <flux:switch wire:model="informasi_ketentuan_pembayaran" label="Informasi Ketentuan Pembayaran" />
+            </div>
+
+            <!-- b -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <flux:switch wire:model="informasi_hak_kewajiban" label="Informasi tentang Hak dan Kewajiban Pasien" />
+            </div>
+
+            <!-- c -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <flux:switch wire:model="informasi_tata_tertib_rs" label="Informasi tentang Tata Tertib RS" />
+            </div>
+
+            <!-- d -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <flux:switch wire:model="kebutuhan_penerjemah_bahasa" label="Kebutuhan Penterjemah Bahasa" />
+            </div>
+
+            <!-- e -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <flux:switch wire:model="kebutuhan_rohaniawan" label="Kebutuhan Rohaniawan" />
+            </div>
+            
+            <!-- f -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <flux:switch wire:model="kerahasiaan_informasi" label="Kerahasiaan Informasi" />
+            </div>
+
+            <!-- f.1 -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                    <div></div>
+                    <flux:switch wire:model="pemeriksaan_ke_pihak_penjamin"
+                        label="Hasil Pemeriksaan Penunjang dapat Diberikan kepada Pihak Penjamin" />
+                </div>
+            </div>
+
+            <!-- f.2 -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                    <div></div>
+                    <flux:switch wire:model="pemeriksaan_diakses_peserta_didik"
+                        label="Hasil Pemeriksaan Penunjang dapat Diakses oleh Peserta Didik" />
+                </div>
+            </div>
+
+            <!-- f.3 -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                    <div></div>
+                    <flux:input wire:model="anggota_keluarga_dapat_akses"
+                        label="Anggota Keluarga Lain yang dapat Diberikan Informasi Data-data Pasien" />
+                </div>
+            </div>
+
+            <!-- f.4 -->
+            <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                <div></div>
+                <div class="grid grid-cols-[20px_1fr] items-start gap-2">
+                    <div></div>
+                    <flux:switch wire:model="akses_fasyankes_rujukan" label="Fasyankes tertentu dalam rangka rujukan" />
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-2 items-center">
             <flux:input wire:model="penanggung_jawab" label="Penanggung Jawab" />
             <flux:input wire:model="petugas_pemberi_penjelasan" label="Petugas yang wPemberi Penjelasan" />

@@ -39,4 +39,8 @@ class Kunjungan extends Model
     {
         return $this->belongsTo(CaraPembayaran::class, 'carapembayaran_id');
     }
+    public function generalConsent()
+    {
+        return $this->hasOne(GeneralConsent::class);
+    }
 }

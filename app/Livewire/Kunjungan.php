@@ -2,19 +2,22 @@
 
 namespace App\Livewire;
 
-use App\Models\Kunjungan as KunjunganModel;
-use App\Models\PasienUmum;
-use App\Models\Poli;
-use App\Models\CaraPembayaran as CaraPembayaranModel;
 use Flux\Flux;
+use App\Models\Poli;
 use Livewire\Component;
+use App\Models\PasienUmum;
 use Livewire\WithPagination;
+use App\Models\GeneralConsent;
+use App\Models\TingkatKesadaran;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Kunjungan as KunjunganModel;
+use App\Models\CaraPembayaran as CaraPembayaranModel;
 
 class Kunjungan extends Component
 {
     use WithPagination;
 
-    public $pasien_id, $poli_id, $carapembayaran_id, $tanggal_kunjungan, $umur;
+    public $pasien_id, $poli_id, $carapembayaran_id, $tanggal_kunjungan, $umur, $kunjungan_id, $tingkatkesadaran_id;
     public $editId = null;
     public $deleteId = null;
     public $search = '';
@@ -25,6 +28,7 @@ class Kunjungan extends Component
     public $listPasien = [];
     public $listPoli = [];
     public $listCaraPembayaran = [];
+    public $listDaftarKesadaran = [];
 
     public $filterTanggal;
     public $filterPasien;
@@ -52,6 +56,7 @@ class Kunjungan extends Component
         $this->listPasien = PasienUmum::orderBy('nama_lengkap')->get();
         $this->listPoli = Poli::orderBy('nama')->get();
         $this->listCaraPembayaran = CaraPembayaranModel::orderBy('nama')->get();
+        $this->listDaftarKesadaran = TingkatKesadaran::orderBy('keterangan')->get();
     }
 
     public function render()
@@ -60,7 +65,7 @@ class Kunjungan extends Component
             ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
             ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
             ->when($this->filterPoli, fn($q) => $q->where('poli_id', $this->filterPoli))
-            ->when($this->filterCara, fn($q) => $q->where('cara_pembayaran_id', $this->filterCara))
+            ->when($this->filterCara, fn($q) => $q->where('carapembayaran_id', $this->filterCara))
             ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
                 $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
                     ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
@@ -74,6 +79,8 @@ class Kunjungan extends Component
             'data' => $data,
             'poliList' => \App\Models\Poli::pluck('nama', 'id')->toArray(),
             'caraPembayaranList' => \App\Models\CaraPembayaran::pluck('nama', 'id')->toArray(),
+            'daftarKesadaran' => \App\Models\TingkatKesadaran::pluck('keterangan', 'id')->toArray(),
+
         ]);
     }
 
@@ -94,26 +101,6 @@ class Kunjungan extends Component
         $this->resetPage(); // agar pagination tetap sinkron
     }
 
-
-    // public function getDataProperty()
-    // {
-
-    //     dd($this->filterTanggal);
-    //     return Kunjungan::with(['pasien', 'poli', 'caraPembayaran'])
-    //         ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
-    //         ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
-    //         ->when($this->filterPoli, fn($q) => $q->whereHas('poli', fn($p) => $p->where('nama', 'like', '%' . $this->filterPoli . '%')))
-    //         ->when($this->filterCara, fn($q) => $q->whereHas('caraPembayaran', fn($c) => $c->where('nama', 'like', '%' . $this->filterCara . '%')))
-    //         ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
-    //             $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
-    //                 ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
-    //                 ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
-    //         }))
-    //         ->orderBy($this->sortField, $this->sortDirection)
-    //         ->paginate(10);
-    // }
-
-
     public function modalKunjungan($id)
     {
         $this->resetForm();
@@ -133,6 +120,27 @@ class Kunjungan extends Component
 
         $this->loadReferences();
         Flux::modal('kunjunganModal')->show();
+    }
+
+    public function cetakConsent($kunjunganId)
+    {
+        $consent = GeneralConsent::with('kunjungan.pasien')
+            ->where('kunjungan_id', $kunjunganId)
+            ->firstOrFail();
+
+        $pdf = Pdf::loadView('pdf.general_consent', compact('consent'));
+
+        return response()->streamDownload(
+            fn() => print($pdf->output()),
+            'general-consent-' . $kunjunganId . '.pdf'
+        );
+    }
+
+    public function openModalkunjungan($id)
+    {
+        $this->kunjungan_id = $id;
+        // dd($this->kunjungan_id);
+        Flux::modal('modalPemeriksaan')->show();
     }
 
     public function save()

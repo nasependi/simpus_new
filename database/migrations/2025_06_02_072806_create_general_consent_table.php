@@ -40,6 +40,9 @@ return new class extends Migration
             $table->string('penanggung_jawab');
             $table->string('petugas_pemberi_penjelasan');
 
+            $table->text('td_petugas');
+            $table->text('td_penanggung_jawab');
+
             $table->timestamps();
         });
     }
