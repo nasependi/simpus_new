@@ -25,7 +25,6 @@ class FormPersetujuanTindakan extends Component
 
     public function save()
     {
-        dd($this->testing);
 
         try {
 
@@ -43,7 +42,7 @@ class FormPersetujuanTindakan extends Component
                 Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
             }
 
-            return redirect()->route('persetujuan-tindakan.index');
+            // return redirect()->route('persetujuan-tindakan');
         } catch (Exception $e) {
             Flux::toast(heading: 'Gagal', text: 'Data tidak berhasil disimpan. ' . $e->getMessage(), variant: 'danger');
         }

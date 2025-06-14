@@ -139,7 +139,6 @@ class Kunjungan extends Component
     public function openModalkunjungan($id)
     {
         $this->kunjungan_id = $id;
-        // dd($this->kunjungan_id);
         Flux::modal('modalPemeriksaan')->show();
     }
 

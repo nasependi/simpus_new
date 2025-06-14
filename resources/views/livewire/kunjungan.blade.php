@@ -26,8 +26,7 @@
             </flux:table.columns>
             <flux:table.columns>
                 <flux:table.column>
-                    <flux:input type="date" size="sm" wire:model.live="filterTanggal"
-                        placeholder="Cari berdasarkan..." />
+                    <flux:input type="date" size="sm" wire:model.live="filterTanggal" placeholder="Cari berdasarkan..." />
                 </flux:table.column>
                 <flux:table.column>
                     <flux:input size="sm" wire:model.live="filterPasien" placeholder="Cari berdasarkan..." />
@@ -66,20 +65,14 @@
                         </flux:table.cell>
                         <flux:table.cell>
                             @if ($item->generalConsent)
-                                <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer"
-                                    label="Cetak Consent" class="mr-2" />
-                                <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="user"
-                                    label="Pemeriksaan" class="mr-2" />
+                                <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
+                                <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="user" label="Pemeriksaan" class="mr-2" />
                             @else
-                                <flux:button
-                                    wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })"
-                                    icon="clipboard" label="Consent" class="mr-2" />
+                                <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
                             @endif
 
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
-                                class="mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
-                                variant="danger" />
+                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
+                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
                         </flux:table.cell>
 
                     </flux:table.row>
@@ -96,12 +89,16 @@
                 </flux:tabs>
 
                 <flux:tab.panel name="awal">
-                    @livewire('anamnesis', ['kunjungan_id' => $kunjungan_id])
-                    @livewire('pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                    @if ($kunjungan_id)
+                        @livewire('anamnesis', ['kunjungan_id' => $kunjungan_id])
+                        @livewire('pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                    @endif
                 </flux:tab.panel>
                 <flux:tab.panel name="pemeriksaan">
-                    @livewire('pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
-                    @livewire('pemeriksaan.form-persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
+                    @if ($kunjungan_id)
+                        @livewire('pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
+                        @livewire('pemeriksaan.form-persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
+                    @endif
 
                     {{-- @livewire('pemeriksaan.form-persetujuan-tindakan', ['k_id' => $kunjungan_id]) --}}
                 </flux:tab.panel>

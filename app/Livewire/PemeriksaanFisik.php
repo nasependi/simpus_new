@@ -4,16 +4,21 @@ namespace App\Livewire;
 
 use App\Models\PemeriksaanFisik as ModelPemeriksaanFisik;
 use App\Models\TingkatKesadaran;
+use Flux\Flux;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class PemeriksaanFisik extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     public $search = '';
     public $perPage = 10;
     public $Kunjungan_id;
+    public $tingkatKesadaranOptions = [];
+    public $tingkat_kesadaran = '';
+    public $gambar_anatomitubuh;
 
     public $form = [
         'kunjungan_id' => '',
@@ -97,28 +102,32 @@ class PemeriksaanFisik extends Component
         $this->editingId = null;
     }
 
-    public function store()
+    public function save()
     {
         $this->form['kunjungan_id'] = $this->Kunjungan_id;
         $this->validate([
             'form.kunjungan_id' => 'required|exists:kunjungan,id',
             'form.tingkatkesadaran_id' => 'required|exists:tingkat_kesadaran,id',
-            'form.gambar_anatomitubuh' => 'required',
+            'gambar_anatomitubuh' => 'required|image|max:2048', // max 2MB
             'form.denyut_jantung' => 'required',
             // validasi lainnya bisa ditambahkan jika dibutuhkan
         ]);
-
         try {
+            if ($this->gambar_anatomitubuh) {
+                // Simpan file saat tombol Save diklik
+                $path = $this->gambar_anatomitubuh->store('anatomi', 'public');
+                $this->form['gambar_anatomitubuh'] = $path;
+            }
             if ($this->editingId) {
                 ModelPemeriksaanFisik::findOrFail($this->editingId)->update($this->form);
-                session()->flash('success', 'Data berhasil diperbarui.');
+                Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
             } else {
                 ModelPemeriksaanFisik::create($this->form);
-                session()->flash('success', 'Data berhasil disimpan.');
+                Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
             }
             $this->closeModal();
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Flux::toast(heading: 'Error', text: 'Terjadi kesalahan: ' . $e->getMessage(), variant: 'danger');
         }
     }
 
@@ -140,16 +149,23 @@ class PemeriksaanFisik extends Component
         }
     }
 
-    public function updatedFormTingkatkesadaranId($value)
+    public function updatedTingkatKesadaran($value)
     {
         // Autocomplete logic jika diperlukan
+        $this->tingkatKesadaranOptions = TingkatKesadaran::where('keterangan', 'like', '%' . $value . '%')
+            ->limit(10)
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+                'keterangan' => $item->keterangan,
+            ])->toArray();
     }
 
-    public function searchKesadaran($query)
+    public function selectTingkatKesadaran($id, $keterangan)
+
     {
-        $this->autocomplete = TingkatKesadaran::where('keterangan', 'like', "%$query%")
-            ->limit(5)
-            ->get()
-            ->toArray();
+        $this->form['tingkatkesadaran_id'] = $id;
+        $this->tingkat_kesadaran = $keterangan;
+        $this->tingkatKesadaranOptions = []; // clear opsi
     }
 }

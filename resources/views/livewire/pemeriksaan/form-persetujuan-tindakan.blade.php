@@ -2,6 +2,7 @@
         <flux:card class="shadow-lg rounded-lg">
 
             <flux:input wire:model="state.nama_petugas_mendampingi" label="Petugas Mendampingi" />
+            <flux:input wire:model="state.nama_dokter" label="Nama Dokter" />
             <flux:input wire:model="state.nama_keluarga_pasien" label="Keluarga Pasien" />
             <flux:input wire:model="state.tindakan_dilakukan" label="Tindakan Dilakukan" />
             <flux:input wire:model="state.konsekuensi_tindakan" label="Konsekuensi Tindakan" />
