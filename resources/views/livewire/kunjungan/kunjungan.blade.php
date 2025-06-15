@@ -2,9 +2,6 @@
     <flux:card class="shadow-lg rounded-lg">
         <div class="flex justify-between mb-4">
             <flux:heading size="xl">Data Kunjungan</flux:heading>
-            <div class="flex gap-4 items-center">
-
-            </div>
         </div>
 
         <flux:table :paginate="$data">
@@ -90,19 +87,23 @@
 
                 <flux:tab.panel name="awal">
                     @if ($kunjungan_id)
-                        @livewire('anamnesis', ['kunjungan_id' => $kunjungan_id])
-                        @livewire('pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
-                        @livewire('pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
+                        @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id])
+                        <flux:separator class="my-5" />
+                        @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                        <flux:separator class="my-5" />
+                        @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
                     @endif
                 </flux:tab.panel>
                 <flux:tab.panel name="pemeriksaan">
                     @if ($kunjungan_id)
-                        @livewire('pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
-                        @livewire('pemeriksaan.form-persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
+                        @livewire('kunjungan.form.pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
+                        <flux:separator class="my-5" />
+                        @livewire('kunjungan.form.persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
                     @endif
 
                     {{-- @livewire('pemeriksaan.form-persetujuan-tindakan', ['k_id' => $kunjungan_id]) --}}
                 </flux:tab.panel>
+                <flux:button wire:click="saveAll" class="mt-4" variant="primary">Simpan Semua</flux:button>
             </flux:tab.group>
         </flux:modal>
 
@@ -171,5 +172,5 @@
             </div>
         </flux:modal>
     </flux:card>
-    <livewire:general-consent />
+    <livewire:kunjungan.modal.general-consent />
 </div>

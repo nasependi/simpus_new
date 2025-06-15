@@ -47,7 +47,7 @@
                 <div></div>
                 <flux:switch wire:model="kebutuhan_rohaniawan" label="Kebutuhan Rohaniawan" />
             </div>
-            
+
             <!-- f -->
             <div class="grid grid-cols-[20px_1fr] items-start gap-2">
                 <div></div>
@@ -59,8 +59,7 @@
                 <div></div>
                 <div class="grid grid-cols-[20px_1fr] items-start gap-2">
                     <div></div>
-                    <flux:switch wire:model="pemeriksaan_ke_pihak_penjamin"
-                        label="Hasil Pemeriksaan Penunjang dapat Diberikan kepada Pihak Penjamin" />
+                    <flux:switch wire:model="pemeriksaan_ke_pihak_penjamin" label="Hasil Pemeriksaan Penunjang dapat Diberikan kepada Pihak Penjamin" />
                 </div>
             </div>
 
@@ -69,8 +68,7 @@
                 <div></div>
                 <div class="grid grid-cols-[20px_1fr] items-start gap-2">
                     <div></div>
-                    <flux:switch wire:model="pemeriksaan_diakses_peserta_didik"
-                        label="Hasil Pemeriksaan Penunjang dapat Diakses oleh Peserta Didik" />
+                    <flux:switch wire:model="pemeriksaan_diakses_peserta_didik" label="Hasil Pemeriksaan Penunjang dapat Diakses oleh Peserta Didik" />
                 </div>
             </div>
 
@@ -79,8 +77,7 @@
                 <div></div>
                 <div class="grid grid-cols-[20px_1fr] items-start gap-2">
                     <div></div>
-                    <flux:input wire:model="anggota_keluarga_dapat_akses"
-                        label="Anggota Keluarga Lain yang dapat Diberikan Informasi Data-data Pasien" />
+                    <flux:input wire:model="anggota_keluarga_dapat_akses" label="Anggota Keluarga Lain yang dapat Diberikan Informasi Data-data Pasien" />
                 </div>
             </div>
 

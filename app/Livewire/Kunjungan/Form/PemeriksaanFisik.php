@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan\Form;
 
 use App\Models\PemeriksaanFisik as ModelPemeriksaanFisik;
 use App\Models\TingkatKesadaran;
@@ -65,6 +65,7 @@ class PemeriksaanFisik extends Component
     protected $listeners = [
         'open-modal-generalconsent' => 'openModal',
         'cetak-generalconsent' => 'cetakConsent',
+        'save-pemeriksaan-fisik' => 'save',
     ];
 
     public function Mount($kunjungan_id)
@@ -79,7 +80,7 @@ class PemeriksaanFisik extends Component
             ->latest()
             ->paginate($this->perPage);
 
-        return view('livewire.pemeriksaan-fisik', [
+        return view('livewire.kunjungan.form.pemeriksaan-fisik', [
             'data' => $data,
             'daftarKesadaran' => $daftarkesadaran,
         ]);

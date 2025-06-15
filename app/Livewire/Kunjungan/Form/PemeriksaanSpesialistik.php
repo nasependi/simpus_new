@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan\Form;
 
 use App\Models\Kunjungan;
 use App\Models\PemeriksaanSpesialistik as PemeriksaanSpesialistikModel;
@@ -17,6 +17,8 @@ class PemeriksaanSpesialistik extends Component
     public $search = '';
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
+
+    protected $listeners = ['save-spesialistik' => 'save'];
 
     protected $rules = [
         'kunjungan_id' => 'required|exists:kunjungan,id',
@@ -36,7 +38,7 @@ class PemeriksaanSpesialistik extends Component
 
         $kunjungans = Kunjungan::orderBy('id', 'desc')->get();
 
-        return view('livewire.pemeriksaan-spesialistik', compact('data', 'kunjungans'));
+        return view('livewire.kunjungan.form.pemeriksaan-spesialistik', compact('data', 'kunjungans'));
     }
 
     public function sortBy($field)

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan;
 
 use Flux\Flux;
 use App\Models\Poli;
@@ -59,32 +59,6 @@ class Kunjungan extends Component
         $this->listDaftarKesadaran = TingkatKesadaran::orderBy('keterangan')->get();
     }
 
-    public function render()
-    {
-        $query = KunjunganModel::with(['pasien', 'poli', 'caraPembayaran'])
-            ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
-            ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
-            ->when($this->filterPoli, fn($q) => $q->where('poli_id', $this->filterPoli))
-            ->when($this->filterCara, fn($q) => $q->where('carapembayaran_id', $this->filterCara))
-            ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
-                $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
-                    ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
-                    ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
-            }))
-            ->orderBy($this->sortField, $this->sortDirection);
-
-        $data = $query->paginate(10);
-
-        return view('livewire.kunjungan', [
-            'data' => $data,
-            'poliList' => \App\Models\Poli::pluck('nama', 'id')->toArray(),
-            'caraPembayaranList' => \App\Models\CaraPembayaran::pluck('nama', 'id')->toArray(),
-            'daftarKesadaran' => \App\Models\TingkatKesadaran::pluck('keterangan', 'id')->toArray(),
-
-        ]);
-    }
-
-
 
     public function sortBy($field)
     {
@@ -94,6 +68,15 @@ class Kunjungan extends Component
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+    }
+
+    public function saveAll()
+    {
+        $this->dispatch('save-anamnesis');
+        $this->dispatch('save-pemeriksaan-fisik');
+        $this->dispatch('save-psikologis');
+        $this->dispatch('save-spesialistik');
+        $this->dispatch('save-persetujuan-tindakan');
     }
 
     public function updated($property)
@@ -187,5 +170,29 @@ class Kunjungan extends Component
     public function resetForm()
     {
         $this->reset(['pasien_id', 'poli_id', 'carapembayaran_id', 'tanggal_kunjungan', 'umur', 'editId']);
+    }
+
+    public function render()
+    {
+        $query = KunjunganModel::with(['pasien', 'poli', 'caraPembayaran'])
+            ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
+            ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
+            ->when($this->filterPoli, fn($q) => $q->where('poli_id', $this->filterPoli))
+            ->when($this->filterCara, fn($q) => $q->where('carapembayaran_id', $this->filterCara))
+            ->when($this->filterUmur, fn($q) => $q->where(function ($query) {
+                $query->where('umur_tahun', 'like', "%{$this->filterUmur}%")
+                    ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
+                    ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
+            }))
+            ->orderBy($this->sortField, $this->sortDirection);
+
+        $data = $query->paginate(10);
+
+        return view('livewire.kunjungan.kunjungan', [
+            'data' => $data,
+            'poliList' => \App\Models\Poli::pluck('nama', 'id')->toArray(),
+            'caraPembayaranList' => \App\Models\CaraPembayaran::pluck('nama', 'id')->toArray(),
+            'daftarKesadaran' => \App\Models\TingkatKesadaran::pluck('keterangan', 'id')->toArray(),
+        ]);
     }
 }

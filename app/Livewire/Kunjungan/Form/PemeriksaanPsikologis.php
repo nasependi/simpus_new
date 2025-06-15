@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan\Form;
 
 use App\Models\PemeriksaanPsikologis as PemeriksaanPsikologisModel;
 use Livewire\Component;
@@ -11,6 +11,8 @@ class PemeriksaanPsikologis extends Component
 {
     public $kunjungan_id;
     public $editingId;
+    protected $listeners = ['save-psikologis' => 'save'];
+
     public $form = [
         'kunjungan_id' => '',
         'status_psikologis' => '',
@@ -20,7 +22,7 @@ class PemeriksaanPsikologis extends Component
 
     public function render()
     {
-        return view('livewire.pemeriksaan-psikologis');
+        return view('livewire.kunjungan.form.pemeriksaan-psikologis');
     }
 
     public function closeModal()

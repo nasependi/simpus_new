@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan\Modal;
 
 use Flux\Flux;
 use Throwable;
@@ -42,9 +42,7 @@ class GeneralConsent extends Component
     }
     public function render()
     {
-
-
-        return view('livewire.general-consent');
+        return view('livewire.kunjungan.modal.general-consent');
     }
 
 

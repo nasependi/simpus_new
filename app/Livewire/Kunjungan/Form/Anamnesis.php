@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan\Form;
 
 use App\Models\Anamnesis as AnamnesisModel;
 use App\Models\Kunjungan;
@@ -26,6 +26,8 @@ class Anamnesis extends Component
         'riwayat_pengobatan' => 'required|string|max:255',
     ];
 
+    protected $listeners = ['save-anamnesis' => 'save'];
+
     public function render()
     {
         $data = AnamnesisModel::with('kunjungan')
@@ -33,9 +35,26 @@ class Anamnesis extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
-        $kunjungans = Kunjungan::orderBy('id', 'desc')->get();
+        $kunjungans = Kunjungan::with('pasien')->orderBy('id', 'desc')->get();
 
-        return view('livewire.anamnesis', compact('data', 'kunjungans'));
+
+        return view('livewire.kunjungan.form.anamnesis', compact('data', 'kunjungans'));
+    }
+
+    public function mount($kunjungan_id)
+    {
+        $this->kunjungan_id = $kunjungan_id;
+
+        // Cek apakah sudah ada data anamnesis sebelumnya
+        $anamnesis = AnamnesisModel::where('kunjungan_id', $kunjungan_id)->first();
+        if ($anamnesis) {
+            // Mode edit
+            $this->editId = $anamnesis->id;
+            $this->keluhan_utama = $anamnesis->keluhan_utama;
+            $this->riwayat_penyakit = $anamnesis->riwayat_penyakit;
+            $this->riwayat_alergi = $anamnesis->riwayat_alergi;
+            $this->riwayat_pengobatan = $anamnesis->riwayat_pengobatan;
+        }
     }
 
     public function sortBy($field)
@@ -72,7 +91,7 @@ class Anamnesis extends Component
         $this->validate();
 
         AnamnesisModel::updateOrCreate(
-            ['id' => $this->editId],
+            ['kunjungan_id' => $this->kunjungan_id],
             [
                 'kunjungan_id' => $this->kunjungan_id,
                 'keluhan_utama' => $this->keluhan_utama,
@@ -83,7 +102,7 @@ class Anamnesis extends Component
         );
 
         Flux::modal('anamnesisModal')->close();
-        Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
+        Flux::toast(heading: 'Sukses', text: 'Data Anamnesis berhasil disimpan.', variant: 'success');
         $this->resetForm();
     }
 
@@ -102,6 +121,14 @@ class Anamnesis extends Component
 
     public function resetForm()
     {
-        $this->reset(['editId', 'kunjungan_id', 'keluhan_utama', 'riwayat_penyakit', 'riwayat_alergi', 'riwayat_pengobatan']);
+        $this->editId = null;
+
+        // Ambil anamnesis berdasarkan kunjungan_id yang sedang aktif
+        $anamnesis = AnamnesisModel::where('kunjungan_id', $this->kunjungan_id)->first();
+
+        $this->keluhan_utama = $anamnesis->keluhan_utama ?? '';
+        $this->riwayat_penyakit = $anamnesis->riwayat_penyakit ?? '';
+        $this->riwayat_alergi = $anamnesis->riwayat_alergi ?? '';
+        $this->riwayat_pengobatan = $anamnesis->riwayat_pengobatan ?? '';
     }
 }

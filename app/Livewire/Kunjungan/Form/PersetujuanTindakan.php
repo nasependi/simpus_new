@@ -1,23 +1,24 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire\Kunjungan\Form;
 
-use App\Models\PersetujuanTindakan;
+use App\Models\PersetujuanTindakan as PersetujuanTindakanModel;
 use App\Models\Kunjungan;
 use Flux\Flux;
 use Livewire\Component;
 
-class PersetujuanTindakanForm extends Component
+class PersetujuanTindakan extends Component
 {
     public $state = [];
     public $listKunjungan;
+    protected $listeners = ['save-persetujuan-tindakan' => 'save'];
 
     public function mount($id = null)
     {
         $this->listKunjungan = Kunjungan::all();
 
         if ($id) {
-            $tindakan = PersetujuanTindakan::findOrFail($id);
+            $tindakan = PersetujuanTindakanModel::findOrFail($id);
             $this->state = $tindakan->toArray();
         }
     }
@@ -40,10 +41,10 @@ class PersetujuanTindakanForm extends Component
 
         try {
             if (isset($this->state['id'])) {
-                PersetujuanTindakan::findOrFail($this->state['id'])->update($this->state);
+                PersetujuanTindakanModel::findOrFail($this->state['id'])->update($this->state);
                 session()->flash('success', 'Data berhasil diperbarui.');
             } else {
-                PersetujuanTindakan::create($this->state);
+                PersetujuanTindakanModel::create($this->state);
                 session()->flash('success', 'Data berhasil disimpan.');
             }
 
@@ -55,6 +56,6 @@ class PersetujuanTindakanForm extends Component
 
     public function render()
     {
-        return view('livewire.persetujuan-tindakan-form');
+        return view('livewire.kunjungan.form.persetujuan-tindakan');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Kunjungan\Form;
+
 
 use Livewire\Component;
 
