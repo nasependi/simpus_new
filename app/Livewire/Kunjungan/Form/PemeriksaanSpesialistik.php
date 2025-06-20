@@ -29,6 +29,22 @@ class PemeriksaanSpesialistik extends Component
         'intruksi_medik' => 'required|string|max:255',
     ];
 
+    public function mount($kunjungan_id)
+    {
+        $this->kunjungan_id = $kunjungan_id;
+
+        $pemeriksaan = PemeriksaanSpesialistikModel::where('kunjungan_id', $kunjungan_id)->first();
+
+        if ($pemeriksaan) {
+            $this->editId = $pemeriksaan->id;
+            $this->nama_obat = $pemeriksaan->nama_obat;
+            $this->dosis = $pemeriksaan->dosis;
+            $this->waktu_penggunaan = $pemeriksaan->waktu_penggunaan;
+            $this->rencana_rawat = $pemeriksaan->rencana_rawat;
+            $this->intruksi_medik = $pemeriksaan->intruksi_medik;
+        }
+    }
+
     public function render()
     {
         $data = PemeriksaanSpesialistikModel::with('kunjungan')
@@ -76,9 +92,8 @@ class PemeriksaanSpesialistik extends Component
         $this->validate();
 
         PemeriksaanSpesialistikModel::updateOrCreate(
-            ['id' => $this->editId],
+            ['kunjungan_id' => $this->kunjungan_id], // Key utama: kunjungan_id (bukan editId)
             [
-                'kunjungan_id' => $this->kunjungan_id,
                 'nama_obat' => $this->nama_obat,
                 'dosis' => $this->dosis,
                 'waktu_penggunaan' => $this->waktu_penggunaan,
@@ -107,14 +122,14 @@ class PemeriksaanSpesialistik extends Component
 
     public function resetForm()
     {
-        $this->reset([
-            'editId',
-            'kunjungan_id',
-            'nama_obat',
-            'dosis',
-            'waktu_penggunaan',
-            'rencana_rawat',
-            'intruksi_medik'
-        ]);
+        $this->editId = null;
+
+        $pemeriksaan = PemeriksaanSpesialistikModel::where('kunjungan_id', $this->kunjungan_id)->first();
+
+        $this->nama_obat = $pemeriksaan->nama_obat ?? '';
+        $this->dosis = $pemeriksaan->dosis ?? '';
+        $this->waktu_penggunaan = $pemeriksaan->waktu_penggunaan ?? '';
+        $this->rencana_rawat = $pemeriksaan->rencana_rawat ?? '';
+        $this->intruksi_medik = $pemeriksaan->intruksi_medik ?? '';
     }
 }

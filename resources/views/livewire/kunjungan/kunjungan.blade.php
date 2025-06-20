@@ -32,7 +32,7 @@
                     <flux:select wire:model.live="filterPoli" size="sm" placeholder="Pilih Poli">
                         <flux:select.option value="">Semua Poli</flux:select.option>
                         @foreach ($poliList as $id => $nama)
-                            <flux:select.option value="{{ $id }}">{{ $nama }}</flux:select.option>
+                        <flux:select.option value="{{ $id }}">{{ $nama }}</flux:select.option>
                         @endforeach
                     </flux:select>
                 </flux:table.column>
@@ -41,7 +41,7 @@
                     <flux:select wire:model.live="filterCara" size="sm" placeholder="Pilih Cara Bayar">
                         <flux:select.option value="">Semua Cara</flux:select.option>
                         @foreach ($caraPembayaranList as $id => $nama)
-                            <flux:select.option value="{{ $id }}">{{ $nama }}</flux:select.option>
+                        <flux:select.option value="{{ $id }}">{{ $nama }}</flux:select.option>
                         @endforeach
                     </flux:select>
                 </flux:table.column>
@@ -52,33 +52,33 @@
             </flux:table.columns>
             <flux:table.rows>
                 @foreach ($data as $item)
-                    <flux:table.row>
-                        <flux:table.cell>{{ $item->tanggal_kunjungan->format('d-m-Y') }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->pasien->nama_lengkap ?? '-' }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->poli->nama ?? '-' }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->caraPembayaran->nama ?? '-' }}</flux:table.cell>
-                        <flux:table.cell>
-                            {{ $item->umur_tahun }} th, {{ $item->umur_bulan }} bln, {{ $item->umur_hari }} hr
-                        </flux:table.cell>
-                        <flux:table.cell>
-                            @if ($item->generalConsent)
-                                <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
-                                <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="user" label="Pemeriksaan" class="mr-2" />
-                            @else
-                                <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
-                            @endif
+                <flux:table.row>
+                    <flux:table.cell>{{ $item->tanggal_kunjungan->format('d-m-Y') }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->pasien->nama_lengkap ?? '-' }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->poli->nama ?? '-' }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->caraPembayaran->nama ?? '-' }}</flux:table.cell>
+                    <flux:table.cell>
+                        {{ $item->umur_tahun }} th, {{ $item->umur_bulan }} bln, {{ $item->umur_hari }} hr
+                    </flux:table.cell>
+                    <flux:table.cell>
+                        @if ($item->generalConsent)
+                        <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
+                        <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="document-text" label="Pemeriksaan" class="mr-2" />
+                        @else
+                        <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
+                        @endif
 
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
-                        </flux:table.cell>
+                        <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
+                        <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
+                    </flux:table.cell>
 
-                    </flux:table.row>
+                </flux:table.row>
                 @endforeach
             </flux:table.rows>
         </flux:table>
 
         {{-- <livewire:General-Consent /> --}}
-        <flux:modal name="modalPemeriksaan" class="w-full max-w-screen-xl max-h-[80vh] overflow-y-auto p-6">
+        <flux:modal name="modalPemeriksaan" class="w-full max-w-screen-xl max-h-[80vh] overflow-y-auto">
             <flux:tab.group>
                 <flux:tabs wire:model="tab">
                     <flux:tab name="awal">Asasment Awal</flux:tab>
@@ -87,23 +87,32 @@
 
                 <flux:tab.panel name="awal">
                     @if ($kunjungan_id)
-                        @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id])
-                        <flux:separator class="my-5" />
-                        @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
-                        <flux:separator class="my-5" />
-                        @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="" text="Anamnesis" />
+                    @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Pemeriksaan Fisik" />
+                    @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Pemeriksaan Psikologis" />
+                    @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
                     @endif
                 </flux:tab.panel>
                 <flux:tab.panel name="pemeriksaan">
                     @if ($kunjungan_id)
-                        @livewire('kunjungan.form.pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
-                        <flux:separator class="my-5" />
-                        @livewire('kunjungan.form.persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
+                    @livewire('kunjungan.form.pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Persetujuan Tindakan" />
+                    @livewire('kunjungan.form.laboratorium-component', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Laboratorium" />
+                    @livewire('kunjungan.form.radiologi-component', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Radiologi" />
+                    @livewire('kunjungan.form.persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Diagnosis" />
+                    @livewire('kunjungan.form.diagnosis-component', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Obat Resep" />
+                    @livewire('kunjungan.form.obat-resep-component', ['kunjungan_id' => $kunjungan_id])
+                    <flux:separator class="m-5" text="Terapi" />
+                    @livewire('kunjungan.form.terapi-component', ['kunjungan_id' => $kunjungan_id])
                     @endif
-
-                    {{-- @livewire('pemeriksaan.form-persetujuan-tindakan', ['k_id' => $kunjungan_id]) --}}
                 </flux:tab.panel>
-                <flux:button wire:click="saveAll" class="mt-4" variant="primary">Simpan Semua</flux:button>
+                <flux:button wire:click="saveAll" class="mt-4 w-full" variant="primary">Simpan Semua</flux:button>
             </flux:tab.group>
         </flux:modal>
 
@@ -115,29 +124,29 @@
 
             <flux:select wire:model="pasien_id" variant="listbox" placeholder="Pilih Pasien">
                 @foreach ($listPasien as $pasien)
-                    <flux:select.option value="{{ $pasien->id }}">{{ $pasien->nama_lengkap }}</flux:select.option>
+                <flux:select.option value="{{ $pasien->id }}">{{ $pasien->nama_lengkap }}</flux:select.option>
                 @endforeach
             </flux:select>
             @error('pasien_id')
-                <span class="text-red-600 text-sm">{{ $message }}</span>
+            <span class="text-red-600 text-sm">{{ $message }}</span>
             @enderror
 
             <flux:select wire:model="poli_id" variant="listbox" placeholder="Pilih Poli">
                 @foreach ($listPoli as $poli)
-                    <flux:select.option value="{{ $poli->id }}">{{ $poli->nama }}</flux:select.option>
+                <flux:select.option value="{{ $poli->id }}">{{ $poli->nama }}</flux:select.option>
                 @endforeach
             </flux:select>
             @error('poli_id')
-                <span class="text-red-600 text-sm">{{ $message }}</span>
+            <span class="text-red-600 text-sm">{{ $message }}</span>
             @enderror
 
             <flux:select wire:model="carapembayaran_id" variant="listbox" placeholder="Pilih Cara Pembayaran">
                 @foreach ($listCaraPembayaran as $cara)
-                    <flux:select.option value="{{ $cara->id }}">{{ $cara->nama }}</flux:select.option>
+                <flux:select.option value="{{ $cara->id }}">{{ $cara->nama }}</flux:select.option>
                 @endforeach
             </flux:select>
             @error('carapembayaran_id')
-                <span class="text-red-600 text-sm">{{ $message }}</span>
+            <span class="text-red-600 text-sm">{{ $message }}</span>
             @enderror
 
             <flux:input wire:model="tanggal_kunjungan" label="Tanggal Kunjungan" type="date" required />

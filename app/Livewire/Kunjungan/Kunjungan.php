@@ -77,6 +77,11 @@ class Kunjungan extends Component
         $this->dispatch('save-psikologis');
         $this->dispatch('save-spesialistik');
         $this->dispatch('save-persetujuan-tindakan');
+        $this->dispatch('save-laboratorium');
+        $this->dispatch('save-radiologi');
+        $this->dispatch('save-terapi');
+        $this->dispatch('save-obat-resep');
+        $this->dispatch('save-diagnosis');
     }
 
     public function updated($property)

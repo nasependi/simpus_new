@@ -13,12 +13,12 @@ class PemeriksaanFisik extends Component
 {
     use WithPagination, WithFileUploads;
 
-    public $search = '';
-    public $perPage = 10;
-    public $Kunjungan_id;
-    public $tingkatKesadaranOptions = [];
+    public $kunjungan_id;
     public $tingkat_kesadaran = '';
+    public $tingkatKesadaranOptions = [];
     public $gambar_anatomitubuh;
+    public $editingId = null;
+    public $modal = false;
 
     public $form = [
         'kunjungan_id' => '',
@@ -58,115 +58,73 @@ class PemeriksaanFisik extends Component
         'persendian_kaki' => '',
     ];
 
-    public $editingId = null;
-    public $modal = false;
-    public $autocomplete = [];
-
     protected $listeners = [
-        'open-modal-generalconsent' => 'openModal',
-        'cetak-generalconsent' => 'cetakConsent',
         'save-pemeriksaan-fisik' => 'save',
     ];
 
-    public function Mount($kunjungan_id)
+    public function mount($kunjungan_id)
     {
-        $this->Kunjungan_id = $kunjungan_id;
+        $this->kunjungan_id = $kunjungan_id;
+        $this->form['kunjungan_id'] = $kunjungan_id;
+
+        // Cek apakah sudah ada data sebelumnya
+        $existing = ModelPemeriksaanFisik::where('kunjungan_id', $kunjungan_id)->first();
+        if ($existing) {
+            $this->editingId = $existing->id;
+            $this->form = array_merge($this->form, $existing->toArray());
+            $this->tingkat_kesadaran = optional($existing->tingkatKesadaran)->keterangan;
+        }
     }
 
     public function render()
     {
-        $daftarkesadaran = TingkatKesadaran::get();
-        $data = ModelPemeriksaanFisik::with('kunjungan', 'tingkatKesadaran')
-            ->latest()
-            ->paginate($this->perPage);
-
         return view('livewire.kunjungan.form.pemeriksaan-fisik', [
-            'data' => $data,
-            'daftarKesadaran' => $daftarkesadaran,
+            'daftarKesadaran' => TingkatKesadaran::get(),
         ]);
-    }
-
-    public function openModal()
-    {
-        $this->resetForm();
-        $this->modal = true;
-    }
-
-    public function closeModal()
-    {
-        $this->modal = false;
-    }
-
-    public function resetForm()
-    {
-        $this->form = array_fill_keys(array_keys($this->form), '');
-        $this->editingId = null;
     }
 
     public function save()
     {
-        $this->form['kunjungan_id'] = $this->Kunjungan_id;
         $this->validate([
             'form.kunjungan_id' => 'required|exists:kunjungan,id',
             'form.tingkatkesadaran_id' => 'required|exists:tingkat_kesadaran,id',
-            'gambar_anatomitubuh' => 'required|image|max:2048', // max 2MB
+            'gambar_anatomitubuh' => $this->editingId ? 'nullable|image|max:2048' : 'required|image|max:2048',
             'form.denyut_jantung' => 'required',
-            // validasi lainnya bisa ditambahkan jika dibutuhkan
         ]);
+
         try {
             if ($this->gambar_anatomitubuh) {
-                // Simpan file saat tombol Save diklik
                 $path = $this->gambar_anatomitubuh->store('anatomi', 'public');
                 $this->form['gambar_anatomitubuh'] = $path;
             }
-            if ($this->editingId) {
-                ModelPemeriksaanFisik::findOrFail($this->editingId)->update($this->form);
-                Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
-            } else {
-                ModelPemeriksaanFisik::create($this->form);
-                Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
-            }
-            $this->closeModal();
+
+            ModelPemeriksaanFisik::updateOrCreate(
+                ['kunjungan_id' => $this->form['kunjungan_id']],
+                $this->form
+            );
+
+            Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
         } catch (\Exception $e) {
             Flux::toast(heading: 'Error', text: 'Terjadi kesalahan: ' . $e->getMessage(), variant: 'danger');
         }
     }
 
-    public function edit($id)
-    {
-        $data = ModelPemeriksaanFisik::findOrFail($id);
-        $this->form = $data->toArray();
-        $this->editingId = $id;
-        $this->modal = true;
-    }
-
-    public function delete($id)
-    {
-        try {
-            ModelPemeriksaanFisik::findOrFail($id)->delete();
-            session()->flash('success', 'Data berhasil dihapus.');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
     public function updatedTingkatKesadaran($value)
     {
-        // Autocomplete logic jika diperlukan
         $this->tingkatKesadaranOptions = TingkatKesadaran::where('keterangan', 'like', '%' . $value . '%')
             ->limit(10)
             ->get()
             ->map(fn($item) => [
                 'id' => $item->id,
                 'keterangan' => $item->keterangan,
-            ])->toArray();
+            ])
+            ->toArray();
     }
 
     public function selectTingkatKesadaran($id, $keterangan)
-
     {
         $this->form['tingkatkesadaran_id'] = $id;
         $this->tingkat_kesadaran = $keterangan;
-        $this->tingkatKesadaranOptions = []; // clear opsi
+        $this->tingkatKesadaranOptions = [];
     }
 }

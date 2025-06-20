@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('terapi', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('kunjungan_id')->references('id')->on('kunjungan')->onDelete('cascade');
             $table->foreignId('obat_id')->references('id')->on('obat_resep')->onDelete('cascade');
 
             $table->string('nama_tindakan');

@@ -11,20 +11,8 @@ class PersetujuanTindakan extends Model
 
     protected $table = 'persetujuan_tindakan';
 
-    protected $fillable = [
-        'kunjungan_id',
-        'nama_dokter',
-        'nama_petugas_mendampingi',
-        'nama_keluarga_pasien',
-        'tindakan_dilakukan',
-        'konsekuensi_tindakan',
-        'persetujuan_penolakan',
-        'tanggal_tindakan',
-        'jam_tindakan',
-        'ttd_dokter',
-        'ttd_pasien_keluarga',
-        'saksi1',
-        'saksi2',
+    protected $guarded = [
+        'id'
     ];
 
     public function kunjungan()

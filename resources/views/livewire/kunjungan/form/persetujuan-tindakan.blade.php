@@ -1,5 +1,6 @@
 <div class="space-y-3">
-    <div class="grid grid-cols-2 gap-2 items-center">
+    <div class="grid grid-cols-3 gap-2 items-center">
+        <flux:input wire:model="state.nama_dokter" label="Nama Dokter" />
         <flux:input wire:model="state.nama_petugas_mendampingi" label="Petugas Mendampingi" />
         <flux:input wire:model="state.nama_keluarga_pasien" label="Keluarga Pasien" />
     </div>
@@ -26,7 +27,7 @@
         <option value="0">Tolak</option>
     </flux:select>
     @error('state.persetujuan_penolakan')
-        <span class="text-red-600 text-sm">{{ $message }}</span>
+    <span class="text-red-600 text-sm">{{ $message }}</span>
     @enderror
 
 </div>

@@ -57,6 +57,7 @@ class Laboratorium extends Model
         'fasilitas_kesehatan_pemeriksaan',
     ];
 
+
     public function kunjungan()
     {
         return $this->belongsTo(Kunjungan::class);
