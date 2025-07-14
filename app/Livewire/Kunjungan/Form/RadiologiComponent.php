@@ -2,26 +2,28 @@
 
 namespace App\Livewire\Kunjungan\Form;
 
-use Flux\Flux;
-use Livewire\Component;
 use App\Models\Radiologi;
+use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Models\JenisPemeriksaanRadiologi;
+use Flux\Flux;
 
 class RadiologiComponent extends Component
 {
-    use WithFileUploads; // << Wajib untuk upload file
+    use WithFileUploads;
 
     public $kunjungan_id;
     public $state = [];
     public $editId;
     public $attachments = [];
-
+    public $listJenisPemeriksaanRadiologi = [];
 
     protected $listeners = ['save-radiologi' => 'save'];
 
     public function mount($kunjungan_id)
     {
         $this->kunjungan_id = $kunjungan_id;
+        $this->listJenisPemeriksaanRadiologi = JenisPemeriksaanRadiologi::orderBy('created_at')->get();
 
         $data = Radiologi::where('kunjungan_id', $kunjungan_id)->first();
 
@@ -48,8 +50,26 @@ class RadiologiComponent extends Component
                 'jenis_bahan_kontras',
                 'foto_hasil',
                 'nama_dokter_pemeriksaan',
-                'interpretasi_radiologi'
+                'interpretasi_radiologi',
             ]);
+
+            // Hilangkan prefix +62 jika ada saat form dimuat
+            if (isset($this->state['nomor_telepon_dokter'])) {
+                $this->state['nomor_telepon_dokter'] = preg_replace('/^\+62/', '', $this->state['nomor_telepon_dokter']);
+            }
+        }
+    }
+
+    public function updatedStateJenisPemeriksaan($value)
+    {
+        if ($this->editId) return;
+
+        $jenis = JenisPemeriksaanRadiologi::where('kode', $value)->first();
+
+        if ($jenis) {
+            $count = Radiologi::where('jenis_pemeriksaan', $value)->count() + 1;
+            $kodeBaru = $jenis->kode . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+            $this->state['nomor_pemeriksaan'] = $kodeBaru;
         }
     }
 
@@ -63,7 +83,7 @@ class RadiologiComponent extends Component
             'state.tanggal_permintaan' => 'required|date',
             'state.jam_permintaan' => 'required',
             'state.dokter_pengirim' => 'required|string|max:255',
-            'state.nomor_telepon_dokter' => 'required|string',
+            'state.nomor_telepon_dokter' => 'required|regex:/^[0-9]{9,15}$/',
             'state.nama_fasilitas_radiologi' => 'required|string',
             'state.unit_pengirim_radiologi' => 'required|string',
             'state.prioritas_pemeriksaan_radiologi' => 'required|string',
@@ -81,28 +101,22 @@ class RadiologiComponent extends Component
         ]);
 
         $fotoPaths = [];
+
         if (!empty($this->attachments)) {
             foreach ($this->attachments as $file) {
-                $path = $file->store('radiologi/foto-hasil', 'public');
-                $fotoPaths[] = $path;
+                $fotoPaths[] = $file->store('radiologi/foto-hasil', 'public');
             }
         }
 
-        \App\Models\Radiologi::updateOrCreate(
-            ['kunjungan_id' => $this->kunjungan_id],
-            array_merge($this->state, [
-                'kunjungan_id' => $this->kunjungan_id,
-                'foto_hasil' => !empty($fotoPaths)
-                    ? json_encode($fotoPaths)
-                    : ($this->state['foto_hasil'] ?? null),
-            ])
-        );
         $updateData = array_merge($this->state, [
             'kunjungan_id' => $this->kunjungan_id,
+            'nomor_telepon_dokter' => '+62' . ltrim($this->state['nomor_telepon_dokter'], '0'),
         ]);
 
         if (!empty($fotoPaths)) {
             $updateData['foto_hasil'] = json_encode($fotoPaths);
+        } elseif (isset($this->state['foto_hasil'])) {
+            $updateData['foto_hasil'] = $this->state['foto_hasil'];
         }
 
         Radiologi::updateOrCreate(

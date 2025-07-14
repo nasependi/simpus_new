@@ -1,9 +1,9 @@
 <div class="space-y-3">
-    <div class="grid grid-cols-3 gap-2 items-center">
+    <div class="grid grid-cols-2 gap-2 items-center">
         <flux:input wire:model="state.nama_dokter" label="Nama Dokter" />
         <flux:input wire:model="state.nama_petugas_mendampingi" label="Petugas Mendampingi" />
-        <flux:input wire:model="state.nama_keluarga_pasien" label="Keluarga Pasien" />
     </div>
+    <flux:input wire:model="state.nama_keluarga_pasien" label="Keluarga Pasien" />
     <div class="grid grid-cols-2 gap-2 items-center">
         <flux:input wire:model="state.tindakan_dilakukan" label="Tindakan Dilakukan" />
         <flux:input wire:model="state.konsekuensi_tindakan" label="Konsekuensi Tindakan" />

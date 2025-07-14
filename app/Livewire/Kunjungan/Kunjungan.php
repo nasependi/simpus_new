@@ -37,7 +37,6 @@ class Kunjungan extends Component
     public $filterCara = '';
 
 
-
     protected $rules = [
         'pasien_id' => 'required|exists:pasien_umum,id',
         'poli_id' => 'required|exists:poli,id',

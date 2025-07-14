@@ -62,10 +62,16 @@
                     </flux:table.cell>
                     <flux:table.cell>
                         @if ($item->generalConsent)
-                        <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
-                        <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="document-text" label="Pemeriksaan" class="mr-2" />
+                        <flux:tooltip content="Cetak General Consent">
+                            <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
+                        </flux:tooltip>
+                        <flux:tooltip content="Pemeriksaan">
+                            <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="document-text" label="Pemeriksaan" class="mr-2" />
+                        </flux:tooltip>
                         @else
-                        <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
+                        <flux:tooltip content="General Consent">
+                            <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
+                        </flux:tooltip>
                         @endif
 
                         <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
@@ -78,38 +84,90 @@
         </flux:table>
 
         {{-- <livewire:General-Consent /> --}}
-        <flux:modal name="modalPemeriksaan" class="w-full max-w-screen-xl max-h-[80vh] overflow-y-auto">
+        <flux:modal name="modalPemeriksaan" class="w-full max-w-screen-xl max-h-[80vh] overflow-y-auto" :dismissible="false" wire:ignore.self>
             <flux:tab.group>
                 <flux:tabs wire:model="tab">
                     <flux:tab name="awal">Asasment Awal</flux:tab>
                     <flux:tab name="pemeriksaan">Pemeriksaan Specialistik</flux:tab>
                 </flux:tabs>
-
                 <flux:tab.panel name="awal">
                     @if ($kunjungan_id)
-                    <flux:separator class="" text="Anamnesis" />
-                    @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Pemeriksaan Fisik" />
-                    @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Pemeriksaan Psikologis" />
-                    @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
+                    <flux:tab.group>
+                        <flux:tabs wire:model="tab">
+                            <flux:tab name="anamnesis">Anamnesis</flux:tab>
+                            <flux:tab name="fisik">Pemeriksaan Fisik</flux:tab>
+                            <flux:tab name="psikologis">Pemeriksaan Psikologis, Sosial Ekonomi, Spiritual</flux:tab>
+                        </flux:tabs>
+
+                        <flux:tab.panel name="anamnesis">
+                            @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id])
+                        </flux:tab.panel>
+                        <flux:tab.panel name="fisik">
+                            @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                        </flux:tab.panel>
+                        <flux:tab.panel name="psikologis">
+                            @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
+                        </flux:tab.panel>
+                    </flux:tab.group>
                     @endif
                 </flux:tab.panel>
                 <flux:tab.panel name="pemeriksaan">
                     @if ($kunjungan_id)
-                    @livewire('kunjungan.form.pemeriksaan-spesialistik', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Persetujuan Tindakan" />
-                    @livewire('kunjungan.form.laboratorium-component', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Laboratorium" />
-                    @livewire('kunjungan.form.radiologi-component', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Radiologi" />
-                    @livewire('kunjungan.form.persetujuan-tindakan', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Diagnosis" />
-                    @livewire('kunjungan.form.diagnosis-component', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Obat Resep" />
-                    @livewire('kunjungan.form.obat-resep-component', ['kunjungan_id' => $kunjungan_id])
-                    <flux:separator class="m-5" text="Terapi" />
-                    @livewire('kunjungan.form.terapi-component', ['kunjungan_id' => $kunjungan_id])
+                    <flux:tab.group>
+                        <flux:tabs wire:model="tab2">
+                            <flux:tab name="spesialistik">Riwayat Penggunaan Obat</flux:tab>
+                            <flux:tab name="account">Laboratorium</flux:tab>
+                            <flux:tab name="billing">Radiologi</flux:tab>
+                            <flux:tab name="diagnosis">Diagnosis</flux:tab>
+                            <flux:tab name="profile">Persetujuan Tindakan</flux:tab>
+                            <flux:tab name="obat">Resep Obat</flux:tab>
+                            <flux:tab name="terapi">Terapi</flux:tab>
+                        </flux:tabs>
+
+                        <flux:tab.panel name="spesialistik" wire:key="panel-spesialistik-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.pemeriksaan-spesialistik
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="spesialistik-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+                        <flux:tab.panel name="profile" wire:key="panel-profile-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.persetujuan-tindakan
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="tindakan-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+                        <flux:tab.panel name="account" wire:key="panel-account-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.laboratorium-component
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="laboratorium-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+                        <flux:tab.panel name="billing" wire:key="panel-billing-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.radiologi-component
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="radiologi-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+                        <flux:tab.panel name="diagnosis" wire:key="panel-diagnosis-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.diagnosis-component
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="diagnosis-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+
+                        <flux:tab.panel name="obat" wire:key="panel-obat-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.obat-resep-component
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="obat-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+                        <flux:tab.panel name="terapi" wire:key="panel-terapi-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.terapi-component
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="terapi-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
+
+                    </flux:tab.group>
                     @endif
                 </flux:tab.panel>
                 <flux:button wire:click="saveAll" class="mt-4 w-full" variant="primary">Simpan Semua</flux:button>

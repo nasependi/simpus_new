@@ -1,7 +1,19 @@
 <div class="space-y-4">
-    <div class="grid grid-cols-3 gap-2">
-        <flux:input wire:model="state.nama_pemeriksaan" label="Nama Pemeriksaan" />
-        <flux:input wire:model="state.jenis_pemeriksaan" label="Jenis Pemeriksaan" />
+    <flux:select wire:model="state.nama_pemeriksaan" label="Nama Pemeriksaan" placeholder="Pilih nama pemeriksaan...">
+        <flux:select.option>X-ray</flux:select.option>
+        <flux:select.option> CT Scan</flux:select.option>
+        <flux:select.option>USG</flux:select.option>
+        <flux:select.option>MRI</flux:select.option>
+        <flux:select.option>Other</flux:select.option>
+    </flux:select>
+    <div class="grid grid-cols-2 gap-2">
+        <flux:select wire:model="state.jenis_pemeriksaan" label="Jenis Pemeriksaan" placeholder="Pilih jenis...">
+            @foreach ($listJenisPemeriksaanRadiologi as $item)
+            <flux:select.option value="{{ $item->kode }}">
+                {{ $item->kode }} - {{ $item->nama }}
+            </flux:select.option>
+            @endforeach
+        </flux:select>
         <flux:input wire:model="state.nomor_pemeriksaan" label="Nomor Pemeriksaan" />
     </div>
 
@@ -12,7 +24,21 @@
 
     <div class="grid grid-cols-2 gap-2">
         <flux:input wire:model="state.dokter_pengirim" label="Dokter Pengirim" />
-        <flux:input wire:model="state.nomor_telepon_dokter" label="No. Telepon Dokter" />
+        <div class="space-y-1">
+            <label class="block text-sm font-medium text-white">No. Telepon Dokter</label>
+            <div class="flex items-center border rounded-md px-3 py-2">
+                <span class="text-sm text-zinc-500 select-none">+62</span>
+                <input
+                    type="text"
+                    wire:model="state.nomor_telepon_dokter"
+                    class="flex-1 bg-transparent outline-none border-none text-sm text-black dark:text-white ml-2"
+                    placeholder="81234567890" />
+            </div>
+            @error('state.nomor_telepon_dokter')
+            <span class="text-red-500 text-sm">{{ $message }}</span>
+            @enderror
+        </div>
+
     </div>
 
     <div class="grid grid-cols-2 gap-2">
@@ -28,9 +54,12 @@
     <flux:textarea wire:model="state.catatan_permintaan" label="Catatan Permintaan" />
 
     <div class="grid grid-cols-2 gap-2">
-        <flux:input wire:model="state.metode_penyampaian_pemeriksaan" label="Metode Penyampaian Pemeriksaan" />
+        <flux:select wire:model="state.metode_penyampaian_pemeriksaan" label="Metode Penyampaian Pemeriksaan">
+            <option value="langsung">Penyerahan langsung (digital/cetak foto)</option>
+            <option value="surel">Dikirim via surel</option>
+        </flux:select>
         <flux:select wire:model="state.status_alergi" label="Status Alergi">
-            <option value="1">Ya</option>
+            <option value="">Ya</option>
             <option value="0">Tidak</option>
         </flux:select>
     </div>

@@ -3,9 +3,11 @@
     <div class="grid grid-cols-2 gap-2">
         <flux:input wire:model="state.tb_pasien" label="TB Pasien" />
         <flux:input wire:model="state.bb_pasien" label="BB Pasien" />
-        <flux:input wire:model="state.id_resep" label="ID Resep" />
-        <flux:input wire:model="state.nama_obat" label="Nama Obat" />
-        <flux:input wire:model="state.id_obat" label="ID Obat" />
+        <flux:select wire:model.live="state.id_obat" variant="listbox" searchable placeholder="Pilih Obat" label="Pilih Obat">
+            @foreach ($obatList as $obat)
+            <flux:select.option value="{{ $obat->id }}">{{ $obat->nama_obat }}</flux:select.option>
+            @endforeach
+        </flux:select>
         <flux:input wire:model="state.sediaan" label="Sediaan" />
         <flux:input wire:model="state.jumlah_obat" label="Jumlah Obat" type="number" />
         <flux:input wire:model="state.metode_pemberian" label="Metode Pemberian" />
@@ -13,46 +15,45 @@
         <flux:input wire:model="state.unit" label="Unit" />
         <flux:input wire:model="state.frekuensi" label="Frekuensi" />
         <flux:input wire:model="state.aturan_tambahan" label="Aturan Tambahan" />
-        <flux:input wire:model="state.catatan_resep" label="Catatan Resep" />
-        <flux:input wire:model="state.dokter_penulis_resep" label="Dokter Penulis" />
-        <flux:input wire:model="state.nomor_telepon_dokter" label="No. Telepon Dokter" />
-        <flux:input wire:model="state.tanggal_penulisan_resep" type="date" label="Tanggal Penulisan" />
-        <flux:input wire:model="state.jam_penulisan_resep" type="time" label="Jam Penulisan" />
-        <flux:input wire:model="state.ttd_dokter" label="TTD Dokter" />
-        <flux:input wire:model="state.status_resep" label="Status Resep" />
-        <flux:input wire:model="state.pengkajian_resep" label="Pengkajian Resep" />
     </div>
+    <flux:textarea wire:model="state.catatan_resep" label="Catatan Resep" />
 
     <flux:button wire:click="save" class="mt-4 w-full" variant="primary">Tambah Resep</flux:button>
 
     {{-- Table View --}}
-    <div class="border rounded p-4 mt-6">
-        <h3 class="font-semibold mb-2">Daftar Obat Resep</h3>
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="text-left border-b">
-                    <th>Nama Obat</th>
-                    <th>Jumlah</th>
-                    <th>Frekuensi</th>
-                    <th class="text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($resep as $item)
-                <tr class="border-t">
-                    <td>{{ $item->nama_obat }}</td>
-                    <td>{{ $item->jumlah_obat }}</td>
-                    <td>{{ $item->frekuensi }}</td>
-                    <td class="text-right">
-                        <flux:button wire:click="delete({{ $item->id }})" variant="danger" size="sm">Hapus</flux:button>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="text-center py-2">Belum ada data.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div class="border rounded p-4 mt-6 bg-white dark:bg-gray-900 shadow-sm">
+        <h3 class="font-semibold text-lg mb-4 text-gray-800 dark:text-white">Daftar Obat Resep</h3>
+
+        <div class="overflow-x-auto rounded">
+            <table class="min-w-full text-sm text-gray-700 dark:text-gray-200">
+                <thead>
+                    <tr class="border-b dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                        <th class="px-4 py-2 text-left">Nama Obat</th>
+                        <th class="px-4 py-2 text-left">Jumlah</th>
+                        <th class="px-4 py-2 text-left">Frekuensi</th>
+                        <th class="px-4 py-2 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y dark:divide-gray-700">
+                    @forelse ($resep as $item)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <td class="px-4 py-2">{{ $item->nama_obat }}</td>
+                        <td class="px-4 py-2">{{ $item->jumlah_obat }}</td>
+                        <td class="px-4 py-2">{{ $item->frekuensi }}</td>
+                        <td class="px-4 py-2 text-right">
+                            <flux:button wire:click="delete({{ $item->id }})" variant="danger" size="sm">
+                                Hapus
+                            </flux:button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-gray-500 dark:text-gray-400">Belum ada data.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
+
 </div>

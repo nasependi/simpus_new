@@ -23,7 +23,7 @@
         <flux:navlist.item href="{{ route('bayi-baru-lahir') }}" :active="request()->routeIs('bayi-baru-lahir')"
           icon="heart">
           Bayi Baru Lahir</flux:navlist.item>
-          <flux:navlist.item href="{{ route('kunjungan') }}" :active="request()->routeIs('kunjungan')"
+        <flux:navlist.item href="{{ route('kunjungan') }}" :active="request()->routeIs('kunjungan')"
           icon="user">
           Kunjungan</flux:navlist.item>
       </flux:navlist.group>
@@ -41,6 +41,8 @@
         <flux:navlist.item href="{{ route('status-pernikahan') }}">Status Pernikahan</flux:navlist.item>
         <flux:navlist.item href="{{ route('poli') }}">Poli</flux:navlist.item>
         <flux:navlist.item href="{{ route('cara') }}">Cara Pembayaran</flux:navlist.item>
+        <flux:navlist.item href="{{ route('obat') }}">Obat</flux:navlist.item>
+        <flux:navlist.item href="{{ route('jenis-pemeriksaan-radiologi') }}">Jenis Pemeriksaan Radiologi</flux:navlist.item>
         <flux:navlist.item href="{{ route('tingkat-kesadaran') }}">Tingkat Kesadaran</flux:navlist.item>
       </flux:navlist.group>
 

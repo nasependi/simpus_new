@@ -54,7 +54,7 @@ class TerapiComponent extends Component
             array_merge($this->state, ['kunjungan_id' => $this->kunjungan_id])
         );
 
-        Flux::toast(heading: 'Berhasil', text: 'Data Terapi disimpan.', variant: 'success');
+        Flux::toast(heading: 'Berhasil', text: 'Data Berhasil disimpan.', variant: 'success');
     }
 
     public function render()

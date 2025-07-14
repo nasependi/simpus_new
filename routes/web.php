@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Livewire\PersetujuanTindakanForm;
 use App\Livewire\Poli;
 use App\Livewire\Agama;
 use Livewire\Volt\Volt;
@@ -10,17 +9,20 @@ use App\Models\BayiBaruLahir;
 use App\Livewire\JenisKelamin;
 use App\Livewire\Auth\RoleCrud;
 use App\Livewire\Auth\UserCrud;
+use App\Livewire\ObatComponent;
 use App\Livewire\CaraPembayaran;
 use App\Livewire\PasienUmumCrud;
 use app\livewire\RegisterPasien;
 use App\Models\StatusPernikahan;
+use App\Models\TingkatKesadaran;
 use App\Livewire\BayiBaruLahirIndex;
 use App\Livewire\Auth\PermissionCrud;
 use App\Livewire\Kunjungan\Kunjungan;
 use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\PersetujuanTindakanForm;
+use App\Livewire\JenisPemeriksaanRadiologiComponent;
 use App\Livewire\StatusPernikahan as LivewireStatusPernikahan;
 use App\Livewire\TingkatKesadaran as LivewireTingkatKesadaran;
-use App\Models\TingkatKesadaran;
 
 Route::get('/', function () {
     return view('welcome');
@@ -48,6 +50,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/status-pernikahan', LivewireStatusPernikahan::class)->name('status-pernikahan');
     Route::get('/poli', Poli::class)->name('poli');
     Route::get('/cara-pembayaran', CaraPembayaran::class)->name('cara');
+    Route::get('/obat', ObatComponent::class)->name('obat');
+    Route::get('/jenis-pemeriksaan-radiologi', JenisPemeriksaanRadiologiComponent::class)->name('jenis-pemeriksaan-radiologi');
     Route::get('/tingkat-kesadaran', LivewireTingkatKesadaran::class)->name('tingkat-kesadaran');
     // Route::get('/persetujuantindakan', PersetujuanTindakanForm::class)->name('persetujuantindakan');
 

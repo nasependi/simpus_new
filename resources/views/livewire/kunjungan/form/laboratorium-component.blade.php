@@ -1,7 +1,7 @@
 <div class="space-y-4">
     <div class="grid grid-cols-2 gap-2">
         <flux:input wire:model.defer="form.nama_pemeriksaan" label="Nama Pemeriksaan" required />
-        <flux:input wire:model.defer="form.nomor_pemeriksaan" label="Nomor Pemeriksaan" required />
+        <flux:input wire:model.defer="form.nomor_pemeriksaan" label="Nomor Permintaan" required />
     </div>
 
     <div class="grid grid-cols-2 gap-2">
@@ -11,8 +11,20 @@
 
     <div class="grid grid-cols-2 gap-2">
         <flux:input wire:model.defer="form.dokter_pengirim" label="Dokter Pengirim" required />
-        <flux:input wire:model.defer="form.nomor_telepon_dokter" label="No. Telepon Dokter" required />
+        <div>
+            <label class="block text-sm font-medium mb-1 text-muted-foreground">No. Telepon Dokter</label>
+            <div class="flex items-center border rounded-md px-3 py-2 shadow-sm">
+                <span class="text-msm text-zinc-500 mr-2 select-none">+62</span>
+                <input
+                    type="text"
+                    class="flex-1 bg-transparent outline-none border-none text-sm text-black dark:text-white ml-2"
+                    placeholder="Contoh: 81234567890"
+                    wire:model.defer="form.nomor_telepon_dokter_input" />
+            </div>
+        </div>
+
     </div>
+
 
     <div class="grid grid-cols-4 gap-2">
         <flux:input wire:model.defer="form.nama_fasilitas_pelayanan" label="Nama Fasilitas Pelayanan" required />
@@ -27,7 +39,10 @@
     <flux:textarea wire:model.defer="form.catatan_permintaan" label="Catatan Permintaan" />
 
     <div class="grid grid-cols-2 gap-2">
-        <flux:input wire:model.defer="form.metode_pengiriman" label="Metode Pengiriman" required />
+        <flux:select wire:model.defer="form.metode_pengiriman" label="Metode Pengiriman" placeholder="Pilih metode pengiriman...">
+            <flux:select.option>Penyerahan langsung</flux:select.option>
+            <flux:select.option>Dikrim via surel</flux:select.option>
+        </flux:select>
         <flux:select wire:model="form.asal_sumber_spesimen" label="Asal Sumber Spesimen Klinis">
             <flux:select.option>Darah</flux:select.option>
             <flux:select.option>Urin</flux:select.option>
@@ -48,8 +63,8 @@
         <flux:input type="time" wire:model.defer="form.jam_pengambilan_spesimen" label="Jam Pengambilan Spesimen" required />
     </div>
 
-    <div class="grid grid-cols-3 gap-2">
-        <flux:input wire:model.defer="form.kondisi_spesimen" label="Kondisi Spesimen" required />
+    <flux:input wire:model.defer="form.kondisi_spesimen" label="Kondisi Spesimen" required />
+    <div class="grid grid-cols-2 gap-2">
         <flux:input type="date" wire:model.defer="form.tanggal_fiksasi_spesimen" label="Tanggal Fiksasi Spesimen" />
         <flux:input type="time" wire:model.defer="form.jam_fiksasi_spesimen" label="Jam Fiksasi Spesimen" />
     </div>
@@ -100,9 +115,9 @@
 
     <flux:input wire:model.defer="form.fasilitas_kesehatan_pemeriksaan" label="Fasilitas Kesehatan Pemeriksa" />
 
-    <!-- <div class="pt-4">
+    <div class="pt-4">
         <flux:button wire:click="saveAll" class="w-full" variant="primary">
             Simpan
         </flux:button>
-    </div> -->
+    </div>
 </div>

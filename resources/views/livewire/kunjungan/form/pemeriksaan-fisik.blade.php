@@ -1,18 +1,40 @@
 <div class="space-y-3">
-    <div class="grid grid-cols-3 gap-2">
-        <div class="col-span-1">
-            <flux:input type="file" wire:model="gambar_anatomitubuh" label="Upload Gambar Anatomi Tubuh" accept="image/*" />
+    <div class="grid grid-cols-3 gap-4 items-start">
+        {{-- Kolom 1: Upload + Link file --}}
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-white">Gambar Anatomi Tubuh</label>
+
+            <div class="flex items-center gap-2">
+                <flux:input type="file" wire:model="gambar_anatomitubuh" label="" accept="image/*" />
+
+                {{-- Link file jika sudah ada --}}
+                @if (!empty($form['gambar_anatomitubuh']))
+                @php $file = $form['gambar_anatomitubuh']; @endphp
+                <a href="{{ Storage::url($file) }}" target="_blank"
+                    class="text-blue-500 underline text-xs truncate max-w-[160px]">
+                    {{ basename($file) }}
+                </a>
+                @endif
+            </div>
         </div>
-        <div class="relative col-span-2">
-            <flux:autocomplete wire:model.live.debounce.500ms="tingkat_kesadaran" label="Tingkat Kesadaran" placeholder="Pilih tingkat kesadaran..." icon="magnifying-glass" />
+
+        {{-- Kolom 2 & 3: Autocomplete --}}
+        <div class="col-span-2 relative">
+            <flux:autocomplete
+                wire:model.live.debounce.500ms="tingkat_kesadaran"
+                label="Tingkat Kesadaran"
+                placeholder="Pilih tingkat kesadaran..."
+                icon="magnifying-glass" />
+
             @if ($tingkatKesadaranOptions)
-                <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow z-10">
-                    @foreach ($tingkatKesadaranOptions as $tingkatKesadaran)
-                        <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer" wire:click="selectTingkatKesadaran({{ $tingkatKesadaran['id'] }}, '{{ addslashes($tingkatKesadaran['keterangan']) }}')">
-                            {{ $tingkatKesadaran['keterangan'] }}
-                        </div>
-                    @endforeach
+            <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow z-10">
+                @foreach ($tingkatKesadaranOptions as $tingkatKesadaran)
+                <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
+                    wire:click="selectTingkatKesadaran({{ $tingkatKesadaran['id'] }}, '{{ addslashes($tingkatKesadaran['keterangan']) }}')">
+                    {{ $tingkatKesadaran['keterangan'] }}
                 </div>
+                @endforeach
+            </div>
             @endif
         </div>
     </div>
@@ -28,7 +50,7 @@
 
     <div class="grid grid-cols-3 gap-3">
         @foreach (['kepala', 'mata', 'telinga', 'hidung', 'rambut', 'bibir', 'gigi_geligi', 'lidah', 'langit_langit', 'leher', 'tenggorokan', 'tonsil', 'dada', 'payudara', 'punggung', 'perut', 'genital', 'anus', 'lengan_atas', 'lengan_bawah', 'kuku_tangan', 'persendian_tangan', 'tungkai_atas', 'tungkai_bawah', 'jari_kaki', 'kuku_kaki', 'persendian_kaki'] as $field)
-            <flux:textarea wire:model="form.{{ $field }}" label="{{ ucwords(str_replace('_', ' ', $field)) }}" />
+        <flux:textarea wire:model="form.{{ $field }}" label="{{ ucwords(str_replace('_', ' ', $field)) }}" />
         @endforeach
     </div>
 

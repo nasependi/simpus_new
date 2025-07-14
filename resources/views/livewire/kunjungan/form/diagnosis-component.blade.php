@@ -8,30 +8,34 @@
     <flux:button wire:click="save" variant="primary" class="w-full">Tambah Diagnosis</flux:button>
 
     @if (!empty($diagnosisList))
-    <div class="">
-        <h4 class="font-semibold mb-2">Daftar Diagnosis</h4>
-        <table class="min-w-full text-sm border">
-            <thead class="bg-gray-100 text-left">
-                <tr>
-                    <th class="px-3 py-2 border">Awal</th>
-                    <th class="px-3 py-2 border">Primer</th>
-                    <th class="px-3 py-2 border">Sekunder</th>
-                    <th class="px-3 py-2 border">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($diagnosisList as $item)
-                <tr>
-                    <td class="px-3 py-2 border">{{ $item['diagnosis_awal'] }}</td>
-                    <td class="px-3 py-2 border">{{ $item['diagnosis_primer'] }}</td>
-                    <td class="px-3 py-2 border">{{ $item['diagnosis_sekunder'] }}</td>
-                    <td class="px-3 py-2 border">
-                        <flux:button wire:click="delete({{ $item['id'] }})" size="sm" variant="danger">Hapus</flux:button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <div class="mt-6 bg-white dark:bg-gray-900 border rounded shadow-sm p-4">
+        <h4 class="font-semibold text-lg mb-4 text-gray-800 dark:text-white">Daftar Diagnosis</h4>
+
+        <div class="overflow-x-auto rounded">
+            <table class="min-w-full text-sm text-gray-700 dark:text-gray-200">
+                <thead class="bg-gray-100 dark:bg-gray-800 text-left">
+                    <tr class="border-b dark:border-gray-700">
+                        <th class="px-4 py-2">Diagnosis Awal</th>
+                        <th class="px-4 py-2">Diagnosis Primer</th>
+                        <th class="px-4 py-2">Diagnosis Sekunder</th>
+                        <th class="px-4 py-2">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y dark:divide-gray-700">
+                    @foreach ($diagnosisList as $item)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <td class="px-4 py-2">{{ $item['diagnosis_awal'] }}</td>
+                        <td class="px-4 py-2">{{ $item['diagnosis_primer'] }}</td>
+                        <td class="px-4 py-2">{{ $item['diagnosis_sekunder'] }}</td>
+                        <td class="px-4 py-2">
+                            <flux:button wire:click="delete({{ $item['id'] }})" size="sm" variant="danger">Hapus</flux:button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
     @endif
+
 </div>

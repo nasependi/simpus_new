@@ -16,7 +16,9 @@ class LaboratoriumComponent extends Component
     protected $rules = [
         'form.nama_pemeriksaan' => 'required|string',
         'form.nomor_pemeriksaan' => 'required|string',
-        // Tambahkan validasi lainnya sesuai kebutuhan
+        'form.tanggal_permintaan' => 'required|date',
+        'form.jam_permintaan' => 'required',
+        'form.dokter_pengirim' => 'required|string',
     ];
 
     public function mount($kunjungan_id)
@@ -26,6 +28,11 @@ class LaboratoriumComponent extends Component
         $lab = Laboratorium::where('kunjungan_id', $kunjungan_id)->first();
         if ($lab) {
             $this->form = $lab->toArray();
+
+            if (!empty($this->form['nomor_telepon_dokter'])) {
+                // Buat input hanya angka tanpa +62
+                $this->form['nomor_telepon_dokter_input'] = ltrim(str_replace('+62', '', $this->form['nomor_telepon_dokter']), '0');
+            }
         }
     }
 
@@ -34,6 +41,14 @@ class LaboratoriumComponent extends Component
         $this->validate();
 
         $this->form['kunjungan_id'] = $this->kunjungan_id;
+
+        // Handle nomor telepon dokter pengirim
+        if (!empty($this->form['nomor_telepon_dokter_input'])) {
+            $nomor = preg_replace('/[^0-9]/', '', $this->form['nomor_telepon_dokter_input']); // pastikan hanya angka
+            $this->form['nomor_telepon_dokter'] = '+62' . ltrim($nomor, '0');
+        }
+
+        unset($this->form['nomor_telepon_dokter_input']); // pastikan tidak ikut disimpan ke DB
 
         Laboratorium::updateOrCreate(
             ['kunjungan_id' => $this->kunjungan_id],
@@ -46,6 +61,8 @@ class LaboratoriumComponent extends Component
             variant: 'success'
         );
     }
+
+
 
     public function render()
     {
