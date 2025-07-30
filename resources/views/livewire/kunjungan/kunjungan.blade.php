@@ -66,7 +66,7 @@
                             <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
                         </flux:tooltip>
                         <flux:tooltip content="Pemeriksaan">
-                            <flux:button wire:click="openModalkunjungan({{ $item->id }})" icon="document-text" label="Pemeriksaan" class="mr-2" />
+                            <flux:button wire:click="openModalPemeriksaan({{ $item->id }})" icon="document-text" label="Pemeriksaan" class="mr-2" />
                         </flux:tooltip>
                         @else
                         <flux:tooltip content="General Consent">
@@ -84,15 +84,19 @@
         </flux:table>
 
         {{-- <livewire:General-Consent /> --}}
-        <flux:modal name="modalPemeriksaan" class="w-full max-w-screen-xl max-h-[80vh] overflow-y-auto" :dismissible="false" wire:ignore.self>
+        <flux:modal
+            name="modalPemeriksaan"
+            class="w-full max-w-screen-xl h-[80vh] overflow-y-auto"
+            :dismissible="false"
+            wire:ignore.self>
             <flux:tab.group>
                 <flux:tabs wire:model="tab">
                     <flux:tab name="awal">Asasment Awal</flux:tab>
-                    <flux:tab name="pemeriksaan">Pemeriksaan Specialistik</flux:tab>
+                    <flux:tab name="pemeriksaanS">Pemeriksaan Specialistik</flux:tab>
                 </flux:tabs>
                 <flux:tab.panel name="awal">
                     @if ($kunjungan_id)
-                    <flux:tab.group>
+                    <flux:tab.group class="outline-2 outline-zinc-600! dark:outline-zinc-500! rounded-lg p-4 my-3">
                         <flux:tabs wire:model="tab">
                             <flux:tab name="anamnesis">Anamnesis</flux:tab>
                             <flux:tab name="fisik">Pemeriksaan Fisik</flux:tab>
@@ -111,9 +115,9 @@
                     </flux:tab.group>
                     @endif
                 </flux:tab.panel>
-                <flux:tab.panel name="pemeriksaan">
+                <flux:tab.panel name="pemeriksaanS">
                     @if ($kunjungan_id)
-                    <flux:tab.group>
+                    <flux:tab.group class="outline-2 outline-zinc-600! dark:outline-zinc-500! rounded-lg p-4 my-3">
                         <flux:tabs wire:model="tab2">
                             <flux:tab name="spesialistik">Riwayat Penggunaan Obat</flux:tab>
                             <flux:tab name="account">Laboratorium</flux:tab>
@@ -170,7 +174,12 @@
                     </flux:tab.group>
                     @endif
                 </flux:tab.panel>
-                <flux:button wire:click="saveAll" class="mt-4 w-full" variant="primary">Simpan Semua</flux:button>
+                <div class="flex justify-between">
+                    <flux:modal.close>
+                        <flux:button variant="ghost" variant="filled" class="text-zinc-700! hover:text-zinc-900! dark:text-zinc-300! dark:hover:text-white!">Kembali</flux:button>
+                    </flux:modal.close>
+                    <flux:button wire:click.prevent="saveAll" onclick="syncAndSave()" variant="primary">Simpan Semua</flux:button>
+                </div>
             </flux:tab.group>
         </flux:modal>
 
@@ -240,4 +249,56 @@
         </flux:modal>
     </flux:card>
     <livewire:kunjungan.modal.general-consent />
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
+    <script>
+        function syncAndSave() {
+            const event = new Event('sync-all-signatures');
+            document.dispatchEvent(event);
+            setTimeout(() => {
+                Livewire.dispatch('syncSignaturesDone');
+            }, 100); // Delay untuk memastikan sync() selesai
+        }
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('signaturePad', (value) => ({
+                signaturePadInstance: null,
+                value: value,
+                init() {
+                    this.signaturePadInstance = new SignaturePad(this.$refs.signature_canvas);
+
+                    this.signaturePadInstance.addEventListener("endStroke", () => {
+                        this.sync();
+                    });
+
+                    if (this.value) {
+                        const img = new Image();
+                        img.onload = () => {
+                            const ctx = this.$refs.signature_canvas.getContext("2d");
+                            ctx.clearRect(0, 0, this.$refs.signature_canvas.width, this.$refs.signature_canvas.height);
+                            ctx.drawImage(img, 0, 0);
+                        };
+                        img.src = this.value;
+                    }
+                },
+                sync() {
+                    this.value = this.signaturePadInstance.toDataURL('image/png');
+                },
+                clear() {
+                    this.signaturePadInstance.clear();
+                    this.value = null;
+                }
+            }));
+        });
+
+        document.addEventListener('sync-all-signatures', () => {
+            document.querySelectorAll('[x-data^="signaturePad"]').forEach(el => {
+                if (el.__x && el.__x.$data?.sync) {
+                    el.__x.$data.sync();
+                }
+            });
+        });
+    </script>
+
 </div>

@@ -14,7 +14,7 @@
                     <div class="flex items-center">
                         <span>Kode</span>
                         @if ($sortField === 'kode')
-                            <x-icon :name="$sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" class="w-3 h-3 text-muted-foreground ml-1" />
+                        <x-icon :name="$sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" class="w-3 h-3 text-muted-foreground ml-1" />
                         @endif
                     </div>
                 </flux:table.column>
@@ -22,7 +22,7 @@
                     <div class="flex items-center">
                         <span>Nama Agama</span>
                         @if ($sortField === 'nama_agama')
-                            <x-icon :name="$sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" class="w-3 h-3 text-muted-foreground ml-1" />
+                        <x-icon :name="$sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" class="w-3 h-3 text-muted-foreground ml-1" />
                         @endif
                     </div>
                 </flux:table.column>
@@ -31,14 +31,14 @@
 
             <flux:table.rows>
                 @foreach ($data as $item)
-                    <flux:table.row>
-                        <flux:table.cell>{{ $item->kode }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->nama_agama }}</flux:table.cell>
-                        <flux:table.cell>
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
-                        </flux:table.cell>
-                    </flux:table.row>
+                <flux:table.row>
+                    <flux:table.cell>{{ $item->kode }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->nama_agama }}</flux:table.cell>
+                    <flux:table.cell>
+                        <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
+                        <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
+                    </flux:table.cell>
+                </flux:table.row>
                 @endforeach
             </flux:table.rows>
         </flux:table>
@@ -51,6 +51,30 @@
 
             <flux:input wire:model="kode" label="Kode" required />
             <flux:input wire:model="nama_agama" label="Nama Agama" required />
+            <canvas id="signature-canvas"></canvas>
+            <div x-data="signaturePad(@entangle('state.ttd_pasien_keluarga'))">
+                <h1 class="text-xl font-semibold text-gray-700 flex items-center justify-between"><span>Signature pad</span></h1>
+                <div>
+                    <canvas x-ref="signature_canvas" class="border rounded shadow">
+
+                    </canvas>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('alpine:init', () => {
+                    Alpine.data('signaturePad', (value) => ({
+                        signaturePadInstance: null,
+                        value: value,
+                        init() {
+                            this.signaturePadInstance = new SignaturePad(this.$refs.signature_canvas);
+                            this.signaturePadInstance.addEventListener("endStroke", () => {
+                                this.value = this.signaturePadInstance.toDataURL('image/png');
+                            });
+                        },
+                    }))
+                })
+            </script>
 
             <div class="flex justify-end gap-2">
                 <flux:modal.close>

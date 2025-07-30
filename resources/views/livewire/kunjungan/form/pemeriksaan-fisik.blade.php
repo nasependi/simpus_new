@@ -2,7 +2,7 @@
     <div class="grid grid-cols-3 gap-4 items-start">
         {{-- Kolom 1: Upload + Link file --}}
         <div class="space-y-2">
-            <label class="block text-sm font-medium text-white">Gambar Anatomi Tubuh</label>
+            <label class="block text-sm font-medium">Gambar Anatomi Tubuh</label>
 
             <div class="flex items-center gap-2">
                 <flux:input type="file" wire:model="gambar_anatomitubuh" label="" accept="image/*" />

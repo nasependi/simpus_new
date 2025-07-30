@@ -154,6 +154,8 @@
   {{ $slot }}
   <flux:toast />
   @fluxScripts
+  <!-- <script src="{{ asset('storage/js/sign-pad.min.js') }}"></script> -->
+
 </body>
 
 </html>

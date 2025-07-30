@@ -35,6 +35,8 @@ class Kunjungan extends Component
     public $filterUmur;
     public $filterPoli = '';
     public $filterCara = '';
+    protected $listeners = ['saveAll' => 'saveAll'];
+
 
 
     protected $rules = [
@@ -71,16 +73,16 @@ class Kunjungan extends Component
 
     public function saveAll()
     {
-        $this->dispatch('save-anamnesis');
-        $this->dispatch('save-pemeriksaan-fisik');
-        $this->dispatch('save-psikologis');
-        $this->dispatch('save-spesialistik');
+        // $this->dispatch('save-anamnesis');
+        // $this->dispatch('save-pemeriksaan-fisik');
+        // $this->dispatch('save-psikologis');
+        // $this->dispatch('save-spesialistik');
         $this->dispatch('save-persetujuan-tindakan');
-        $this->dispatch('save-laboratorium');
-        $this->dispatch('save-radiologi');
-        $this->dispatch('save-terapi');
-        $this->dispatch('save-obat-resep');
-        $this->dispatch('save-diagnosis');
+        // $this->dispatch('save-laboratorium');
+        // $this->dispatch('save-radiologi');
+        // $this->dispatch('save-terapi');
+        // $this->dispatch('save-obat-resep');
+        // $this->dispatch('save-diagnosis');
     }
 
     public function updated($property)
@@ -123,7 +125,7 @@ class Kunjungan extends Component
         );
     }
 
-    public function openModalkunjungan($id)
+    public function openModalPemeriksaan($id)
     {
         $this->kunjungan_id = $id;
         Flux::modal('modalPemeriksaan')->show();
