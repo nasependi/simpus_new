@@ -41,20 +41,22 @@
         <flux:navlist.item href="{{ route('status-pernikahan') }}">Status Pernikahan</flux:navlist.item>
         <flux:navlist.item href="{{ route('poli') }}">Poli</flux:navlist.item>
         <flux:navlist.item href="{{ route('cara') }}">Cara Pembayaran</flux:navlist.item>
-        <flux:navlist.item href="{{ route('obat') }}">Obat</flux:navlist.item>
         <flux:navlist.item href="{{ route('jenis-pemeriksaan-radiologi') }}">Jenis Pemeriksaan Radiologi</flux:navlist.item>
         <flux:navlist.item href="{{ route('tingkat-kesadaran') }}">Tingkat Kesadaran</flux:navlist.item>
       </flux:navlist.group>
 
-      <flux:navlist.group expandable heading="Manajemen Akses" class="grid">
-        <flux:navlist.item :href="route('userscrud')" :current="request()->routeIs('userscrud.*')"
-          wire:navigate>Users
-        </flux:navlist.item>
-        <flux:navlist.item :href="route('roles')" :current="request()->routeIs('roles.*')" wire:navigate>Role
-        </flux:navlist.item>
-        <flux:navlist.item :href="route('permissions')" :current="request()->routeIs('permissions.*')"
-          wire:navigate>
-          Permission</flux:navlist.item>
+      <flux:navlist.group expandable heading="Managament Obat" class="grid">
+        <flux:navlist.item href="{{ route('obat') }}">Obat</flux:navlist.item>
+        <flux:navlist.item href="{{ route('pembelian-obat') }}">Pembelian Obat</flux:navlist.item>
+        <flux:navlist.item href="{{ route('penjualan-obat') }}">Penjualan Obat</flux:navlist.item>
+        <flux:navlist.item href="{{ route('detail-pembelianobat') }}">Detail Pembelian Obat</flux:navlist.item>
+        <flux:navlist.item href="{{ route('detail-penjualanobat') }}">Deatil Penjualan Obat</flux:navlist.item>
+      </flux:navlist.group>
+
+      <flux:navlist.group expandable heading="Manajemen Pengguna" class="grid">
+        <flux:navlist.item :href="route('userscrud')" :current="request()->routeIs('userscrud.*')" wire:navigate>Users</flux:navlist.item>
+        <flux:navlist.item :href="route('roles')" :current="request()->routeIs('roles.*')" wire:navigate>Role</flux:navlist.item>
+        <flux:navlist.item :href="route('permissions')" :current="request()->routeIs('permissions.*')" wire:navigate> Permission</flux:navlist.item>
       </flux:navlist.group>
     </flux:navlist>
     @endrole

@@ -13,4 +13,15 @@ class Obat extends Model
         'golongan',
         'sediaan',
     ];
+
+    public function detailPembelian()
+    {
+        return $this->hasMany(DetailPembelianObatModel::class, 'obat_id');
+    }
+
+    // Relasi ke detail penjualan
+    public function detailPenjualan()
+    {
+        return $this->hasMany(DetailPenjualanObatModel::class, 'obat_id');
+    }
 }

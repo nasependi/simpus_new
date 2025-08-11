@@ -2,10 +2,10 @@
 
 namespace App\Livewire;
 
+use Flux\Flux;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\TingkatKesadaran as TingkatKesadaranModel;
-use Flux\Flux;
 
 class TingkatKesadaran extends Component
 {
@@ -13,30 +13,61 @@ class TingkatKesadaran extends Component
 
     public $keterangan, $nilai, $editId, $deleteId;
     public $search = '';
-    public $sortField = 'keterangan';
+
+    // Default: urut nilai dari 0 ke atas
+    public $sortField = 'nilai';
     public $sortDirection = 'asc';
 
     protected $rules = [
         'keterangan' => 'required|max:50',
-        'nilai' => 'required|max:10',
+        'nilai'      => 'required|max:10', // jika ingin angka saja, lihat catatan di bawah
     ];
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
     public function sortBy($field)
     {
+        // whitelist kolom yang boleh disort
+        $allowed = ['keterangan', 'nilai'];
+        if (! in_array($field, $allowed, true)) {
+            return;
+        }
+
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+
+        $this->resetPage();
     }
 
     public function render()
     {
-        $data = TingkatKesadaranModel::where('keterangan', 'like', '%' . $this->search . '%')
-            ->orWhere('nilai', 'like', '%' . $this->search . '%')
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
+        $query = TingkatKesadaranModel::query()
+            ->when($this->search !== '', function ($q) {
+                $q->where(function ($qq) {
+                    $qq->where('keterangan', 'like', '%' . $this->search . '%')
+                        ->orWhere('nilai', 'like', '%' . $this->search . '%');
+                });
+            });
+
+        // Terapkan sorting
+        if ($this->sortField === 'nilai') {
+            $dir = $this->sortDirection === 'desc' ? 'DESC' : 'ASC';
+            $query->orderByRaw("CAST(nilai AS UNSIGNED) $dir");
+        } else {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        }
+
+        // tie-breaker agar stabil
+        $query->orderBy('id', 'asc');
+
+        $data = $query->paginate(10);
 
         return view('livewire.tingkat-kesadaran', compact('data'));
     }
@@ -50,9 +81,9 @@ class TingkatKesadaran extends Component
     public function edit($id)
     {
         $item = TingkatKesadaranModel::findOrFail($id);
-        $this->editId = $item->id;
+        $this->editId    = $item->id;
         $this->keterangan = $item->keterangan;
-        $this->nilai = $item->nilai;
+        $this->nilai      = $item->nilai;
 
         Flux::modal('tingkatKesadaranModal')->show();
     }
@@ -86,6 +117,6 @@ class TingkatKesadaran extends Component
 
     public function resetForm()
     {
-        $this->reset(['keterangan', 'nilai', 'editId']);
+        $this->reset(['keterangan', 'nilai', 'editId', 'deleteId']);
     }
 }

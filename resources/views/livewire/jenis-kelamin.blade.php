@@ -17,22 +17,22 @@
                     {{-- <flux:button wire:click="sortBy('kode')" class="ml-2"/> --}}
                 </flux:table.column>
                 <flux:table.column class="text-left px-2 py-3">
-                    <span> Nama Jenis Kelamin </span>
-                    {{-- <flux:button wire:click="sortBy('nama_jk')" class="ml-2"/> --}}
+                    <span> Jenis Kelamin </span>
+                    {{-- <flux:button wire:click="sortBy('jk')" class="ml-2"/> --}}
                 </flux:table.column>
                 <flux:table.column class="text-center px-2 py-3">Aksi</flux:table.column>
             </flux:table.columns>
 
             <flux:table.rows>
                 @foreach ($data as $item)
-                    <flux:table.row class="transition duration-300 ease-in-out">
-                        <flux:table.cell class="px-2 py-3">{{ $item->kode }}</flux:table.cell>
-                        <flux:table.cell class="px-2 py-3">{{ $item->nama_jk }}</flux:table.cell>
-                        <flux:table.cell class="px-2 py-3">
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="px-3 py-1 mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" class="px-3 py-1" />
-                        </flux:table.cell>
-                    </flux:table.row>
+                <flux:table.row class="transition duration-300 ease-in-out">
+                    <flux:table.cell class="px-2 py-3">{{ $item->kode }}</flux:table.cell>
+                    <flux:table.cell class="px-2 py-3">{{ $item->jk }}</flux:table.cell>
+                    <flux:table.cell class="px-2 py-3">
+                        <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="px-3 py-1 mr-2" />
+                        <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" class="px-3 py-1" />
+                    </flux:table.cell>
+                </flux:table.row>
                 @endforeach
             </flux:table.rows>
         </flux:table>
@@ -42,7 +42,7 @@
             <flux:heading class="text-lg font-semibold">{{ $editId ? 'Edit' : 'Tambah' }} Jenis Kelamin</flux:heading>
 
             <flux:input wire:model="kode" label="Kode" required class="w-full" />
-            <flux:input wire:model="nama_jk" label="Nama Jenis Kelamin" required class="w-full" />
+            <flux:input wire:model="jk" label="Jenis Kelamin" required class="w-full" />
 
             <div class="flex justify-end gap-2 mt-4">
                 <flux:modal.close>

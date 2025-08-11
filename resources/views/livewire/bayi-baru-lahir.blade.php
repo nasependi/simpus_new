@@ -35,7 +35,7 @@
                     <flux:table.cell>
                         {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->jam_lahir)->format('H:i') }} WIB
                     </flux:table.cell>
-                    <flux:table.cell>{{ $item->jenisKelamin->nama_jk }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->jenisKelamin->jk }}</flux:table.cell>
                     <flux:table.cell>
                         @can('edit')
                         <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
@@ -66,7 +66,7 @@
             <flux:select wire:model="jk_id" label="Jenis Kelamin" required>
                 <flux:select.option value="">Pilih Jenis Kelamin</flux:select.option>
                 @foreach ($jenis_kelamin as $i)
-                <flux:select.option value="{{ $i->id }}">{{ $i->nama_jk }}</flux:select.option>
+                <flux:select.option value="{{ $i->id }}">{{ $i->jk }}</flux:select.option>
                 @endforeach
             </flux:select>
 

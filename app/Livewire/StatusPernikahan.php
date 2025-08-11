@@ -34,6 +34,7 @@ class StatusPernikahan extends Component
     public function render()
     {
         $data = StatusPernikahanModel::where('status', 'like', '%' . $this->search . '%')
+            ->orderByRaw('CAST(kode AS UNSIGNED) ASC') // << urut 0,1,2,3,...
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 

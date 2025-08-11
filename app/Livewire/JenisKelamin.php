@@ -43,7 +43,9 @@ class JenisKelamin extends Component
     public function render()
     {
         $data = JenisKelaminModel::where('nama_jk', 'like', '%' . $this->search . '%')
+            ->orderByRaw('CAST(kode AS UNSIGNED) ASC') // << urut 0,1,2,3,...
             ->orderBy($this->sortField, $this->sortDirection)
+            ->orderByRaw('LENGTH(kode), kode')  // << di sini
             ->paginate(10);
 
         return view('livewire.jenis-kelamin', compact('data'));

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('jenis_kelamin', function (Blueprint $table) {
             $table->id();
             $table->string('kode', 1);
-            $table->string('nama_jk', 30);
+            $table->string('jk', 30);
             $table->timestamps();
         });
     }

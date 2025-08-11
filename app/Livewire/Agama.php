@@ -34,6 +34,7 @@ class Agama extends Component
     public function render()
     {
         $data = AgamaModel::where('nama_agama', 'like', '%' . $this->search . '%')
+            ->orderByRaw('CAST(kode AS UNSIGNED) ASC') // << urut 0,1,2,3,...
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 

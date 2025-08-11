@@ -34,6 +34,7 @@ class Pendidikan extends Component
     public function render()
     {
         $data = PendidikanModel::where('nama_pendidikan', 'like', '%' . $this->search . '%')
+            ->orderByRaw('CAST(kode AS UNSIGNED) ASC') // << urut 0,1,2,3,...
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
