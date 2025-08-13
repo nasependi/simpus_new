@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('pembelian_obat', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('obat_id')->constrained('obat')->onDelete('cascade');
             $table->string('no_faktur');
             $table->integer('jumlah_beli');
             $table->float('ppn', 10, 2)->default(0);

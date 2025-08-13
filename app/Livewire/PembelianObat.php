@@ -16,7 +16,7 @@ class PembelianObat extends Component
     public $no_faktur, $ppn = 0, $pph = 0, $diskon = 0, $harga_beli_kotor, $harga_beli_bersih;
     public $editId, $deleteId;
 
-    // Detail pembelian: hanya obat + kuantitas (untuk sekarang)
+    // Detail pembelian
     public $obat_id, $kuantitas;
     public $detailItems = [];
 
@@ -67,7 +67,6 @@ class PembelianObat extends Component
             'kuantitas' => 'required|integer|min:1',
         ]);
 
-        // Coba cari obat berdasarkan id (numeric) dulu, kalau nggak ada coba berdasarkan nama
         $obat = null;
         if (is_numeric($this->obat_id)) {
             $obat = Obat::find((int) $this->obat_id);
@@ -82,14 +81,12 @@ class PembelianObat extends Component
             return;
         }
 
-        // Tambah ke detailItems (saat ini hanya simpan id, nama, dan kuantitas)
         $this->detailItems[] = [
             'obat_id'   => $obat->id,
             'nama_obat' => $obat->nama_obat,
             'kuantitas' => (int) $this->kuantitas,
         ];
 
-        // reset input detail
         $this->reset(['obat_id', 'kuantitas']);
     }
 
@@ -103,14 +100,14 @@ class PembelianObat extends Component
     {
         $this->validate();
 
-        // Hitung total jumlah_beli dari detailItems
-        $total_jumlah_beli = array_sum(array_column($this->detailItems, 'kuantitas'));
+        // Hitung jumlah beli dari total kuantitas
+        $jumlahBeli = array_sum(array_column($this->detailItems, 'kuantitas'));
 
-        $pembelian = PembelianObatModel::updateOrCreate(
+        PembelianObatModel::updateOrCreate(
             ['id' => $this->editId],
             [
                 'no_faktur'         => $this->no_faktur,
-                'jumlah_beli'       => $total_jumlah_beli,
+                'jumlah_beli'       => $jumlahBeli,
                 'ppn'               => $this->ppn ?? 0,
                 'pph'               => $this->pph ?? 0,
                 'diskon'            => $this->diskon ?? 0,
@@ -119,25 +116,41 @@ class PembelianObat extends Component
             ]
         );
 
-        // Simpan detail pembelian — isi kolom lain dengan default/0 jika belum ada
-        if (!empty($this->detailItems)) {
-            foreach ($this->detailItems as $item) {
-                DetailPembelianObatModel::create([
-                    'pembelian_id' => $pembelian->id,
-                    'obat_id'      => $item['obat_id'],
-                    'kuantitas'    => $item['kuantitas'],
-                    // sementara untuk kolom yang belum ada nilainya:
-                    'harga_beli'   => 0,
-                    'jumlah'       => $item['kuantitas'], // atau 0 tergantung schema
-                    'kadaluarsa'   => null,
-                ]);
-            }
-        }
-
         Flux::modal('pembelianModal')->close();
         Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
         $this->resetForm();
     }
+
+    public function edit($id)
+    {
+        // Ambil data pembelian header
+        $m = PembelianObatModel::findOrFail($id);
+
+        $this->editId            = $m->id;
+        $this->no_faktur         = $m->no_faktur;
+        $this->ppn               = $m->ppn ?? 0;
+        $this->pph               = $m->pph ?? 0;
+        $this->diskon            = $m->diskon ?? 0;
+        $this->harga_beli_kotor  = $m->harga_beli_kotor;
+        $this->harga_beli_bersih = $m->harga_beli_bersih;
+
+        // Ambil detail dari tabel DetailPembelianObatModel
+        $details = DetailPembelianObatModel::with('obat')
+            ->where('pembelian_id', $m->id)
+            ->get();
+
+        $this->detailItems = $details->map(function ($d) {
+            return [
+                'obat_id'   => $d->obat_id,
+                'nama_obat' => $d->obat->nama_obat ?? '',
+                'kuantitas' => (int) $d->kuantitas,
+            ];
+        })->toArray();
+
+        // Tampilkan modal edit
+        Flux::modal('pembelianModal')->show();
+    }
+
 
     public function deleteConfirm($id)
     {
@@ -161,10 +174,8 @@ class PembelianObat extends Component
             'diskon',
             'harga_beli_kotor',
             'harga_beli_bersih',
-            'editId',
             'detailItems',
-            'obat_id',
-            'kuantitas'
+            'editId'
         ]);
     }
 }
