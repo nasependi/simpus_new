@@ -13,7 +13,7 @@ class PembelianObat extends Component
 {
     use WithPagination;
 
-    public $no_faktur, $ppn = 0, $pph = 0, $diskon = 0, $harga_beli_kotor, $harga_beli_bersih;
+    public $no_faktur, $ppn = 0, $pph = 0, $diskon = 0, $harga_beli_kotor, $harga_beli_bersih, $pembelianList;
     public $editId, $deleteId;
 
     // Detail pembelian
@@ -23,6 +23,7 @@ class PembelianObat extends Component
     public $search = '';
     public $sortField = 'no_faktur';
     public $sortDirection = 'asc';
+
 
     protected $rules = [
         'no_faktur'         => 'required|max:50',
@@ -50,6 +51,8 @@ class PembelianObat extends Component
             ->paginate(10);
 
         $obatList = Obat::orderBy('nama_obat')->get();
+
+        $pembelianList = PembelianObatModel::pluck('no_faktur', 'id');
 
         return view('livewire.pembelian-obat', compact('data', 'obatList'));
     }
@@ -103,7 +106,8 @@ class PembelianObat extends Component
         // Hitung jumlah beli dari total kuantitas
         $jumlahBeli = array_sum(array_column($this->detailItems, 'kuantitas'));
 
-        PembelianObatModel::updateOrCreate(
+        // Simpan data pembelian (header)
+        $pembelian = PembelianObatModel::updateOrCreate(
             ['id' => $this->editId],
             [
                 'no_faktur'         => $this->no_faktur,
@@ -115,6 +119,21 @@ class PembelianObat extends Component
                 'harga_beli_bersih' => $this->harga_beli_bersih,
             ]
         );
+
+        // Hapus detail lama kalau sedang edit
+        DetailPembelianObatModel::where('pembelian_id', $pembelian->id)->delete();
+
+        // Simpan detail baru
+        foreach ($this->detailItems as $item) {
+            DetailPembelianObatModel::create([
+                'pembelian_id' => $pembelian->id,
+                'obat_id'      => $item['obat_id'],
+                'kuantitas'    => $item['kuantitas'],
+                'harga_beli'   => 0, // isi sesuai kebutuhan
+                'jumlah'       => 0, // isi sesuai kebutuhan
+                'kadaluarsa'   => now()->addYear(), // default contoh
+            ]);
+        }
 
         Flux::modal('pembelianModal')->close();
         Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
@@ -134,11 +153,12 @@ class PembelianObat extends Component
         $this->harga_beli_kotor  = $m->harga_beli_kotor;
         $this->harga_beli_bersih = $m->harga_beli_bersih;
 
-        // Ambil detail dari tabel DetailPembelianObatModel
+        // Ambil detail pembelian + relasi obat
         $details = DetailPembelianObatModel::with('obat')
-            ->where('pembelian_id', $m->id)
+            ->where('pembelian_id', $m->id) // pastikan ini sesuai dengan DB
             ->get();
 
+        // Mapping ke array untuk Blade
         $this->detailItems = $details->map(function ($d) {
             return [
                 'obat_id'   => $d->obat_id,
@@ -147,9 +167,10 @@ class PembelianObat extends Component
             ];
         })->toArray();
 
-        // Tampilkan modal edit
+        // Buka modal
         Flux::modal('pembelianModal')->show();
     }
+
 
 
     public function deleteConfirm($id)
@@ -177,5 +198,26 @@ class PembelianObat extends Component
             'detailItems',
             'editId'
         ]);
+    }
+
+    public $detailPembelian = [];
+
+    public function showDetail($pembelianId)
+    {
+        $this->detailPembelian = \App\Models\DetailPembelianObatModel::with('obat')
+            ->where('pembelian_id', $pembelianId)
+            ->get()
+            ->map(function ($d) {
+                return [
+                    'nama_obat'  => $d->obat->nama_obat ?? '-',
+                    'kuantitas'  => $d->kuantitas,
+                    'harga_beli' => number_format($d->harga_beli, 0, ',', '.'),
+                    'jumlah'     => number_format($d->jumlah, 0, ',', '.'),
+                    'kadaluarsa' => \Carbon\Carbon::parse($d->kadaluarsa)->format('d-m-Y'),
+                ];
+            })
+            ->toArray();
+
+        Flux::modal('detailPembelianModal')->show();
     }
 }
