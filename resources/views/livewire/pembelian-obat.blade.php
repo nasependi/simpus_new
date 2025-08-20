@@ -43,11 +43,6 @@
 
             {{-- Input Umum --}}
             <flux:input wire:model="no_faktur" label="No Faktur" required />
-            <flux:input wire:model="ppn" label="PPN" type="number" step="0.01" />
-            <flux:input wire:model="pph" label="PPH" type="number" step="0.01" />
-            <flux:input wire:model="diskon" label="Diskon" type="number" step="0.01" />
-            <flux:input wire:model="harga_beli_kotor" label="Harga Beli Kotor" type="number" required />
-            <flux:input wire:model="harga_beli_bersih" label="Harga Beli Bersih" type="number" required />
 
             <hr class="my-4">
 
@@ -71,20 +66,20 @@
 
             {{-- Tabel Item --}}
             @if(!empty($detailItems))
-            <table class="min-w-full mt-4 border border-gray-300">
+            <table class="min-w-full my-4 border border-border text-sm">
                 <thead>
-                    <tr class="bg-gray-100">
-                        <th class="px-2 py-1">Nama Obat</th>
-                        <th class="px-2 py-1">Kuantitas</th>
-                        <th class="px-2 py-1">Harga Beli</th>
-                        <th class="px-2 py-1">Jumlah</th>
-                        <th class="px-2 py-1">Kadaluarsa</th>
-                        <th class="px-2 py-1">Aksi</th>
+                    <tr class="bg-muted">
+                        <th class="px-2 py-1 text-left">Nama Obat</th>
+                        <th class="px-2 py-1 text-left">Kuantitas</th>
+                        <th class="px-2 py-1 text-left">Harga Beli</th>
+                        <th class="px-2 py-1 text-left">Jumlah</th>
+                        <th class="px-2 py-1 text-left">Kadaluarsa</th>
+                        <th class="px-2 py-1 text-left">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($detailItems as $index => $item)
-                    <tr>
+                    <tr class="border-t border-border">
                         <td class="px-2 py-1">{{ $item['nama_obat'] }}</td>
                         <td class="px-2 py-1">{{ $item['kuantitas'] }}</td>
                         <td class="px-2 py-1">{{ number_format($item['harga_beli'], 0, ',', '.') }}</td>
@@ -99,6 +94,13 @@
             </table>
 
             @endif
+            <div class="my-3">
+                <flux:input wire:model.live.debounce.300ms="harga_beli_kotor" label="Harga Beli Kotor" type="number" required />
+                <flux:input wire:model.live.debounce.300ms="ppn" label="PPN" type="number" step="0.01" />
+                <flux:input wire:model.live.debounce.300ms="pph" label="PPH" type="number" step="0.01" />
+                <flux:input wire:model.live.debounce.300ms="diskon" label="Diskon" type="number" step="0.01" />
+                <flux:input wire:model.live.debounce.300ms="harga_beli_bersih" label="Harga Beli Bersih" type="number" required />
+            </div>
 
             <div class="flex justify-end gap-2 mt-4">
                 <flux:modal.close>

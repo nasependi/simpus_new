@@ -107,6 +107,8 @@ class PembelianObat extends Component
             'kadaluarsa' => $this->kadaluarsa,
         ];
 
+        $this->hitungTotal();
+
         // reset form input item
         $this->reset(['obat_id', 'kuantitas', 'harga_beli', 'jumlah', 'kadaluarsa']);
     }
@@ -114,7 +116,38 @@ class PembelianObat extends Component
     public function removeItem($index)
     {
         unset($this->detailItems[$index]);
+        $this->hitungTotal();
         $this->detailItems = array_values($this->detailItems);
+    }
+
+    private function hitungTotal()
+    {
+        // harga kotor = total semua jumlah item
+        $this->harga_beli_kotor = array_sum(array_map('floatval', array_column($this->detailItems, 'jumlah')));
+        $ppn = floatval($this->harga_beli_kotor) * ($this->ppn ?? 0 / 100);
+        $pph = floatval($this->harga_beli_kotor) * ($this->pph ?? 0 / 100);
+        $diskon = floatval($this->diskon);
+
+        $kotor  = floatval($this->harga_beli_kotor ?? 0);
+
+        // harga bersih = harga kotor + ppn + pph - diskon
+        $this->harga_beli_bersih = $kotor + $ppn + $pph - $diskon;
+    }
+
+
+    public function updatedPpn()
+    {
+        $this->hitungTotal();
+    }
+
+    public function updatedPph()
+    {
+        $this->hitungTotal();
+    }
+
+    public function updatedDiskon()
+    {
+        $this->hitungTotal();
     }
 
     // === SIMPAN ===

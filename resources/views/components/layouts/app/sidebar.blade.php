@@ -49,8 +49,6 @@
         <flux:navlist.item href="{{ route('obat') }}">Obat</flux:navlist.item>
         <flux:navlist.item href="{{ route('pembelian-obat') }}">Pembelian Obat</flux:navlist.item>
         <flux:navlist.item href="{{ route('penjualan-obat') }}">Penjualan Obat</flux:navlist.item>
-        <flux:navlist.item href="{{ route('detail-pembelianobat') }}">Detail Pembelian Obat</flux:navlist.item>
-        <flux:navlist.item href="{{ route('detail-penjualanobat') }}">Deatil Penjualan Obat</flux:navlist.item>
       </flux:navlist.group>
 
       <flux:navlist.group expandable heading="Manajemen Pengguna" class="grid">
