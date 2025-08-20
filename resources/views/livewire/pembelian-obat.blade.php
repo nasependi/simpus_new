@@ -52,7 +52,7 @@
             <hr class="my-4">
 
             {{-- Input Detail Obat (hanya nama obat + jumlah) --}}
-            <div class="grid grid-cols-5 gap-2 items-end">
+            <div class="grid grid-cols-6 gap-2 items-end">
                 <flux:autocomplete wire:model="obat_id" label="Pilih Obat" placeholder="Cari obat...">
                     @foreach($obatList as $obat)
                     <flux:autocomplete.item value="{{ $obat->id }}">
@@ -61,12 +61,10 @@
                     @endforeach
                 </flux:autocomplete>
 
-                <flux:input wire:model="kuantitas" label="Kuantitas" type="number" min="1" />
-                <!-- <flux:input wire:model="harga_beli" label="Harga Beli" type="number" step="0.01" />
-                <flux:input wire:model="jumlah_beli" label="Jumlah" type="number" step="0.01" />
-                <flux:input wire:model="kadaluarsa" label="Kadaluarsa" type="date" /> -->
-
-                <div class="col-span-2"></div>
+                <flux:input wire:model.live.debounce.300ms="kuantitas" label="Kuantitas" type="number" min="1" />
+                <flux:input wire:model.live.debounce.300ms="harga_beli" label="Harga Beli" type="number" min="0" />
+                <flux:input wire:model="jumlah" label="Jumlah" readonly />
+                <flux:input wire:model="kadaluarsa" label="Kadaluarsa" type="date" />
 
                 <flux:button wire:click.prevent="addItem" variant="primary">Tambah Item</flux:button>
             </div>
@@ -77,7 +75,10 @@
                 <thead>
                     <tr class="bg-gray-100">
                         <th class="px-2 py-1">Nama Obat</th>
+                        <th class="px-2 py-1">Kuantitas</th>
+                        <th class="px-2 py-1">Harga Beli</th>
                         <th class="px-2 py-1">Jumlah</th>
+                        <th class="px-2 py-1">Kadaluarsa</th>
                         <th class="px-2 py-1">Aksi</th>
                     </tr>
                 </thead>
@@ -86,9 +87,9 @@
                     <tr>
                         <td class="px-2 py-1">{{ $item['nama_obat'] }}</td>
                         <td class="px-2 py-1">{{ $item['kuantitas'] }}</td>
-                        <!-- <td class="px-2 py-1">{{ $item['harga_beli'] }}</td>
-                        <td class="px-2 py-1">{{ $item['jumlah_beli'] }}</td>
-                        <td class="px-2 py-1">{{ $item['kadaluarsa'] }}</td> -->
+                        <td class="px-2 py-1">{{ number_format($item['harga_beli'], 0, ',', '.') }}</td>
+                        <td class="px-2 py-1">{{ number_format($item['jumlah'], 0, ',', '.') }}</td>
+                        <td class="px-2 py-1">{{ \Carbon\Carbon::parse($item['kadaluarsa'])->format('d-m-Y') }}</td>
                         <td class="px-2 py-1">
                             <flux:button wire:click="removeItem({{ $index }})" variant="danger" size="sm">Hapus</flux:button>
                         </td>
@@ -96,52 +97,10 @@
                     @endforeach
                 </tbody>
             </table>
+
             @endif
 
             <div class="flex justify-end gap-2 mt-4">
-                <flux:modal.close>
-                    <flux:button variant="ghost">Batal</flux:button>
-                </flux:modal.close>
-                <flux:button wire:click="save" variant="primary">Simpan</flux:button>
-            </div>
-        </flux:modal>
-
-        {{-- Modal Detail Pembelian --}}
-        <flux:modal name="detailPembelianModal" class="w-full max-w-screen-xl h-[80vh] overflow-y-auto">
-            <flux:heading class="text-lg font-semibold">Detail Pembelian Obat</flux:heading>
-
-            @if(empty($detailPembelian))
-            <p class="text-gray-500">Tidak ada detail untuk pembelian ini.</p>
-            @else
-            <table class="min-w-full border border-gray-300">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border px-3 py-2">Nama Obat</th>
-                        <th class="border px-3 py-2">Kuantitas</th>
-                        <th class="border px-3 py-2">Harga Beli</th>
-                        <th class="border px-3 py-2">Jumlah</th>
-                        <th class="border px-3 py-2">Kadaluarsa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($detailPembelian as $d)
-                    <tr>
-                        <td class="border px-3 py-2">{{ $d['nama_obat'] }}</td>
-                        <td class="border px-3 py-2 text-center">{{ $d['kuantitas'] }}</td>
-                        <!-- <td class="border px-3 py-2 text-right">{{ $d['harga_beli'] }}</td>
-                        <td class="border px-3 py-2 text-right">{{ $d['jumlah'] }}</td>
-                        <td class="border px-3 py-2 text-center">{{ $d['kadaluarsa'] }}</td> -->
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            @endif
-            <flux:input wire:model="kuantitas" label="Kuantitas" type="number" required />
-            <!-- <flux:input wire:model="harga_beli" label="Harga Beli" type="number" required />
-            <flux:input wire:model="jumlah" label="Jumlah" type="number" required />
-            <flux:input wire:model="kadaluarsa" label="Kadaluarsa" type="date" required /> -->
-
-            <div class="flex justify-end gap-2">
                 <flux:modal.close>
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>

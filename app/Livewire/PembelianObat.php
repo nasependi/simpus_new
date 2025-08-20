@@ -13,17 +13,16 @@ class PembelianObat extends Component
 {
     use WithPagination;
 
-    public $no_faktur, $ppn = 0, $pph = 0, $diskon = 0, $harga_beli_kotor, $harga_beli_bersih, $pembelianList;
+    public $no_faktur, $ppn = 0, $pph = 0, $diskon = 0, $harga_beli_kotor, $harga_beli_bersih;
     public $editId, $deleteId;
 
-    // Detail pembelian
-    public $obat_id, $kuantitas;
+    // Detail pembelian (form item)
+    public $obat_id, $kuantitas, $harga_beli, $jumlah, $kadaluarsa;
     public $detailItems = [];
 
     public $search = '';
     public $sortField = 'no_faktur';
     public $sortDirection = 'asc';
-
 
     protected $rules = [
         'no_faktur'         => 'required|max:50',
@@ -52,8 +51,6 @@ class PembelianObat extends Component
 
         $obatList = Obat::orderBy('nama_obat')->get();
 
-        $pembelianList = PembelianObatModel::pluck('no_faktur', 'id');
-
         return view('livewire.pembelian-obat', compact('data', 'obatList'));
     }
 
@@ -63,34 +60,55 @@ class PembelianObat extends Component
         Flux::modal('pembelianModal')->show();
     }
 
+    // === FORM DETAIL ITEM ===
+
+    public function updatedKuantitas()
+    {
+        $this->hitungJumlah();
+    }
+
+    public function updatedHargaBeli()
+    {
+        $this->hitungJumlah();
+    }
+
+    private function hitungJumlah()
+    {
+        $this->jumlah = (int) $this->kuantitas * (int) $this->harga_beli;
+    }
+
     public function addItem()
     {
         $this->validate([
-            'obat_id'   => 'required',
-            'kuantitas' => 'required|integer|min:1',
+            'obat_id'    => 'required',
+            'kuantitas'  => 'required|integer|min:1',
+            'harga_beli' => 'required|numeric|min:0',
+            'kadaluarsa' => 'required|date',
         ]);
 
-        $obat = null;
-        if (is_numeric($this->obat_id)) {
-            $obat = Obat::find((int) $this->obat_id);
-        }
-
-        if (!$obat) {
-            $obat = Obat::where('nama_obat', $this->obat_id)->first();
-        }
+        $obat = is_numeric($this->obat_id)
+            ? Obat::find((int) $this->obat_id)
+            : Obat::where('nama_obat', $this->obat_id)->first();
 
         if (!$obat) {
             $this->addError('obat_id', 'Obat tidak ditemukan.');
             return;
         }
 
+        // pastikan jumlah sudah dihitung
+        $this->hitungJumlah();
+
         $this->detailItems[] = [
-            'obat_id'   => $obat->id,
-            'nama_obat' => $obat->nama_obat,
-            'kuantitas' => (int) $this->kuantitas,
+            'obat_id'    => $obat->id,
+            'nama_obat'  => $obat->nama_obat,
+            'kuantitas'  => (int) $this->kuantitas,
+            'harga_beli' => (float) $this->harga_beli,
+            'jumlah'     => (float) $this->jumlah,
+            'kadaluarsa' => $this->kadaluarsa,
         ];
 
-        $this->reset(['obat_id', 'kuantitas']);
+        // reset form input item
+        $this->reset(['obat_id', 'kuantitas', 'harga_beli', 'jumlah', 'kadaluarsa']);
     }
 
     public function removeItem($index)
@@ -99,6 +117,8 @@ class PembelianObat extends Component
         $this->detailItems = array_values($this->detailItems);
     }
 
+    // === SIMPAN ===
+
     public function save()
     {
         $this->validate();
@@ -106,7 +126,7 @@ class PembelianObat extends Component
         // Hitung jumlah beli dari total kuantitas
         $jumlahBeli = array_sum(array_column($this->detailItems, 'kuantitas'));
 
-        // Simpan data pembelian (header)
+        // Simpan header pembelian
         $pembelian = PembelianObatModel::updateOrCreate(
             ['id' => $this->editId],
             [
@@ -120,7 +140,7 @@ class PembelianObat extends Component
             ]
         );
 
-        // Hapus detail lama kalau sedang edit
+        // Hapus detail lama (kalau edit)
         DetailPembelianObatModel::where('pembelian_id', $pembelian->id)->delete();
 
         // Simpan detail baru
@@ -129,9 +149,9 @@ class PembelianObat extends Component
                 'pembelian_id' => $pembelian->id,
                 'obat_id'      => $item['obat_id'],
                 'kuantitas'    => $item['kuantitas'],
-                'harga_beli'   => 0, // isi sesuai kebutuhan
-                'jumlah'       => 0, // isi sesuai kebutuhan
-                'kadaluarsa'   => now()->addYear(), // default contoh
+                'harga_beli'   => $item['harga_beli'],
+                'jumlah'       => $item['jumlah'],
+                'kadaluarsa'   => $item['kadaluarsa'],
             ]);
         }
 
@@ -140,9 +160,10 @@ class PembelianObat extends Component
         $this->resetForm();
     }
 
+    // === EDIT ===
+
     public function edit($id)
     {
-        // Ambil data pembelian header
         $m = PembelianObatModel::findOrFail($id);
 
         $this->editId            = $m->id;
@@ -153,25 +174,25 @@ class PembelianObat extends Component
         $this->harga_beli_kotor  = $m->harga_beli_kotor;
         $this->harga_beli_bersih = $m->harga_beli_bersih;
 
-        // Ambil detail pembelian + relasi obat
         $details = DetailPembelianObatModel::with('obat')
-            ->where('pembelian_id', $m->id) // pastikan ini sesuai dengan DB
+            ->where('pembelian_id', $m->id)
             ->get();
 
-        // Mapping ke array untuk Blade
         $this->detailItems = $details->map(function ($d) {
             return [
-                'obat_id'   => $d->obat_id,
-                'nama_obat' => $d->obat->nama_obat ?? '',
-                'kuantitas' => (int) $d->kuantitas,
+                'obat_id'    => $d->obat_id,
+                'nama_obat'  => $d->obat->nama_obat ?? '',
+                'kuantitas'  => (int) $d->kuantitas,
+                'harga_beli' => (float) $d->harga_beli,
+                'jumlah'     => (float) $d->jumlah,
+                'kadaluarsa' => $d->kadaluarsa,
             ];
         })->toArray();
 
-        // Buka modal
         Flux::modal('pembelianModal')->show();
     }
 
-
+    // === DELETE ===
 
     public function deleteConfirm($id)
     {
@@ -196,15 +217,22 @@ class PembelianObat extends Component
             'harga_beli_kotor',
             'harga_beli_bersih',
             'detailItems',
-            'editId'
+            'editId',
+            'obat_id',
+            'kuantitas',
+            'harga_beli',
+            'jumlah',
+            'kadaluarsa',
         ]);
     }
+
+    // === DETAIL VIEW ===
 
     public $detailPembelian = [];
 
     public function showDetail($pembelianId)
     {
-        $this->detailPembelian = \App\Models\DetailPembelianObatModel::with('obat')
+        $this->detailPembelian = DetailPembelianObatModel::with('obat')
             ->where('pembelian_id', $pembelianId)
             ->get()
             ->map(function ($d) {
@@ -219,5 +247,10 @@ class PembelianObat extends Component
             ->toArray();
 
         Flux::modal('detailPembelianModal')->show();
+    }
+
+    public function updatedProperty($propertyName)
+    {
+        dd("Updated property: {$propertyName} with value: {$this->{$propertyName}}");
     }
 }
