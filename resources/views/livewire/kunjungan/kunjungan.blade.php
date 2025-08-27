@@ -66,7 +66,7 @@
                             <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
                         </flux:tooltip>
                         <flux:tooltip content="Pemeriksaan">
-                            <flux:button wire:click="openModalPemeriksaan({{ $item->id }})" icon="document-text" label="Pemeriksaan" class="mr-2" />
+                            <flux:button wire:click="openModalPemeriksaan({{ $item->id }})" icon="rectangle-stack" label="Pemeriksaan" class="mr-2" />
                         </flux:tooltip>
                         @else
                         <flux:tooltip content="General Consent">

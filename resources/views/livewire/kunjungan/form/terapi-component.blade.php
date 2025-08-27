@@ -1,13 +1,14 @@
 <div class="space-y-4">
     <div class="grid grid-cols-2 gap-2">
-        <flux:select wire:model="state.obat_id" label="Obat Resep">
-            <option value="">-- Pilih Obat --</option>
+        <flux:input wire:model="state.nama_tindakan" label="Nama Tindakan" />
+        <flux:select wire:model.live="state.id_obat" variant="listbox" searchable placeholder="Pilih Obat" label="Pilih Obat">
             @foreach ($obatResepList as $obat)
-            <option value="{{ $obat->id }}">{{ $obat->nama_obat }}</option>
+            <flux:select.option value="{{ $obat->id }}">
+                {{ $obat->nama_obat }}
+            </flux:select.option>
             @endforeach
         </flux:select>
 
-        <flux:input wire:model="state.nama_tindakan" label="Nama Tindakan" />
     </div>
 
     <div class="grid grid-cols-2 gap-2">

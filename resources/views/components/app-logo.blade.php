@@ -2,5 +2,7 @@
     <x-app-logo-icon class="size-5 fill-current text-white dark:text-black" />
 </div>
 <div class="ms-1 grid flex-1 text-start text-sm">
-    <span class="mb-0.5 truncate leading-none font-semibold">SIMPUS</span>
+    <flux:heading size="xl" class="font-extrabold text-primary-700 dark:text-primary-400">
+        SIMPUS
+    </flux:heading>
 </div>

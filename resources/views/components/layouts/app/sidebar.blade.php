@@ -18,13 +18,13 @@
         <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
           wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
         <flux:navlist.item href="{{ route('pasien-umum') }}" :active="request()->routeIs('pasien-umum')"
-          icon="user">
+          icon="user-group">
           Pasien Umum</flux:navlist.item>
         <flux:navlist.item href="{{ route('bayi-baru-lahir') }}" :active="request()->routeIs('bayi-baru-lahir')"
-          icon="heart">
+          icon="user-plus">
           Bayi Baru Lahir</flux:navlist.item>
         <flux:navlist.item href="{{ route('kunjungan') }}" :active="request()->routeIs('kunjungan')"
-          icon="user">
+          icon="users">
           Kunjungan</flux:navlist.item>
       </flux:navlist.group>
     </flux:navlist>

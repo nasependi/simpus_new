@@ -33,7 +33,7 @@
                     <flux:table.cell>{{ $item->nama_lengkap }}</flux:table.cell>
                     <flux:table.cell>{{ $item->nik }}</flux:table.cell>
                     <flux:table.cell>{{ $item->province->name }}</flux:table.cell>
-                    <flux:table.cell>{{ $item->jenisKelamin->jk }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->jenisKelamin->nama_jk }}</flux:table.cell>
                     <flux:table.cell>{{ $item->agama->nama_agama }}</flux:table.cell>
                     <flux:table.cell>
                         @can('edit')
@@ -120,7 +120,7 @@
                 <flux:select wire:model="jk_id" label="Jenis Kelamin" required>
                     <flux:select.option value="">Pilih Jenis Kelamin</flux:select.option>
                     @foreach ($jenis_kelamin as $i)
-                    <flux:select.option value="{{ $i->id }}">{{ $i->jk }}</flux:select.option>
+                    <flux:select.option value="{{ $i->id }}">{{ $i->nama_jk }}</flux:select.option>
                     @endforeach
                 </flux:select>
                 <flux:select wire:model="agama_id" label="Agama" required>
@@ -159,15 +159,21 @@
                     <flux:input wire:model="rt" label="RT" required />
                     <flux:input wire:model="rw" label="RW" required />
                     <flux:input wire:model="no_rumah" label="Nomor Rumah" required />
+
                 </div>
                 <!-- PROVINSI -->
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_provinsi" label="Provinsi"
-                        placeholder="Ketik nama provinsi..." autocomplete="off" />
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_provinsi"
+                        label="Provinsi"
+                        placeholder="Ketik nama provinsi..."
+                        autocomplete="off" />
+
                     @if ($provinsiOptions)
-                    <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
+                    <div class="absolute z-50 mt-1 w-full rounded-xl border shadow-lg bg-white dark:bg-gray-800 dark:border-gray-700 max-h-48 overflow-y-auto">
                         @foreach ($provinsiOptions as $provinsi)
-                        <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
+                        <div
+                            class="px-4 py-2 cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                             wire:click="selectProvinsi({{ $provinsi['id'] }}, '{{ $provinsi['name'] }}')">
                             {{ $provinsi['name'] }}
                         </div>
@@ -176,14 +182,22 @@
                     @endif
                 </div>
                 <!-- KABUPATEN -->
+                {{-- KABUPATEN --}}
                 @if ($prov_id)
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_kabupaten" label="Kabupaten/Kota"
-                        placeholder="Ketik nama kabupaten..." autocomplete="off" />
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_kabupaten"
+                        label="Kabupaten/Kota"
+                        placeholder="Ketik nama kabupaten..."
+                        autocomplete="off" />
+
                     @if ($kabupatenOptions)
-                    <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
                         @foreach ($kabupatenOptions as $kabupaten)
-                        <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
+                        <div class="px-4 py-2 cursor-pointer 
+                                text-gray-800 dark:text-gray-200 
+                                hover:bg-gray-100 dark:hover:bg-gray-700"
                             wire:click="selectKabupaten({{ $kabupaten['id'] }}, '{{ $kabupaten['name'] }}')">
                             {{ $kabupaten['name'] }}
                         </div>
@@ -192,45 +206,57 @@
                     @endif
                 </div>
                 @endif
-                <!-- KECAMATAN -->
+
+                {{-- KECAMATAN --}}
                 @if ($kab_id)
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_kecamatan" label="Kecamatan"
-                        placeholder="Ketik nama kecamatan..." autocomplete="off" />
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_kecamatan"
+                        label="Kecamatan"
+                        placeholder="Ketik nama kecamatan..."
+                        autocomplete="off" />
+
                     @if ($kecamatanOptions)
-                    <div class="relative z-50">
-                        <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
-                            @foreach ($kecamatanOptions as $kecamatan)
-                            <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
-                                wire:click="selectKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
-                                {{ $kecamatan['name'] }}
-                            </div>
-                            @endforeach
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
+                        @foreach ($kecamatanOptions as $kecamatan)
+                        <div class="px-4 py-2 cursor-pointer 
+                                text-gray-800 dark:text-gray-200 
+                                hover:bg-gray-100 dark:hover:bg-gray-700"
+                            wire:click="selectKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
+                            {{ $kecamatan['name'] }}
                         </div>
+                        @endforeach
                     </div>
                     @endif
                 </div>
                 @endif
 
-                <!-- KELURAHAN -->
+                {{-- KELURAHAN --}}
                 @if ($kec_id)
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_kelurahan" label="Kelurahan/Desa"
-                        placeholder="Ketik nama kelurahan..." autocomplete="off" />
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_kelurahan"
+                        label="Kelurahan/Desa"
+                        placeholder="Ketik nama kelurahan..."
+                        autocomplete="off" />
+
                     @if ($kelurahanOptions)
-                    <div class="relative z-50">
-                        <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
-                            @foreach ($kelurahanOptions as $kelurahan)
-                            <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
-                                wire:click="selectKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
-                                {{ $kelurahan['name'] }}
-                            </div>
-                            @endforeach
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
+                        @foreach ($kelurahanOptions as $kelurahan)
+                        <div class="px-4 py-2 cursor-pointer 
+                                text-gray-800 dark:text-gray-200 
+                                hover:bg-gray-100 dark:hover:bg-gray-700"
+                            wire:click="selectKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
+                            {{ $kelurahan['name'] }}
                         </div>
+                        @endforeach
                     </div>
                     @endif
                 </div>
                 @endif
+
                 <flux:input wire:model="kodepos_id" label="Kode Pos" required />
                 @endif
                 @if ($halaman === 3)
@@ -248,16 +274,23 @@
 
                 @if (!$sama_domisili)
                 <!-- DOMISILI PROVINSI -->
+                <!-- DOMISILI PROVINSI -->
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_domisili_prov"
-                        label="Provinsi Domisili" placeholder="Ketik nama provinsi..." autocomplete="off" />
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_domisili_prov"
+                        label="Provinsi Domisili"
+                        placeholder="Ketik nama provinsi..."
+                        autocomplete="off" />
+
                     @if ($domisiliProvinsiOptions)
-                    <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                    bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
                         @foreach ($domisiliProvinsiOptions as $provinsi)
-                        <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
+                        <div class="px-4 py-2 cursor-pointer text-gray-800 dark:text-gray-200 
+                            hover:bg-gray-100 dark:hover:bg-gray-700"
                             wire:click="selectDomisiliProvinsi({{ $provinsi['id'] }}, '{{ $provinsi['name'] }}')">
                             {{ $provinsi['name'] }}
-                        </div>w
+                        </div>
                         @endforeach
                     </div>
                     @endif
@@ -265,14 +298,19 @@
 
                 <!-- DOMISILI KABUPATEN -->
                 @if ($domisili_prov_id)
-                <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_domisili_kab"
-                        label="Kabupaten/Kota Domisili" placeholder="Ketik nama kabupaten..."
+                <div class="relative mt-4">
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_domisili_kab"
+                        label="Kabupaten/Kota Domisili"
+                        placeholder="Ketik nama kabupaten..."
                         autocomplete="off" />
+
                     @if ($domisiliKabupatenOptions)
-                    <div class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
                         @foreach ($domisiliKabupatenOptions as $kabupaten)
-                        <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
+                        <div class="px-4 py-2 cursor-pointer text-gray-800 dark:text-gray-200 
+                                hover:bg-gray-100 dark:hover:bg-gray-700"
                             wire:click="selectDomisiliKabupaten({{ $kabupaten['id'] }}, '{{ $kabupaten['name'] }}')">
                             {{ $kabupaten['name'] }}
                         </div>
@@ -284,21 +322,23 @@
 
                 <!-- DOMISILI KECAMATAN -->
                 @if ($domisili_kab_id)
-                <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_domisili_kec"
-                        label="Kecamatan Domisili" placeholder="Ketik nama kecamatan..."
+                <div class="relative mt-4">
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_domisili_kec"
+                        label="Kecamatan Domisili"
+                        placeholder="Ketik nama kecamatan..."
                         autocomplete="off" />
+
                     @if ($domisiliKecamatanOptions)
-                    <div class="relative z-50">
-                        <div
-                            class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
-                            @foreach ($domisiliKecamatanOptions as $kecamatan)
-                            <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
-                                wire:click="selectDomisiliKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
-                                {{ $kecamatan['name'] }}
-                            </div>
-                            @endforeach
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
+                        @foreach ($domisiliKecamatanOptions as $kecamatan)
+                        <div class="px-4 py-2 cursor-pointer text-gray-800 dark:text-gray-200 
+                                hover:bg-gray-100 dark:hover:bg-gray-700"
+                            wire:click="selectDomisiliKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
+                            {{ $kecamatan['name'] }}
                         </div>
+                        @endforeach
                     </div>
                     @endif
                 </div>
@@ -306,25 +346,28 @@
 
                 <!-- DOMISILI KELURAHAN -->
                 @if ($domisili_kec_id)
-                <div class="relative">
-                    <flux:input wire:model.live.debounce.500ms="search_domisili_kel"
-                        label="Kelurahan/Desa Domisili" placeholder="Ketik nama kelurahan..."
+                <div class="relative mt-4">
+                    <flux:input
+                        wire:model.live.debounce.300ms="search_domisili_kel"
+                        label="Kelurahan/Desa Domisili"
+                        placeholder="Ketik nama kelurahan..."
                         autocomplete="off" />
+
                     @if ($domisiliKelurahanOptions)
-                    <div class="relative z-50">
-                        <div
-                            class="absolute bg-white border rounded w-full max-h-40 overflow-auto shadow">
-                            @foreach ($domisiliKelurahanOptions as $kelurahan)
-                            <div class="px-4 py-2 text-black hover:bg-gray-100 cursor-pointer"
-                                wire:click="selectDomisiliKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
-                                {{ $kelurahan['name'] }}
-                            </div>
-                            @endforeach
+                    <div class="absolute mt-1 w-full max-h-48 overflow-auto rounded-lg border shadow-lg 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-50">
+                        @foreach ($domisiliKelurahanOptions as $kelurahan)
+                        <div class="px-4 py-2 cursor-pointer text-gray-800 dark:text-gray-200 
+                                hover:bg-gray-100 dark:hover:bg-gray-700"
+                            wire:click="selectDomisiliKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
+                            {{ $kelurahan['name'] }}
                         </div>
+                        @endforeach
                     </div>
                     @endif
                 </div>
                 @endif
+
                 @endif
                 <flux:input wire:model="domisili_kodepos" label="Kode Pos Domisili" required />
                 <flux:input wire:model="domisili_negara" label="Negara Domisili" required />

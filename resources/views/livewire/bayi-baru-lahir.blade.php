@@ -35,7 +35,7 @@
                     <flux:table.cell>
                         {{ \Carbon\Carbon::createFromFormat('H:i:s', $item->jam_lahir)->format('H:i') }} WIB
                     </flux:table.cell>
-                    <flux:table.cell>{{ $item->jenisKelamin->jk }}</flux:table.cell>
+                    <flux:table.cell>{{ $item->jenisKelamin->nama_jk }}</flux:table.cell>
                     <flux:table.cell>
                         @can('edit')
                         <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"

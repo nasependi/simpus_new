@@ -123,16 +123,24 @@ class PembelianObat extends Component
     private function hitungTotal()
     {
         // harga kotor = total semua jumlah item
-        $this->harga_beli_kotor = array_sum(array_map('floatval', array_column($this->detailItems, 'jumlah')));
-        $ppn = floatval($this->harga_beli_kotor) * ($this->ppn ?? 0 / 100);
-        $pph = floatval($this->harga_beli_kotor) * ($this->pph ?? 0 / 100);
-        $diskon = floatval($this->diskon);
+        $this->harga_beli_kotor = array_sum(
+            array_map('floatval', array_column($this->detailItems, 'jumlah'))
+        );
 
-        $kotor  = floatval($this->harga_beli_kotor ?? 0);
+        // pastikan semua angka dikonversi ke float
+        $ppnPersen = floatval($this->ppn ?? 0);
+        $pphPersen = floatval($this->pph ?? 0);
+        $diskon    = floatval($this->diskon ?? 0);
+        $kotor     = floatval($this->harga_beli_kotor ?? 0);
+
+        // hitung ppn & pph dalam bentuk nilai
+        $ppn = $kotor * ($ppnPersen / 100);
+        $pph = $kotor * ($pphPersen / 100);
 
         // harga bersih = harga kotor + ppn + pph - diskon
         $this->harga_beli_bersih = $kotor + $ppn + $pph - $diskon;
     }
+
 
 
     public function updatedPpn()

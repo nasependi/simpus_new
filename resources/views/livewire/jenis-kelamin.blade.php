@@ -27,7 +27,7 @@
                 @foreach ($data as $item)
                 <flux:table.row class="transition duration-300 ease-in-out">
                     <flux:table.cell class="px-2 py-3">{{ $item->kode }}</flux:table.cell>
-                    <flux:table.cell class="px-2 py-3">{{ $item->jk }}</flux:table.cell>
+                    <flux:table.cell class="px-2 py-3">{{ $item->nama_jk }}</flux:table.cell>
                     <flux:table.cell class="px-2 py-3">
                         <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="px-3 py-1 mr-2" />
                         <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" class="px-3 py-1" />

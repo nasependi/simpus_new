@@ -2,10 +2,11 @@
 
 namespace App\Livewire\Kunjungan\Form;
 
-use App\Models\Terapi;
-use App\Models\ObatResep;
-use Livewire\Component;
 use Flux\Flux;
+use App\Models\Obat;
+use App\Models\Terapi;
+use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class TerapiComponent extends Component
 {
@@ -39,7 +40,7 @@ class TerapiComponent extends Component
     public function save()
     {
         $this->validate([
-            'state.obat_id' => 'required|exists:obat_resep,id',
+            'state.obat_id' => 'required|exists:obat,id',
             'state.nama_tindakan' => 'required|string|max:255',
             'state.petugas' => 'required|string|max:255',
             'state.tanggal_pelaksanaan_tindakan' => 'required|date',
@@ -59,7 +60,18 @@ class TerapiComponent extends Component
 
     public function render()
     {
-        $obatResepList = ObatResep::all();
+        // Change to fetch from Obat model with stock calculation
+        $obatResepList = Obat::select(
+            'obat.*',
+            DB::raw('COALESCE(SUM(detail_pembelian_obat.kuantitas), 0) as stok_total')
+        )
+            ->leftJoin('detail_pembelian_obat', function ($join) {
+                $join->on('obat.id', '=', 'detail_pembelian_obat.obat_id')
+                    ->where('detail_pembelian_obat.kadaluarsa', '>', now());
+            })
+            ->groupBy('obat.id', 'obat.nama_obat', 'obat.golongan', 'obat.sediaan')
+            ->having('stok_total', '>', 0)
+            ->get();
 
         return view('livewire.kunjungan.form.terapi-component', compact('obatResepList'));
     }

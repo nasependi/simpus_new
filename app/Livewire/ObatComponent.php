@@ -5,7 +5,9 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Obat;
+use App\Models\DetailPembelianObatModel;
 use Flux\Flux;
+use Illuminate\Support\Facades\DB;
 
 class ObatComponent extends Component
 {
@@ -34,11 +36,22 @@ class ObatComponent extends Component
 
     public function render()
     {
-        $data = Obat::where('nama_obat', 'like', '%' . $this->search . '%')
+        $data = Obat::select('obat.*', DB::raw('SUM(detail_pembelian_obat.kuantitas) as stok_total'))
+            ->leftJoin('detail_pembelian_obat', 'obat.id', '=', 'detail_pembelian_obat.obat_id')
+            ->where('nama_obat', 'like', '%' . $this->search . '%')
+            ->groupBy('obat.id', 'obat.nama_obat', 'obat.golongan', 'obat.sediaan')
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
         return view('livewire.obat-component', compact('data'));
+    }
+
+    // Tambahkan method untuk mendapatkan stok obat
+    public function getStokObat($obatId)
+    {
+        return DetailPembelianObatModel::where('obat_id', $obatId)
+            ->where('kadaluarsa', '>', now())
+            ->sum('kuantitas');
     }
 
     public function create()
