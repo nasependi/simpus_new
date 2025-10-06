@@ -29,6 +29,7 @@ class Kunjungan extends Component
     public $listPoli = [];
     public $listCaraPembayaran = [];
     public $listDaftarKesadaran = [];
+    public $status, $statusId = null;
 
     public $filterTanggal;
     public $filterPasien;
@@ -73,16 +74,16 @@ class Kunjungan extends Component
 
     public function saveAll()
     {
-        // $this->dispatch('save-anamnesis');
-        // $this->dispatch('save-pemeriksaan-fisik');
-        // $this->dispatch('save-psikologis');
-        // $this->dispatch('save-spesialistik');
+        $this->dispatch('save-anamnesis');
+        $this->dispatch('save-pemeriksaan-fisik');
+        $this->dispatch('save-psikologis');
+        $this->dispatch('save-spesialistik');
         $this->dispatch('save-persetujuan-tindakan');
-        // $this->dispatch('save-laboratorium');
-        // $this->dispatch('save-radiologi');
-        // $this->dispatch('save-terapi');
-        // $this->dispatch('save-obat-resep');
-        // $this->dispatch('save-diagnosis');
+        $this->dispatch('save-laboratorium');
+        $this->dispatch('save-radiologi');
+        $this->dispatch('save-terapi');
+        $this->dispatch('save-obat-resep');
+        $this->dispatch('save-diagnosis');
     }
 
     public function updated($property)
@@ -159,6 +160,29 @@ class Kunjungan extends Component
     {
         $this->deleteId = $id;
         Flux::modal('delete-kunjungan')->show();
+    }
+
+    public function openStatusModal($id)
+    {
+        $item = KunjunganModel::findOrFail($id);
+        $this->statusId = $item->id;
+        $this->status = $item->status;
+        Flux::modal('statusModal')->show();
+    }
+
+
+    public function updateStatus()
+    {
+        $this->validate([
+            'status' => 'required|in:rawat_jalan,rawat_inap,rujuk,pulang',
+        ]);
+
+        $item = KunjunganModel::findOrFail($this->statusId);
+        $item->status = $this->status;
+        $item->save();
+
+        Flux::modal('statusModal')->close();
+        Flux::toast(heading: 'Sukses', text: 'Data berhasil disimpan.', variant: 'success');
     }
 
     public function delete()

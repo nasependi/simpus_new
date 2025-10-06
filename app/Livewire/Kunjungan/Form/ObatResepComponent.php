@@ -14,7 +14,7 @@ class ObatResepComponent extends Component
 {
     public $kunjungan_id;
     public $obatList;
-    public $sediaanList, $stok_obat;
+    public $sediaanList, $stok_obat, $sediaan;
     public $state = [];
 
     protected $listeners = ['obat-resep' => 'save'];
@@ -71,10 +71,14 @@ class ObatResepComponent extends Component
             if ($obat) {
                 $this->state['nama_obat'] = $obat->nama_obat;
                 $this->state['sediaan']  = $obat->sediaan;
-                $this->stok_obat = DetailPembelianObatModel::where('obat_id', $obat->id)
+                $pembelian = DetailPembelianObatModel::where('obat_id', $obat->id)
                     ->where('kadaluarsa', '>', now())
                     ->sum('kuantitas');
+                $pengeluaran = ObatResep::where('id_obat', $obat->id)
+                    ->sum('jumlah_obat');
+                $this->stok_obat = $pembelian - $pengeluaran;
             }
+            // dd($pembelian, $pengeluaran);
         }
     }
 
@@ -97,7 +101,7 @@ class ObatResepComponent extends Component
         $this->state['tanggal_penulisan_resep'] = now()->toDateString();
         $this->state['jam_penulisan_resep']   = now()->toTimeString();
         $this->state['ttd_dokter']            = auth()->user()->signature ?? '-';
-        $this->state['status_resep']          = 'Aktif';
+        $this->state['status_resep']          = $this->state['status_resep'] ?? 'Pending';
         $this->state['pengkajian_resep']      = 'Pengkajian awal';
 
         // Simpan tb & bb ke session

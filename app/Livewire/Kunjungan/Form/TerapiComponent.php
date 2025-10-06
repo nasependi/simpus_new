@@ -6,6 +6,7 @@ use Flux\Flux;
 use App\Models\Obat;
 use App\Models\Terapi;
 use Livewire\Component;
+use App\Models\PemeriksaanTindakan;
 use Illuminate\Support\Facades\DB;
 
 class TerapiComponent extends Component
@@ -60,7 +61,7 @@ class TerapiComponent extends Component
 
     public function render()
     {
-        // Change to fetch from Obat model with stock calculation
+        // Ambil data obat
         $obatResepList = Obat::select(
             'obat.*',
             DB::raw('COALESCE(SUM(detail_pembelian_obat.kuantitas), 0) as stok_total')
@@ -73,6 +74,12 @@ class TerapiComponent extends Component
             ->having('stok_total', '>', 0)
             ->get();
 
-        return view('livewire.kunjungan.form.terapi-component', compact('obatResepList'));
+        // Ambil data tindakan dari CRUD pemeriksaan_tindakan
+        $pemeriksaanTindakanList = PemeriksaanTindakan::orderBy('nama')->get();
+
+        return view('livewire.kunjungan.form.terapi-component', [
+            'obatResepList' => $obatResepList,
+            'pemeriksaanTindakanList' => $pemeriksaanTindakanList,
+        ]);
     }
 }

@@ -131,13 +131,11 @@
         {{-- Modal Detail Pembelian --}}
         <flux:modal name="detailPembelianModal" class="w-full max-w-screen-xl h-[85vh] overflow-y-auto">
             <div class="p-6">
-                <div class="flex justify-between items-center border-b pb-3 mb-4">
-                    <h2 class="text-xl font-bold text-gray-700">Detail Pembelian Obat</h2>
-                    <span class="text-sm text-gray-500">
-                        📅 Tanggal: {{ $pembelian['tanggal_pembelian'] ?? now()->format('Y-m-d') }}
-                    </span>
-                </div>
 
+                {{-- Detail Item Pembelian --}}
+                @if(empty($detailPembelian))
+                <p class="text-gray-500 text-center py-6">Tidak ada detail untuk pembelian ini.</p>
+                @else
                 {{-- Informasi Umum Pembelian --}}
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
@@ -151,11 +149,6 @@
                         </p>
                     </div>
                 </div>
-
-                {{-- Detail Item Pembelian --}}
-                @if(empty($detailPembelian))
-                <p class="text-gray-500 text-center py-6">Tidak ada detail untuk pembelian ini.</p>
-                @else
                 <div class="overflow-x-auto rounded-lg shadow">
                     <table class="min-w-full text-sm border border-gray-200">
                         <thead class="bg-gray-100 text-gray-700">
@@ -169,7 +162,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @foreach($detailPembelian as $d)
-                            <tr class="hover:bg-gray-50">
+                            <tr class="">
                                 <td class="px-4 py-2 border">{{ $d['nama_obat'] }}</td>
                                 <td class="px-4 py-2 border text-center">{{ $d['kuantitas'] }}</td>
                                 <td class="px-4 py-2 border text-right">

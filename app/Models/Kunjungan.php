@@ -35,6 +35,12 @@ class Kunjungan extends Model
         return $this->belongsTo(Poli::class, 'poli_id');
     }
 
+    public function obatResep()
+    {
+        return $this->hasMany(ObatResep::class, 'kunjungan_id');
+    }
+
+
     public function caraPembayaran()
     {
         return $this->belongsTo(CaraPembayaran::class, 'carapembayaran_id');

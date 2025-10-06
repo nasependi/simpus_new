@@ -12,6 +12,7 @@
                 @endforeach
             </flux:select>
             <flux:input wire:model="stok_obat" label="Stok Obat" disabled />
+            <!-- <flux:input wire:model="sediaan" label="Sedian" disabled /> -->
         </div>
         <flux:input wire:model.live="state.jumlah_obat" label="Jumlah Obat" type="number" />
         <flux:input wire:model="state.metode_pemberian" label="Metode Pemberian" />
@@ -37,6 +38,7 @@
                         <th class="px-4 py-2 text-left">Metode Pemberian</th>
                         <th class="px-4 py-2 text-left">Dosis yang Diberikan</th>
                         <th class="px-4 py-2 text-left">Aturan Tambahan</th>
+                        <th class="px-4 py-2 text-left">Catatan Tambahan</th>
                         <th class="px-4 py-2 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -48,6 +50,7 @@
                         <td class="px-4 py-2">{{ $item->metode_pemberian}}</td>
                         <td class="px-4 py-2">{{ $item->dosis_diberikan }}</td>
                         <td class="px-4 py-2">{{ $item->aturan_tambahan }}</td>
+                        <td class="px-4 py-2">{{ $item->catatan_resep }}</td>
                         <td class="px-4 py-2 text-right">
                             <flux:button wire:click="delete({{ $item->id }})" variant="danger" size="sm">
                                 Hapus

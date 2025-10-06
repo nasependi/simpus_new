@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Kunjungan\Form;
 
-use App\Models\Laboratorium;
-use Livewire\Component;
 use Flux\Flux;
+use Livewire\Component;
+use App\Models\Laboratorium;
+use App\Models\PemeriksaanLab;
 
 class LaboratoriumComponent extends Component
 {
@@ -62,10 +63,13 @@ class LaboratoriumComponent extends Component
         );
     }
 
-
-
     public function render()
     {
-        return view('livewire.kunjungan.form.laboratorium-component');
+        // Ambil semua data dari tabel pemeriksaan_lab
+        $pemeriksaanLab = PemeriksaanLab::orderBy('nama')->get();
+
+        return view('livewire.kunjungan.form.laboratorium-component', [
+            'pemeriksaanLab' => $pemeriksaanLab,
+        ]);
     }
 }

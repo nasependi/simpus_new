@@ -55,13 +55,17 @@
 
                 <div>
                     <label class="block mb-1 font-medium text-sm">Role</label>
-                    <select wire:model="role" class="w-full border rounded p-2">
-                        <option value="">Pilih Role</option>
+                    <flux:select wire:model="role" placeholder="Pilih Role...">
                         @foreach ($roles as $roleItem)
-                        <option value="{{ $roleItem->name }}">{{ $roleItem->name }}</option>
+                        <flux:select.option value="{{ $roleItem->name }}">
+                            {{ $roleItem->name }}
+                        </flux:select.option>
                         @endforeach
-                    </select>
-                    <div class="text-sm text-gray-500" wire:loading wire:target="role">Memuat permission dari role...</div>
+                    </flux:select>
+
+                    <div class="text-sm" wire:loading wire:target="role">
+                        Memuat permission dari role...
+                    </div>
                 </div>
 
                 <div class="mt-4">

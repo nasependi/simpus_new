@@ -34,4 +34,15 @@ class ObatResep extends Model
         'status_resep',
         'pengkajian_resep',
     ];
+
+    public function obat()
+    {
+        return $this->belongsTo(Obat::class, 'id_obat',);
+    }
+
+    // Relasi ke Kunjungan
+    public function kunjungan()
+    {
+        return $this->belongsTo(Kunjungan::class, 'kunjungan_id');
+    }
 }

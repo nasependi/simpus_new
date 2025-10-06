@@ -1,13 +1,13 @@
 <x-layouts.app :title="__('Dashboard')">
     {{-- Header with Animation --}}
-    <div class="mb-6 animate-fade-in">
+    <!-- <div class="mb-6 animate-fade-in">
         <flux:heading size="2xl" class="font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
             Dashboard
         </flux:heading>
         <flux:text class="mt-2 text-neutral-600 dark:text-neutral-400 animate-fade-in-up">
             Selamat datang kembali <span class="animate-wave inline-block">👋</span>, berikut ringkasan datamu hari ini.
         </flux:text>
-    </div>
+    </div> -->
 
     {{-- Statistik Cards with Hover Effects --}}
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

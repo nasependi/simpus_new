@@ -19,6 +19,7 @@
                 <flux:table.column>Poli</flux:table.column>
                 <flux:table.column>Cara Pembayaran</flux:table.column>
                 <flux:table.column>Umur</flux:table.column>
+                <flux:table.column>Status</flux:table.column>
                 <flux:table.column>Aksi</flux:table.column>
             </flux:table.columns>
             <flux:table.columns>
@@ -61,19 +62,34 @@
                         {{ $item->umur_tahun }} th, {{ $item->umur_bulan }} bln, {{ $item->umur_hari }} hr
                     </flux:table.cell>
                     <flux:table.cell>
+                        @if (empty($item->status))
+                        <flux:badge size="sm" color="gray">Pemeriksaan</flux:badge>
+                        @elseif ($item->status === 'rawat_inap')
+                        <flux:badge size="sm" color="red">Rawat Inap</flux:badge>
+                        @elseif ($item->status === 'rujuk')
+                        <flux:badge size="sm" color="yellow">Rujuk</flux:badge>
+                        @elseif ($item->status === 'pulang')
+                        <flux:badge size="sm" color="green">Pulang</flux:badge>
+                        @else
+                        <flux:badge size="sm"></flux:badge>
+                        @endif
+                    </flux:table.cell>
+                    <flux:table.cell>
                         @if ($item->generalConsent)
                         <flux:tooltip content="Cetak General Consent">
                             <flux:button wire:click="cetakConsent({{ $item->id }})" icon="printer" label="Cetak Consent" class="mr-2" />
                         </flux:tooltip>
                         <flux:tooltip content="Pemeriksaan">
-                            <flux:button wire:click="openModalPemeriksaan({{ $item->id }})" icon="rectangle-stack" label="Pemeriksaan" class="mr-2" />
+                            <flux:button wire:click="openModalPemeriksaan({{ $item->id }})" icon="funnel" label="Pemeriksaan" class="mr-2" />
+                        </flux:tooltip>
+                        <flux:tooltip content="Status">
+                            <flux:button wire:click="openStatusModal({{ $item->id }})" icon="arrow-path" label="Status" class="mr-2" />
                         </flux:tooltip>
                         @else
                         <flux:tooltip content="General Consent">
                             <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
                         </flux:tooltip>
                         @endif
-
                         <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
                         <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
                     </flux:table.cell>
@@ -123,9 +139,9 @@
                             <flux:tab name="account">Laboratorium</flux:tab>
                             <flux:tab name="billing">Radiologi</flux:tab>
                             <flux:tab name="diagnosis">Diagnosis</flux:tab>
-                            <flux:tab name="profile">Persetujuan Tindakan</flux:tab>
+                            <flux:tab name="profile">Penolakan Tindakan</flux:tab>
+                            <flux:tab name="terapi">Tindakan</flux:tab>
                             <flux:tab name="obat">Resep Obat</flux:tab>
-                            <flux:tab name="terapi">Terapi</flux:tab>
                         </flux:tabs>
 
                         <flux:tab.panel name="spesialistik" wire:key="panel-spesialistik-{{ $kunjungan_id }}">
@@ -158,17 +174,16 @@
                                 wire:key="diagnosis-{{ $kunjungan_id }}" />
                         </flux:tab.panel>
 
+                        <flux:tab.panel name="terapi" wire:key="panel-terapi-{{ $kunjungan_id }}">
+                            <livewire:kunjungan.form.terapi-component
+                                :kunjungan_id="$kunjungan_id"
+                                wire:key="terapi-{{ $kunjungan_id }}" />
+                        </flux:tab.panel>
 
                         <flux:tab.panel name="obat" wire:key="panel-obat-{{ $kunjungan_id }}">
                             <livewire:kunjungan.form.obat-resep-component
                                 :kunjungan_id="$kunjungan_id"
                                 wire:key="obat-{{ $kunjungan_id }}" />
-                        </flux:tab.panel>
-
-                        <flux:tab.panel name="terapi" wire:key="panel-terapi-{{ $kunjungan_id }}">
-                            <livewire:kunjungan.form.terapi-component
-                                :kunjungan_id="$kunjungan_id"
-                                wire:key="terapi-{{ $kunjungan_id }}" />
                         </flux:tab.panel>
 
                     </flux:tab.group>
@@ -229,6 +244,24 @@
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
                 <flux:button wire:click="save" variant="primary">Simpan</flux:button>
+            </div>
+        </flux:modal>
+
+        <flux:modal name="statusModal" class="min-w-[25rem]">
+            <flux:heading size="lg">Ubah Status Pasien</flux:heading>
+
+            <flux:radio.group wire:model="status" label="Pilih Status Pasien">
+                <flux:radio value="rawat_inap" label="Rawat Inap" />
+                <flux:radio value="rujuk" label="Rujuk" />
+                <flux:radio value="pulang" label="Pulang" />
+            </flux:radio.group>
+            @error('status') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+
+            <div class="flex justify-end gap-2 mt-4">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Batal</flux:button>
+                </flux:modal.close>
+                <flux:button wire:click="updateStatus" variant="primary">Simpan</flux:button>
             </div>
         </flux:modal>
 

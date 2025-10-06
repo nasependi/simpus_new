@@ -6,75 +6,97 @@
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
-  <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-    <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+  <flux:header container class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
+    <!-- Tombol sidebar untuk mobile -->
+    <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
-    <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+    <!-- Brand / Logo -->
+    <a href="{{ route('dashboard') }}" class="max-lg:hidden flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
       <x-app-logo />
     </a>
 
-    <flux:navlist variant="outline">
-      <flux:navlist.group :heading="__('Platform')" class="grid">
-        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
-          wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-        <flux:navlist.item href="{{ route('pasien-umum') }}" :active="request()->routeIs('pasien-umum')"
-          icon="user-group">
-          Pasien Umum</flux:navlist.item>
-        <flux:navlist.item href="{{ route('bayi-baru-lahir') }}" :active="request()->routeIs('bayi-baru-lahir')"
-          icon="user-plus">
-          Bayi Baru Lahir</flux:navlist.item>
-        <flux:navlist.item href="{{ route('kunjungan') }}" :active="request()->routeIs('kunjungan')"
-          icon="users">
-          Kunjungan</flux:navlist.item>
-      </flux:navlist.group>
-    </flux:navlist>
+    <!-- Navbar Menu Utama -->
+    <flux:navbar class="-mb-px max-lg:hidden">
+      <flux:navbar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+        Dashboard
+      </flux:navbar.item>
+      <flux:navbar.item icon="user-group" href="{{ route('pasien-umum') }}" :active="request()->routeIs('pasien-umum')">
+        Pendaftaran
+      </flux:navbar.item>
+      <flux:navbar.item icon="users" href="{{ route('kunjungan') }}" :active="request()->routeIs('kunjungan')">
+        Pelayanan
+      </flux:navbar.item>
+      <flux:navbar.item icon="beaker" href="{{ route('farmasi') }}" :active="request()->routeIs('farmasi')">
+        Farmasi
+      </flux:navbar.item>
+      <flux:navbar.item icon="folder-plus" href="{{ route('poli') }}" :active="request()->routeIs('poli')">
+        Poli
+      </flux:navbar.item>
+    </flux:navbar>
 
     <flux:spacer />
 
-    @role('admin')
-    <flux:navlist variant="outline">
-      <flux:navlist.group expandable heading="Kategori" class="grid">
-        <flux:navlist.item href="{{ route('jenis-kelamin') }}">Jenis Kelamin</flux:navlist.item>
-        <flux:navlist.item href="{{ route('agama') }}">Agama</flux:navlist.item>
-        <flux:navlist.item href="{{ route('pendidikan') }}">Pendidikan</flux:navlist.item>
-        <flux:navlist.item href="{{ route('pekerjaan') }}">Pekerjaan</flux:navlist.item>
-        <flux:navlist.item href="{{ route('status-pernikahan') }}">Status Pernikahan</flux:navlist.item>
-        <flux:navlist.item href="{{ route('poli') }}">Poli</flux:navlist.item>
-        <flux:navlist.item href="{{ route('cara') }}">Cara Pembayaran</flux:navlist.item>
-        <flux:navlist.item href="{{ route('jenis-pemeriksaan-radiologi') }}">Jenis Pemeriksaan Radiologi</flux:navlist.item>
-        <flux:navlist.item href="{{ route('tingkat-kesadaran') }}">Tingkat Kesadaran</flux:navlist.item>
-      </flux:navlist.group>
+    <!-- Menu User -->
 
-      <flux:navlist.group expandable heading="Managament Obat" class="grid">
-        <flux:navlist.item href="{{ route('obat') }}">Obat</flux:navlist.item>
-        <flux:navlist.item href="{{ route('pembelian-obat') }}">Pembelian Obat</flux:navlist.item>
-        <flux:navlist.item href="{{ route('penjualan-obat') }}">Penjualan Obat</flux:navlist.item>
-      </flux:navlist.group>
+    @hasanyrole('admin|super-admin')
+    <!-- Dropdown untuk kategori admin & super admin -->
+    <flux:dropdown class="max-lg:hidden">
+      <flux:navbar.item icon:trailing="chevron-down">Kategori</flux:navbar.item>
+      <flux:navmenu>
+        <flux:navmenu.item href="{{ route('jenis-kelamin') }}">Jenis Kelamin</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('agama') }}">Agama</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('pendidikan') }}">Pendidikan</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('pekerjaan') }}">Pekerjaan</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('status-pernikahan') }}">Status Pernikahan</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('cara') }}">Cara Pembayaran</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('jenis-pemeriksaan-radiologi') }}">Jenis Pemeriksaan Radiologi</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('pemeriksaan-lab') }}">Jenis Pemeriksaan Laboratorium</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('pemeriksaan-tindakan') }}">Jenis Pemeriksaan Tindakan</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('tingkat-kesadaran') }}">Tingkat Kesadaran</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('faskes') }}">Unit Kerja</flux:navmenu.item>
+      </flux:navmenu>
+    </flux:dropdown>
+    @endhasanyrole
 
-      <flux:navlist.group expandable heading="Manajemen Pengguna" class="grid">
-        <flux:navlist.item :href="route('userscrud')" :current="request()->routeIs('userscrud.*')" wire:navigate>Users</flux:navlist.item>
-        <flux:navlist.item :href="route('roles')" :current="request()->routeIs('roles.*')" wire:navigate>Role</flux:navlist.item>
-        <flux:navlist.item :href="route('permissions')" :current="request()->routeIs('permissions.*')" wire:navigate> Permission</flux:navlist.item>
-      </flux:navlist.group>
-    </flux:navlist>
+    @hasanyrole('apotek|super-admin')
+    <flux:dropdown class="max-lg:hidden">
+      <flux:navbar.item icon:trailing="chevron-down">Obat</flux:navbar.item>
+      <flux:navmenu>
+        <flux:navmenu.item href="{{ route('obat') }}">Obat</flux:navmenu.item>
+        <flux:navmenu.item href="{{ route('pembelian-obat') }}">Pembelian Obat</flux:navmenu.item>
+        <!-- <flux:navmenu.item href="{{ route('penjualan-obat') }}">Penjualan Obat</flux:navmenu.item> -->
+      </flux:navmenu>
+    </flux:dropdown>
+    @endhasanyrole
+
+    @role('super-admin')
+    <flux:dropdown class="max-lg:hidden">
+      <flux:navbar.item icon:trailing="chevron-down">User</flux:navbar.item>
+      <flux:navmenu>
+        <flux:navmenu.item :href="route('userscrud')" :current="request()->routeIs('userscrud.*')" wire:navigate>
+          Users
+        </flux:navmenu.item>
+        <flux:navmenu.item :href="route('roles')" :current="request()->routeIs('roles.*')" wire:navigate>
+          Role
+        </flux:navmenu.item>
+        <flux:navmenu.item :href="route('permissions')" :current="request()->routeIs('permissions.*')" wire:navigate>
+          Permission
+        </flux:navmenu.item>
+      </flux:navmenu>
+    </flux:dropdown>
     @endrole
 
-    <!-- Desktop User Menu -->
-    <flux:dropdown position="bottom" align="start">
-      <flux:profile :name="auth()-> user()->name" :initials="auth()->user()->initials()"
-        icon-trailing="chevrons-up-down" />
-
+    <flux:dropdown position="top" align="start">
+      <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()" icon-trailing="chevrons-up-down" />
       <flux:menu class="w-[220px]">
         <flux:menu.radio.group>
           <div class="p-0 text-sm font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
               <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                <span
-                  class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                <span class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                   {{ auth()->user()->initials() }}
                 </span>
               </span>
-
               <div class="grid flex-1 text-start text-sm leading-tight">
                 <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
                 <span class="truncate text-xs">{{ auth()->user()->email }}</span>
@@ -101,7 +123,8 @@
         </form>
       </flux:menu>
     </flux:dropdown>
-  </flux:sidebar>
+  </flux:header>
+
 
   <!-- Mobile User Menu -->
   <flux:header class="lg:hidden">

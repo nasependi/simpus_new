@@ -1,6 +1,17 @@
 <div class="space-y-4">
     <div class="grid grid-cols-2 gap-2">
-        <flux:input wire:model="state.nama_tindakan" label="Nama Tindakan" />
+        <flux:autocomplete
+            wire:model.defer="state.nama_tindakan"
+            label="Nama Tindakan"
+            placeholder="Ketik atau pilih tindakan..."
+            clearable>
+            @foreach ($pemeriksaanTindakanList as $tindakan)
+            <flux:autocomplete.item value="{{ $tindakan->nama }}">
+                {{ $tindakan->nama }}
+            </flux:autocomplete.item>
+            @endforeach
+        </flux:autocomplete>
+
         <flux:select wire:model.live="state.id_obat" variant="listbox" searchable placeholder="Pilih Obat" label="Pilih Obat">
             @foreach ($obatResepList as $obat)
             <flux:select.option value="{{ $obat->id }}">

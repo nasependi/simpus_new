@@ -1,6 +1,17 @@
 <div class="space-y-4">
     <div class="grid grid-cols-2 gap-2">
-        <flux:input wire:model.defer="form.nama_pemeriksaan" label="Nama Pemeriksaan" required />
+        <flux:autocomplete
+            wire:model.defer="form.nama_pemeriksaan"
+            label="Nama Pemeriksaan"
+            required
+            placeholder="Ketik atau pilih pemeriksaan..."
+            clearable>
+            @foreach ($pemeriksaanLab as $lab)
+            <flux:autocomplete.item value="{{ $lab->nama }}">
+                {{ $lab->nama }}
+            </flux:autocomplete.item>
+            @endforeach
+        </flux:autocomplete>
         <flux:input wire:model.defer="form.nomor_pemeriksaan" label="Nomor Permintaan" required />
     </div>
 
@@ -24,7 +35,6 @@
         </div>
 
     </div>
-
 
     <div class="grid grid-cols-4 gap-2">
         <flux:input wire:model.defer="form.nama_fasilitas_pelayanan" label="Nama Fasilitas Pelayanan" required />

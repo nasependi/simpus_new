@@ -11,10 +11,16 @@ use App\Livewire\Auth\UserCrud;
 use App\Livewire\ObatComponent;
 use App\Livewire\CaraPembayaran;
 use App\Livewire\PasienUmumCrud;
+use App\Livewire\FaskesComponent;
+use App\Livewire\FarmasiComponent;
 use App\Livewire\BayiBaruLahirIndex;
 use App\Livewire\Auth\PermissionCrud;
 use App\Livewire\Kunjungan\Kunjungan;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ResepController;
+use App\Http\Controllers\TiketController;
+use App\Livewire\PemeriksaanLabComponent;
+use App\Livewire\PemeriksaanTindakanComponent;
 use App\Livewire\JenisPemeriksaanRadiologiComponent;
 use App\Livewire\StatusPernikahan as LivewireStatusPernikahan;
 use App\Livewire\TingkatKesadaran as LivewireTingkatKesadaran;
@@ -33,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pasien-umum', PasienUmumCrud::class)->name('pasien-umum');
     Route::get('/bayi-baru-lahir', BayiBaruLahirIndex::class)->name('bayi-baru-lahir');
     Route::get('/kunjungan', Kunjungan::class)->name('kunjungan');
+    Route::get('/farmasi', FarmasiComponent::class)->name('farmasi');
+
 
     //User management
     Route::redirect('settings', 'settings/profile');
@@ -49,7 +57,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/poli', Poli::class)->name('poli');
     Route::get('/cara-pembayaran', CaraPembayaran::class)->name('cara');
     Route::get('/jenis-pemeriksaan-radiologi', JenisPemeriksaanRadiologiComponent::class)->name('jenis-pemeriksaan-radiologi');
+    Route::get('/pemeriksaan-lab', PemeriksaanLabComponent::class)->name('pemeriksaan-lab');
+    Route::get('/pemeriksaan-tindakan', PemeriksaanTindakanComponent::class)->name('pemeriksaan-tindakan');
     Route::get('/tingkat-kesadaran', LivewireTingkatKesadaran::class)->name('tingkat-kesadaran');
+    Route::get('/faskes', FaskesComponent::class)->name('faskes');
+
+    Route::get('/farmasi/resep/{id}/print', [ResepController::class, 'print'])->name('resep.print');
+    Route::get('/farmasi/tiket/{id}/print', [TiketController::class, 'print'])->name('tiket.print');
+
+
 
     //Categories for drug management
     Route::get('/obat', ObatComponent::class)->name('obat');
