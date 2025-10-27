@@ -14,6 +14,9 @@ class RadiologiComponent extends Component
 
     public $kunjungan_id;
     public $state = [];
+
+    public $selectedExams = [];
+    public $currentExam = '';
     public $editId;
     public $attachments = [];
     public $listJenisPemeriksaanRadiologi = [];
@@ -23,10 +26,17 @@ class RadiologiComponent extends Component
     public function mount($kunjungan_id)
     {
         $this->kunjungan_id = $kunjungan_id;
+        $this->refreshExamList();
         $this->listJenisPemeriksaanRadiologi = JenisPemeriksaanRadiologi::orderBy('created_at')->get();
 
         $data = Radiologi::where('kunjungan_id', $kunjungan_id)->first();
 
+        if ($data) {
+            $this->state = $data->toArray();
+            $this->selectedExams = array_filter(explode(', ', $data->jenis_pemeriksaan));
+        }
+
+        // jika ada data (edit)
         if ($data) {
             $this->editId = $data->id;
             $this->state = $data->only([
@@ -53,11 +63,65 @@ class RadiologiComponent extends Component
                 'interpretasi_radiologi',
             ]);
 
-            // Hilangkan prefix +62 jika ada saat form dimuat
+            // Hilangkan +62 jika ada
             if (isset($this->state['nomor_telepon_dokter'])) {
                 $this->state['nomor_telepon_dokter'] = preg_replace('/^\+62/', '', $this->state['nomor_telepon_dokter']);
             }
+        } else {
+            // jika form baru, isi default waktu sekarang
+            $this->state['tanggal_permintaan'] = now()->toDateString();
+            $this->state['jam_permintaan'] = now()->format('H:i');
+            $this->state['tanggal_pemeriksaan'] = now()->toDateString();
+            $this->state['jam_pemeriksaan'] = now()->format('H:i');
         }
+    }
+
+    public function refreshExamList()
+    {
+        // Get all jenis pemeriksaan except those already selected
+        $this->listJenisPemeriksaanRadiologi = JenisPemeriksaanRadiologi::whereNotIn('kode', $this->selectedExams)
+            ->orderBy('nama')
+            ->get();
+    }
+
+    public function addExam()
+    {
+        if (empty($this->currentExam)) {
+            return;
+        }
+
+        if (in_array($this->currentExam, $this->selectedExams)) {
+            Flux::toast(
+                heading: 'Peringatan',
+                text: 'Pemeriksaan ini sudah dipilih',
+                variant: 'warning'
+            );
+            return;
+        }
+
+        $this->selectedExams[] = $this->currentExam;
+        $this->currentExam = '';
+        $this->refreshExamList();
+
+        Flux::toast(
+            heading: 'Berhasil',
+            text: 'Pemeriksaan berhasil ditambahkan',
+            variant: 'success'
+        );
+    }
+
+    public function removeExam($index)
+    {
+        $removedExam = $this->selectedExams[$index];
+        unset($this->selectedExams[$index]);
+        $this->selectedExams = array_values($this->selectedExams);
+        $this->refreshExamList();
+
+        Flux::toast(
+            heading: 'Berhasil',
+            text: 'Pemeriksaan berhasil dihapus',
+            variant: 'success'
+        );
     }
 
     public function updatedStateJenisPemeriksaan($value)
@@ -88,20 +152,19 @@ class RadiologiComponent extends Component
             'state.unit_pengirim_radiologi' => 'required|string',
             'state.prioritas_pemeriksaan_radiologi' => 'required|string',
             'state.diagnosis_kerja' => 'required|string',
-            'state.catatan_permintaan' => 'nullable|string',
+            'state.catatan_permintaan' => 'required|string',
             'state.metode_penyampaian_pemeriksaan' => 'required|string',
-            'state.status_alergi' => 'required|boolean',
+            'state.status_alergi' => 'required',
             'state.status_kehamilan' => 'required|string',
             'state.tanggal_pemeriksaan' => 'required|date',
             'state.jam_pemeriksaan' => 'required',
-            'state.jenis_bahan_kontras' => 'nullable|string',
-            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'state.jenis_bahan_kontras' => 'required|string',
+            'attachments.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'state.nama_dokter_pemeriksaan' => 'required|string',
-            'state.interpretasi_radiologi' => 'nullable|string',
+            'state.interpretasi_radiologi' => 'required|string',
         ]);
 
         $fotoPaths = [];
-
         if (!empty($this->attachments)) {
             foreach ($this->attachments as $file) {
                 $fotoPaths[] = $file->store('radiologi/foto-hasil', 'public');
@@ -124,7 +187,11 @@ class RadiologiComponent extends Component
             $updateData
         );
 
-        Flux::toast(heading: 'Berhasil', text: 'Data Radiologi disimpan.', variant: 'success');
+        Flux::toast(
+            heading: 'Berhasil',
+            text: 'Data Radiologi berhasil disimpan.',
+            variant: 'success'
+        );
     }
 
     public function render()

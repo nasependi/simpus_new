@@ -29,6 +29,12 @@
       <flux:navbar.item icon="beaker" href="{{ route('farmasi') }}" :active="request()->routeIs('farmasi')">
         Farmasi
       </flux:navbar.item>
+      <flux:navbar.item icon="beaker" href="{{ route('farmasi') }}" :active="request()->routeIs('farmasi')">
+        Laboratorium
+      </flux:navbar.item>
+      <flux:navbar.item icon="beaker" href="{{ route('farmasi') }}" :active="request()->routeIs('farmasi')">
+        Radiologi
+      </flux:navbar.item>
       <flux:navbar.item icon="folder-plus" href="{{ route('poli') }}" :active="request()->routeIs('poli')">
         Poli
       </flux:navbar.item>

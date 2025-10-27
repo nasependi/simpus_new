@@ -40,6 +40,10 @@ class Kunjungan extends Model
         return $this->hasMany(ObatResep::class, 'kunjungan_id');
     }
 
+    public function laboratorium()
+    {
+        return $this->hasMany(Laboratorium::class, 'kunjungan_id');
+    }
 
     public function caraPembayaran()
     {

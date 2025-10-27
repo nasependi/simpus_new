@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('laboratorium', function (Blueprint $table) {
             $table->id();
-            
+
             $table->text('nama_pemeriksaan');
             $table->text('nomor_pemeriksaan');
             $table->date('tanggal_permintaan');

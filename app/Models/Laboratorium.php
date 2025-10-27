@@ -10,6 +10,7 @@ class Laboratorium extends Model
     use HasFactory;
 
     protected $table = 'laboratorium';
+    protected $guarded = [];
 
     protected $fillable = [
         'kunjungan_id',

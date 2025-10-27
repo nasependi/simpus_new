@@ -110,7 +110,7 @@ class PersetujuanTindakan extends Component
                 ]
             );
 
-            Flux::toast(heading: 'Berhasil', text: 'Data Persetujuan Tindakan disimpan.', variant: 'success');
+            // Flux::toast(heading: 'Berhasil', text: 'Data Persetujuan Tindakan disimpan.', variant: 'success');
         } catch (\Throwable $th) {
             Flux::toast(heading: 'Gagal', text: 'Data Persetujuan Tindakan gagal disimpan: ' . $th->getMessage(), variant: 'danger');
         }

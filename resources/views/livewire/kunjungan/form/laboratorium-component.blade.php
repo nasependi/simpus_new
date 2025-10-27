@@ -1,19 +1,5 @@
 <div class="space-y-4">
-    <div class="grid grid-cols-2 gap-2">
-        <flux:autocomplete
-            wire:model.defer="form.nama_pemeriksaan"
-            label="Nama Pemeriksaan"
-            required
-            placeholder="Ketik atau pilih pemeriksaan..."
-            clearable>
-            @foreach ($pemeriksaanLab as $lab)
-            <flux:autocomplete.item value="{{ $lab->nama }}">
-                {{ $lab->nama }}
-            </flux:autocomplete.item>
-            @endforeach
-        </flux:autocomplete>
-        <flux:input wire:model.defer="form.nomor_pemeriksaan" label="Nomor Permintaan" required />
-    </div>
+    <flux:input wire:model.defer="form.nomor_pemeriksaan" label="Nomor Permintaan" required />
 
     <div class="grid grid-cols-2 gap-2">
         <flux:input type="date" wire:model.defer="form.tanggal_permintaan" label="Tanggal Permintaan" required />
@@ -96,34 +82,62 @@
         <flux:input type="time" wire:model.defer="form.jam_pemeriksaan_spesimen" label="Jam Pemeriksaan Spesimen" />
     </div>
 
-    <div class="grid grid-cols-2 gap-2">
-        <flux:input wire:model.defer="form.nilai_hasil_pemeriksaan" label="Nilai Hasil Pemeriksaan" />
-        <flux:select wire:model="form.nilai_moral" label="Nilai Moral">
-            <flux:select.option>Normal</flux:select.option>
-            <flux:select.option>Tidak Normal</flux:select.option>
-        </flux:select>
-        <flux:input wire:model.defer="form.nilai_rujukan" label="Nilai Rujukan" />
-        <flux:input wire:model.defer="form.nilai_kritis" label="Nilai Kritis" />
+    <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-2">
+            <flux:autocomplete
+                wire:model="currentExam"
+                label="Nama Pemeriksaan"
+                placeholder="Ketik atau pilih pemeriksaan..."
+                clearable>
+                @foreach ($pemeriksaanLab as $lab)
+                <flux:autocomplete.item value="{{ $lab->nama }}">
+                    {{ $lab->nama }}
+                </flux:autocomplete.item>
+                @endforeach
+            </flux:autocomplete>
+
+            <flux:button
+                wire:click="addExam"
+                class="w-full"
+                variant="primary"
+                @disabled="empty($currentExam)">
+                Tambah Pemeriksaan
+            </flux:button>
+        </div>
     </div>
+    @if(count($selectedExams) > 0)
+    <div class="border rounded-lg p-4 bg-white dark:bg-neutral-900 shadow-sm transition-all duration-300">
+        <flux:heading size="sm" class="mb-3 text-gray-800 dark:text-gray-200">Daftar Pemeriksaan yang Dipilih</flux:heading>
 
-    <flux:textarea wire:model.defer="form.interpretasi_hasil" label="Interpretasi Hasil" />
-
-    <div class="grid grid-cols-2 gap-2">
-        <flux:input wire:model.defer="form.dokter_validasi" label="Dokter Validasi" />
-        <flux:input wire:model.defer="form.dokter_interpretasi" label="Dokter Interpretasi" />
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm border-collapse">
+                <thead>
+                    <tr class="bg-neutral-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300">
+                        <th class="px-3 py-2 text-left">No</th>
+                        <th class="px-3 py-2 text-left">Nama Pemeriksaan</th>
+                        <th class="px-3 py-2 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($selectedExams as $index => $exam)
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                        <td class="px-3 py-2">{{ $loop->iteration }}</td>
+                        <td class="px-3 py-2 font-medium">{{ $exam }}</td>
+                        <td class="px-3 py-2 text-center">
+                            <flux:button
+                                wire:click="removeExam({{ $index }})"
+                                size="xs"
+                                variant="primary"
+                                icon="x-mark"
+                                class="transition-transform hover:scale-105" />
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <div class="grid grid-cols-2 gap-2">
-        <flux:input type="date" wire:model.defer="form.tanggalpemeriksaan_keluar" label="Tanggal Pemeriksaan Keluar" />
-        <flux:input type="time" wire:model.defer="form.jam_pemeriksaan_keluar" label="Jam Pemeriksaan Keluar" />
-    </div>
-
-    <div class="grid grid-cols-2 gap-2">
-        <flux:input type="date" wire:model.defer="form.tanggal_pemeriksaan_diterima" label="Tanggal Pemeriksaan Diterima" />
-        <flux:input type="time" wire:model.defer="form.jam_pemeriksaan_diterima" label="Jam Pemeriksaan Diterima" />
-    </div>
-
-    <flux:input wire:model.defer="form.fasilitas_kesehatan_pemeriksaan" label="Fasilitas Kesehatan Pemeriksa" />
+    @endif
 
     <div class="pt-4">
         <flux:button wire:click="saveAll" class="w-full" variant="primary">
