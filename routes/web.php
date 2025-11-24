@@ -19,6 +19,8 @@ use App\Livewire\Kunjungan\Kunjungan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ResepController;
 use App\Http\Controllers\TiketController;
+use App\Livewire\HasilLabComponent;
+use App\Livewire\HasilRadiologiComponent;
 use App\Livewire\PemeriksaanLabComponent;
 use App\Livewire\PemeriksaanTindakanComponent;
 use App\Livewire\JenisPemeriksaanRadiologiComponent;
@@ -26,7 +28,7 @@ use App\Livewire\StatusPernikahan as LivewireStatusPernikahan;
 use App\Livewire\TingkatKesadaran as LivewireTingkatKesadaran;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
@@ -40,6 +42,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bayi-baru-lahir', BayiBaruLahirIndex::class)->name('bayi-baru-lahir');
     Route::get('/kunjungan', Kunjungan::class)->name('kunjungan');
     Route::get('/farmasi', FarmasiComponent::class)->name('farmasi');
+    Route::get('/hasil-lab', HasilLabComponent::class)->name('hasil-lab');
+    Route::get('/hasil-radiologi', HasilRadiologiComponent::class)->name('hasil-radiologi');
 
 
     //User management
