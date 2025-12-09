@@ -4,7 +4,7 @@
             <flux:heading size="xl">Data Obat</flux:heading>
             <div class="flex gap-4 items-center">
                 <flux:input wire:model.live="search" placeholder="Cari obat..." icon="magnifying-glass" />
-                <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                <flux:button wire:click="create" variant="primary" icon="plus">Tambah</flux:button>
             </div>
         </div>
 
@@ -44,8 +44,8 @@
                     <flux:table.cell>{{ $item->golongan }}</flux:table.cell>
                     <flux:table.cell>{{ $item->sediaan }}</flux:table.cell>
                     <flux:table.cell>
-                        <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
-                        <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
+                        <flux:button size="sm" class="bg-grey-300" icon="pencil" wire:click="edit({{ $item->id }})">Edit</flux:button>
+                        <flux:button size="sm" variant="danger" icon="trash" wire:click="deleteConfirm({{ $item->id }})" class="ml-2">Hapus</flux:button>
                     </flux:table.cell>
                 </flux:table.row>
                 @endforeach

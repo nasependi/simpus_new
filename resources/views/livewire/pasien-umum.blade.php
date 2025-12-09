@@ -4,9 +4,7 @@
             <flux:heading size="xl">Data Pasien Umum</flux:heading>
             <div class="flex gap-4 items-center">
                 <flux:input wire:model.live="search" placeholder="Cari pasien..." size="md" />
-                @can('tambah')
-                <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
-                @endcan
+                <flux:button wire:click="create" variant="primary" icon="plus">Tambah Pasien</flux:button>
             </div>
         </div>
 
@@ -22,11 +20,8 @@
                 <flux:table.column>NIK</flux:table.column>
                 <flux:table.column>Tanggal Lahir</flux:table.column>
                 <flux:table.column>Jenis Kelamin</flux:table.column>
-                <flux:table.column>Agama</flux:table.column>
                 <flux:table.column>Pekerjaan</flux:table.column>
-                <flux:table.column>Status Pernikahan</flux:table.column>
                 <flux:table.column>No HP</flux:table.column>
-                <flux:table.column>Alamat Lengkap</flux:table.column>
                 <flux:table.column>Aksi</flux:table.column>
                 <flux:table.column>Pelayanan</flux:table.column>
 
@@ -40,22 +35,14 @@
                     <flux:table.cell>{{ $item->nik }}</flux:table.cell>
                     <flux:table.cell>{{ $item->tanggal_lahir }}</flux:table.cell>
                     <flux:table.cell>{{ $item->jenisKelamin?->nama_jk }}</flux:table.cell>
-                    <flux:table.cell>{{ $item->agama?->nama_agama }}</flux:table.cell>
                     <flux:table.cell>{{ $item->pekerjaan?->nama_pekerjaan }}</flux:table.cell>
-                    <flux:table.cell>{{ $item->statusPernikahan?->status }}</flux:table.cell>
                     <flux:table.cell>{{ $item->no_hp }}</flux:table.cell>
-                    <flux:table.cell>{{ $item->alamat_lengkap }}</flux:table.cell>
                     <flux:table.cell>
-                        @can('edit')
-                        <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" />
-                        @endcan
-                        @can('hapus')
-                        <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
-                            variant="danger" />
-                        @endcan
+                        <flux:button size="sm" class="bg-grey-300" icon="pencil" wire:click="edit({{ $item->id }})">Edit</flux:button>
+                        <flux:button size="sm" variant="danger" icon="trash" wire:click="deleteConfirm({{ $item->id }})" class="ml-2">Hapus</flux:button>
                     </flux:table.cell>
                     <flux:table.cell>
-                        <flux:button wire:click="modalKunjungan({{ $item->id }})">Pelayanan</flux:button>
+                        <flux:button size="sm" wire:click="modalKunjungan({{ $item->id }})">Pelayanan</flux:button>
 
                         <flux:modal name="kunjunganModal" class="space-y-4 md:w-[90rem]">
                             <flux:heading class="text-lg font-semibold">

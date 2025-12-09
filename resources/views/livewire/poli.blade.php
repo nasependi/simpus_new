@@ -4,7 +4,7 @@
             <flux:heading size="xl">Data Poli</flux:heading>
             <div class="flex gap-4 items-center">
                 <flux:input wire:model.live="search" placeholder="Cari poli..." icon="magnifying-glass" size="md" />
-                <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                <flux:button wire:click="create" variant="primary" icon="plus">Tambah</flux:button>
             </div>
         </div>
 
@@ -14,7 +14,7 @@
                     <div class="flex items-center">
                         <span>Nama Poli</span>
                         @if ($sortField === 'nama')
-                            <x-icon :name="$sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" class="w-3 h-3 text-muted-foreground ml-1" />
+                        <x-icon :name="$sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" class="w-3 h-3 text-muted-foreground ml-1" />
                         @endif
                     </div>
                 </flux:table.column>
@@ -25,21 +25,19 @@
 
             <flux:table.rows>
                 @foreach ($data as $item)
-                    <flux:table.row>
-                        <flux:table.cell>{{ $item->nama }}</flux:table.cell>
-                        <flux:table.cell>{{ $item->keterangan }}</flux:table.cell>
-                        <flux:table.cell>
-                            <span class="text-sm font-medium {{ $item->status ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $item->status ? 'Aktif' : 'Nonaktif' }}
-                            </span>
-                        </flux:table.cell>
-                        <flux:table.cell>
-                            <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit"
-                                class="mr-2" />
-                            <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus"
-                                variant="danger" />
-                        </flux:table.cell>
-                    </flux:table.row>
+                <flux:table.row>
+                    <flux:table.cell>{{ $item->nama }}</flux:table.cell>
+                    <flux:table.cell class="whitespace-pre-line break-words text-sm max-w-[30rem]">{{ $item->keterangan }}</flux:table.cell>
+                    <flux:table.cell>
+                        <span class="text-sm font-medium {{ $item->status ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $item->status ? 'Aktif' : 'Nonaktif' }}
+                        </span>
+                    </flux:table.cell>
+                    <flux:table.cell>
+                        <flux:button size="sm" class="bg-grey-300" icon="pencil" wire:click="edit({{ $item->id }})">Edit</flux:button>
+                        <flux:button size="sm" variant="danger" icon="trash" wire:click="deleteConfirm({{ $item->id }})" class="ml-2">Hapus</flux:button>
+                    </flux:table.cell>
+                </flux:table.row>
                 @endforeach
             </flux:table.rows>
         </flux:table>

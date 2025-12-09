@@ -2,7 +2,7 @@
     <flux:card class="">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold">Manajemen User</h2>
-            <flux:button wire:click="openModal" variant="primary">Tambah User</flux:button>
+            <flux:button wire:click="openModal" variant="primary" icon="plus">Tambah User</flux:button>
         </div>
 
         <flux:table>
@@ -27,8 +27,8 @@
                         </div>
                     </flux:table.cell>
                     <flux:table.cell>
-                        <flux:button size="sm" wire:click="edit({{ $user->id }})">Edit</flux:button>
-                        <flux:button size="sm" variant="danger" wire:click="delete({{ $user->id }})" class="ml-2">Hapus</flux:button>
+                        <flux:button size="sm" icon="pencil" wire:click="edit({{ $user->id }})">Edit</flux:button>
+                        <flux:button size="sm" icon="trash" variant="danger" wire:click="delete({{ $user->id }})" class="ml-2">Hapus</flux:button>
                     </flux:table.cell>
                 </flux:table.row>
                 @endforeach

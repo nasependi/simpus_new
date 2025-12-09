@@ -2,7 +2,7 @@
     <flux:card class="">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold">Daftar Permission</h2>
-            <flux:button wire:click="openModal" variant="primary">Tambah Permission</flux:button>
+            <flux:button wire:click="openModal" variant="primary" icon="plus">Tambah Permission</flux:button>
         </div>
 
         <flux:table>
@@ -15,8 +15,8 @@
                 <flux:table.row :key="$permission->id">
                     <flux:table.cell>{{ $permission->name }}</flux:table.cell>
                     <flux:table.cell>
-                        <flux:button size="sm" class="bg-grey-300" wire:click="edit({{ $permission->id }})">Edit</flux:button>
-                        <flux:button size="sm" variant="danger" wire:click="delete({{ $permission->id }})" class="ml-2">Hapus</flux:button>
+                        <flux:button size="sm" class="bg-grey-300" icon="pencil" wire:click="edit({{ $permission->id }})">Edit</flux:button>
+                        <flux:button size="sm" variant="danger" icon="trash" wire:click="delete({{ $permission->id }})" class="ml-2">Hapus</flux:button>
                     </flux:table.cell>
                 </flux:table.row>
                 @endforeach
@@ -37,9 +37,9 @@
                 <div class="flex justify-end space-x-2">
                     <flux:button class="bg-grey-300" wire:click="closeModal">Batal</flux:button>
                     @if ($editId)
-                    <flux:button variant="primary" wire:click="update">Update</flux:button>
+                    <flux:button variant="primary" icon="pencil" wire:click="update">Update</flux:button>
                     @else
-                    <flux:button variant="primary" wire:click="store">Simpan</flux:button>
+                    <flux:button variant="primary" icon="trash" wire:click="store">Simpan</flux:button>
                     @endif
                 </div>
             </div>

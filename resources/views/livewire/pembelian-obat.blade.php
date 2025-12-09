@@ -23,11 +23,9 @@
                     <flux:table.cell>{{ $item->jumlah_beli }}</flux:table.cell>
                     <flux:table.cell>{{ number_format($item->harga_beli_bersih, 0, ',', '.') }}</flux:table.cell>
                     <flux:table.cell>
-                        <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
-                        <flux:tooltip content="Detail Pembelian Obat">
-                            <flux:button wire:click="showDetail({{ $item->id }})" icon="document-text" label="Detail" class="mr-2" />
-                        </flux:tooltip>
-                        <flux:button wire:click="deleteConfirm({{ $item->id }})" icon="trash" label="Hapus" variant="danger" />
+                        <flux:button size="sm" class="bg-grey-300" icon="document-text" wire:click="showDetail({{ $item->id }})" class="mr-2">Detail Pembelian</flux:button>
+                        <flux:button size="sm" class="bg-grey-300" icon="pencil" wire:click="edit({{ $item->id }})">Edit</flux:button>
+                        <flux:button size="sm" variant="danger" icon="trash" wire:click="deleteConfirm({{ $item->id }})" class="ml-2">Hapus</flux:button>
                     </flux:table.cell>
 
                 </flux:table.row>
