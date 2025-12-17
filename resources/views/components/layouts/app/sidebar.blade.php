@@ -33,17 +33,13 @@
           Farmasi
         </flux:navlist.item>
 
-        <flux:navlist.item icon="beaker" :href="route('hasil-lab')" :current="request()->routeIs('hasil-lab')" wire:navigate>
+        <!-- <flux:navlist.item icon="beaker" :href="route('hasil-lab')" :current="request()->routeIs('hasil-lab')" wire:navigate>
           Laboratorium
         </flux:navlist.item>
 
         <flux:navlist.item icon="beaker" :href="route('hasil-radiologi')" :current="request()->routeIs('hasil-radiologi')" wire:navigate>
           Radiologi
-        </flux:navlist.item>
-
-        <flux:navlist.item icon="folder-plus" :href="route('poli')" :current="request()->routeIs('poli')" wire:navigate>
-          Poli
-        </flux:navlist.item>
+        </flux:navlist.item> -->
       </flux:navlist.group>
     </flux:navlist>
 
@@ -59,6 +55,7 @@
         <flux:navlist.item :href="route('pekerjaan')" wire:navigate>Pekerjaan</flux:navlist.item>
         <flux:navlist.item :href="route('status-pernikahan')" wire:navigate>Status Pernikahan</flux:navlist.item>
         <flux:navlist.item :href="route('cara')" wire:navigate>Cara Pembayaran</flux:navlist.item>
+        <flux:navlist.item :href="route('poli')" wire:navigate>Tambah Poli</flux:navlist.item>
         <flux:navlist.item :href="route('jenis-pemeriksaan-radiologi')" wire:navigate>Pemeriksaan Radiologi</flux:navlist.item>
         <flux:navlist.item :href="route('pemeriksaan-lab')" wire:navigate>Pemeriksaan Laboratorium</flux:navlist.item>
         <flux:navlist.item :href="route('pemeriksaan-tindakan')" wire:navigate>Pemeriksaan Tindakan</flux:navlist.item>
