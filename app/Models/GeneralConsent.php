@@ -25,6 +25,8 @@ class GeneralConsent extends Model
         'akses_fasyankes_rujukan',
         'penanggung_jawab',
         'petugas_pemberi_penjelasan',
+        'ttd_penanggung_jawab',
+        'ttd_petugas',
     ];
 
     // Relasi ke Kunjungan

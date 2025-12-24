@@ -18,6 +18,7 @@ class Kunjungan extends Component
     use WithPagination;
 
     public $pasien_id, $poli_id, $carapembayaran_id, $tanggal_kunjungan, $umur, $kunjungan_id, $tingkatkesadaran_id;
+    public $umur_tahun, $umur_bulan, $umur_hari;
     public $editId = null;
     public $deleteId = null;
     public $search = '';
@@ -30,13 +31,17 @@ class Kunjungan extends Component
     public $listCaraPembayaran = [];
     public $listDaftarKesadaran = [];
     public $status, $statusId = null;
+    public $status_kunjungan = null; // Status yang dipilih dokter saat pemeriksaan
 
     public $filterTanggal;
     public $filterPasien;
     public $filterUmur;
     public $filterPoli = '';
     public $filterCara = '';
-    protected $listeners = ['saveAll' => 'saveAll'];
+    protected $listeners = [
+        'saveAll' => 'saveAll',
+        'consent-saved' => '$refresh'
+    ];
 
 
 
@@ -74,6 +79,19 @@ class Kunjungan extends Component
 
     public function saveAll()
     {
+        // Save status if doctor selected rujuk or rawat inap
+        if ($this->status_kunjungan && $this->kunjungan_id) {
+            KunjunganModel::where('id', $this->kunjungan_id)
+                ->update(['status' => $this->status_kunjungan]);
+            
+            Flux::toast(
+                heading: 'Status Diperbarui',
+                text: 'Status pasien telah diubah menjadi ' . ($this->status_kunjungan === 'rujuk' ? 'Rujuk' : 'Rawat Inap'),
+                variant: 'success'
+            );
+        }
+        
+        // Dispatch save events to all child components
         $this->dispatch('save-anamnesis');
         $this->dispatch('save-pemeriksaan-fisik');
         $this->dispatch('save-psikologis');
@@ -106,7 +124,11 @@ class Kunjungan extends Component
         $this->poli_id = $item->poli_id;
         $this->carapembayaran_id = $item->carapembayaran_id;
         $this->tanggal_kunjungan = $item->tanggal_kunjungan->format('Y-m-d');
-        $this->umur = $item->umur;
+        
+        // Load umur fields
+        $this->umur_tahun = $item->umur_tahun;
+        $this->umur_bulan = $item->umur_bulan;
+        $this->umur_hari = $item->umur_hari;
 
         $this->loadReferences();
         Flux::modal('kunjunganModal')->show();
@@ -120,16 +142,32 @@ class Kunjungan extends Component
 
         $pdf = Pdf::loadView('pdf.general_consent', compact('consent'));
 
-        return response()->streamDownload(
-            fn() => print($pdf->output()),
-            'general-consent-' . $kunjunganId . '.pdf'
+        // Stream PDF to browser for printing (not download)
+        return response()->stream(
+            function() use ($pdf) {
+                echo $pdf->output();
+            },
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="general-consent-' . $kunjunganId . '.pdf"',
+            ]
         );
     }
 
     public function openModalPemeriksaan($id)
     {
         $this->kunjungan_id = $id;
+        
+        // Force refresh all child components
+        $this->dispatch('$refresh');
+        
         Flux::modal('modalPemeriksaan')->show();
+    }
+
+    public function openGeneralConsent($id)
+    {
+        $this->dispatch('open-modal-generalconsent', kunjungan_id: $id);
     }
 
     public function save()
@@ -214,7 +252,7 @@ class Kunjungan extends Component
                     ->orWhere('umur_bulan', 'like', "%{$this->filterUmur}%")
                     ->orWhere('umur_hari', 'like', "%{$this->filterUmur}%");
             }))
-            ->orderBy($this->sortField, $this->sortDirection);
+            ->orderBy('id', 'desc'); // Newest first
 
         $data = $query->paginate(10);
 

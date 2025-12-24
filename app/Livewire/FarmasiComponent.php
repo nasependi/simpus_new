@@ -52,21 +52,62 @@ class FarmasiComponent extends Component
                 $obat->status_resep = $status;
                 $obat->update();
                 $this->loadTableResep($obat->kunjungan_id);
-                Flux::toast(heading: 'Sukses', text: 'Status berhasil diupdate.', variant: 'success');
+                
+                // Check if all obat resep for this kunjungan are completed
+                $kunjungan = Kunjungan::with('obatResep')->find($obat->kunjungan_id);
+                $allCompleted = $kunjungan->obatResep->every(function($item) {
+                    return $item->status_resep == 1; // 1 = Sudah Diberikan
+                });
+                
+                // Auto-update status kunjungan to "pulang" if all obat resep are completed
+                if ($allCompleted && !in_array($kunjungan->status, ['rujuk', 'rawat_inap'])) {
+                    $kunjungan->status = 'pulang';
+                    $kunjungan->save();
+                    
+                    Flux::toast(
+                        heading: 'Sukses',
+                        text: 'Semua obat telah diberikan.',
+                        variant: 'success'
+                    );
+                } else {
+                    Flux::toast(heading: 'Sukses', text: 'Status obat berhasil diupdate.', variant: 'success');
+                }
             }
         }
     }
 
     public function berikanObat($kunjunganId)
     {
-        $kunjungan = Kunjungan::with('obatResep')->find($kunjunganId);
+        try {
+            $kunjungan = Kunjungan::with('obatResep')->find($kunjunganId);
 
-        if ($kunjungan) {
-            foreach ($kunjungan->obatResep as $obat) {
-                $obat->status_resep = 'Sudah Diberikan';
-                $obat->save();
+            if ($kunjungan && $kunjungan->obatResep->count() > 0) {
+                // Update semua obat resep menjadi sudah diberikan
+                foreach ($kunjungan->obatResep as $obat) {
+                    // Update status resep - bisa berupa text atau boolean tergantung struktur DB
+                    $obat->update(['status_resep' => 'Sudah Diberikan']);
+                }
+                
+                // Auto-update status kunjungan ke "pulang" jika belum rujuk/rawat inap
+                if (!in_array($kunjungan->status, ['rujuk', 'rawat_inap'])) {
+                    $kunjungan->status = 'pulang';
+                    $kunjungan->save();
+                }
+                
+                Flux::toast(
+                    heading: 'Berhasil',
+                    text: 'Obat telah diberikan. Status pasien diubah menjadi Pulang.',
+                    variant: 'success'
+                );
+                
+                $this->emitSelf('refreshComponent');
             }
-            $this->emitSelf('refreshComponent');
+        } catch (\Exception $e) {
+            Flux::toast(
+                heading: 'Gagal',
+                text: 'Terjadi kesalahan: ' . $e->getMessage(),
+                variant: 'danger'
+            );
         }
     }
 
@@ -99,7 +140,7 @@ class FarmasiComponent extends Component
     public function render()
     {
         $kunjungan = Kunjungan::with(['pasien', 'obatResep', 'poli'])
-            ->where('status', 'pulang')
+            ->whereHas('obatResep') // Hanya tampilkan kunjungan yang punya resep obat
             ->when($this->filterTanggal, function ($query) {
                 $query->whereDate('tanggal_kunjungan', $this->filterTanggal);
             })

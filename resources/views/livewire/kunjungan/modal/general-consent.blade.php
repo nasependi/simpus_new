@@ -91,18 +91,58 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 items-center">
-            <flux:input wire:model="penanggung_jawab" label="Penanggung Jawab" />
-            <flux:input wire:model="petugas_pemberi_penjelasan" label="Petugas yang wPemberi Penjelasan" />
+        <div class="grid grid-cols-2 gap-4 justify-items-between">
+            {{-- Penanggung Jawab --}}
+            <div class="w-full">
+                <flux:input wire:model="penanggung_jawab" label="Nama Penanggung Jawab" required class="mb-3" />
+                
+                <div x-data="signaturePad(@entangle('ttd_penanggung_jawab'))" class="w-full">
+                    <label class="block text-sm font-medium mb-1">Tanda Tangan Penanggung Jawab</label>
+                    <div>
+                        <canvas x-ref="signature_canvas" class="border rounded shadow touch-none"></canvas>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <button type="button" class="text-sm text-green-600 hover:underline" @click="sync()">Simpan</button>
+                        <button type="button" class="text-sm text-red-600 hover:underline" @click="clear()">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Petugas Pemberi Penjelasan --}}
+            <div class="w-full">
+                <flux:input wire:model="petugas_pemberi_penjelasan" label="Nama Petugas Pemberi Penjelasan" required class="mb-3" />
+                
+                <div x-data="signaturePad(@entangle('ttd_petugas'))" class="w-full">
+                    <label class="block text-sm font-medium mb-1">Tanda Tangan Petugas Pemberi Penjelasan</label>
+                    <div>
+                        <canvas x-ref="signature_canvas" class="border rounded shadow touch-none"></canvas>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <button type="button" class="text-sm text-green-600 hover:underline" @click="sync()">Simpan</button>
+                        <button type="button" class="text-sm text-red-600 hover:underline" @click="clear()">Clear</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="flex justify-end gap-2">
             <flux:modal.close>
                 <flux:button variant="ghost">Batal</flux:button>
             </flux:modal.close>
-            <flux:button wire:click="save" variant="primary">Simpan</flux:button>
+            <flux:button wire:click="save" onclick="syncConsentSignatures()" variant="primary">Simpan</flux:button>
         </div>
     </flux:modal>
+
+    <script>
+        function syncConsentSignatures() {
+            // Trigger sync for all signature pads in the consent modal
+            document.querySelectorAll('[x-data^="signaturePad"]').forEach(el => {
+                if (el.__x && el.__x.$data?.sync) {
+                    el.__x.$data.sync();
+                }
+            });
+        }
+    </script>
 
     {{-- Modal Konfirmasi Hapus --}}
     <flux:modal name="delete-consent" class="min-w-[22rem]">

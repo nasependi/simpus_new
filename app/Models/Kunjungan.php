@@ -19,6 +19,8 @@ class Kunjungan extends Model
         'poli_id',
         'tanggal_kunjungan',
         'carapembayaran_id',
+        'carapembayaran_lainnya',
+        'status',
     ];
 
     protected $casts = [

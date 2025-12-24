@@ -35,6 +35,7 @@ class PasienUmumCrud extends Component
     public $rt, $rw, $kodepos_id;
     public $alamat_domisili, $domisili_rt, $domisili_rw, $domisili_kel, $domisili_kec, $domisili_kab, $domisili_kodepos, $domisili_prov, $domisili_negara;
     public $no_rumah, $no_hp, $pendidikan_id, $pekerjaan_id, $statusnikah_id;
+    public $pekerjaan_lainnya, $carapembayaran_lainnya;
 
     // public $regencies = [];
     public $search_provinsi = '';
@@ -107,17 +108,18 @@ class PasienUmumCrud extends Component
     }
 
     protected $rules = [
-        'nama_lengkap' => 'required|max:100',
+        'nama_lengkap' => 'required|max:30',
+        'nik' => 'required|size:16',
         'no_hp' => 'required|max:20',
         'jk_id' => 'required|exists:jenis_kelamin,id',
         'agama_id' => 'required|exists:agama,id',
         'pendidikan_id' => 'required|exists:pendidikan,id',
         'pekerjaan_id' => 'required|exists:pekerjaan,id',
         'statusnikah_id' => 'required|exists:status_pernikahan,id',
-        'domisili_prov' => 'required|exists:provinces,id',
-        'domisili_kab' => 'required|exists:regencies,id',
-        'domisili_kec' => 'required|exists:districts,id',
-        'domisili_kel' => 'required|exists:villages,id',
+        'domisili_prov' => 'nullable|exists:provinces,id',
+        'domisili_kab' => 'nullable|exists:regencies,id',
+        'domisili_kec' => 'nullable|exists:districts,id',
+        'domisili_kel' => 'nullable|exists:villages,id',
         'no_rekamedis' => 'nullable|string|max:50',
         'ibu_kandung' => 'nullable|string|max:255',
         'tempat_lahir' => 'nullable|string|max:100',
@@ -125,7 +127,19 @@ class PasienUmumCrud extends Component
         'bahasa_dikuasai' => 'nullable|string|max:100',
         'alamat_lengkap' => 'nullable|string',
         'no_rumah' => 'nullable|string|max:20',
+        'alamat_domisili' => 'nullable|string',
+        'domisili_rt' => 'nullable|string|max:10',
+        'domisili_rw' => 'nullable|string|max:10',
+        'domisili_kodepos' => 'nullable|string|max:10',
+        'domisili_negara' => 'nullable|string|max:100',
+        'kodepos_id' => 'nullable|string|max:10',
     ];
+
+    protected $messages = [
+        'nik.size' => 'NIK harus diisi dengan 16 karakter',
+        'nama_lengkap.max' => 'Nama lengkap maksimal 30 karakter',
+    ];
+
 
     public function updatedSearchProvinsi()
     {
@@ -362,8 +376,12 @@ class PasienUmumCrud extends Component
     public function render()
     {
         $data = PasienUmum::with(['agama', 'jenisKelamin', 'pendidikan', 'pekerjaan', 'statusPernikahan', 'province'])
-            ->where('nama_lengkap', 'like', '%' . $this->search . '%')
-            ->orderBy($this->sortField, $this->sortDirection)
+            ->where(function($query) {
+                $query->where('nama_lengkap', 'like', '%' . $this->search . '%')
+                      ->orWhere('nik', 'like', '%' . $this->search . '%')
+                      ->orWhere('no_rekamedis', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy('id', 'desc')
             ->paginate(10);
 
 
@@ -384,6 +402,10 @@ class PasienUmumCrud extends Component
     public function create()
     {
         $this->resetForm();
+        // Auto-fill default values
+        $this->suku = 'Sunda';
+        $this->bahasa_dikuasai = 'Bahasa Sunda, Bahasa Indonesia';
+        $this->domisili_negara = 'Indonesia';
         Flux::modal('pasienModal')->show();
     }
 
@@ -398,6 +420,16 @@ class PasienUmumCrud extends Component
         $this->ibu_kandung = $data->ibu_kandung;
         $this->tempat_lahir = $data->tempat_lahir;
         $this->tanggal_lahir = $data->tanggal_lahir;
+        
+        // Calculate umur from tanggal_lahir
+        if ($data->tanggal_lahir) {
+            $birthDate = new \DateTime($data->tanggal_lahir);
+            $today = new \DateTime();
+            $interval = $today->diff($birthDate);
+            $this->umur = $interval->y;
+            $this->hitungan = 'tahun';
+        }
+        
         $this->jk_id = $data->jk_id;
         $this->agama_id = $data->agama_id;
         $this->suku = $data->suku;
@@ -431,6 +463,7 @@ class PasienUmumCrud extends Component
         $this->no_hp = $data->no_hp;
         $this->pendidikan_id = $data->pendidikan_id;
         $this->pekerjaan_id = $data->pekerjaan_id;
+        $this->pekerjaan_lainnya = $data->pekerjaan_lainnya;
         $this->statusnikah_id = $data->statusnikah_id;
 
         Flux::modal('pasienModal')->show();
@@ -476,6 +509,7 @@ class PasienUmumCrud extends Component
                     'no_hp' => $this->no_hp,
                     'pendidikan_id' => $this->pendidikan_id,
                     'pekerjaan_id' => $this->pekerjaan_id,
+                    'pekerjaan_lainnya' => $this->pekerjaan_lainnya,
                     'statusnikah_id' => $this->statusnikah_id,
                 ]
             );
@@ -499,6 +533,10 @@ class PasienUmumCrud extends Component
         $this->selectedPasienId = $pasien->id;
         $this->nama_lengkap = $pasien->nama_lengkap;
         $this->hitungUmur($pasien->tanggal_lahir);
+        
+        // Auto-fill tanggal kunjungan dengan hari ini
+        $this->tanggal_kunjungan = now()->format('Y-m-d');
+        
         Flux::modal('kunjunganModal')->show();
     }
 
@@ -539,6 +577,7 @@ class PasienUmumCrud extends Component
                     'tanggal_kunjungan' => $this->tanggal_kunjungan,
                     'poli_id' => $this->poli_id,
                     'carapembayaran_id' => $this->carapembayaran_id,
+                    'carapembayaran_lainnya' => $this->carapembayaran_lainnya,
                 ]
             );
 
@@ -582,6 +621,26 @@ class PasienUmumCrud extends Component
 
     public function resetForm()
     {
-        $this->reset(['editId', 'nama_lengkap', 'no_hp', 'jk_id', 'agama_id', 'pendidikan_id', 'pekerjaan_id', 'statusnikah_id', 'umur_tahun', 'umur_bulan', 'umur_hari', 'tanggal_kunjungan', 'poli_id', 'carapembayaran_id']);
+        $this->reset([
+            'editId', 'nama_lengkap', 'no_rekamedis', 'nik', 'paspor', 'ibu_kandung', 'tempat_lahir',
+            'tanggal_lahir', 'jk_id', 'agama_id', 'suku', 'bahasa_dikuasai', 'alamat_lengkap',
+            'rt', 'rw', 'kel_id', 'kec_id', 'kab_id', 'kodepos_id', 'prov_id',
+            'alamat_domisili', 'domisili_rt', 'domisili_rw', 'domisili_kel', 'domisili_kec',
+            'domisili_kab', 'domisili_kodepos', 'domisili_prov', 'domisili_negara',
+            'no_rumah', 'no_hp', 'pendidikan_id', 'pekerjaan_id', 'statusnikah_id',
+            'umur', 'hitungan', 'umur_tahun', 'umur_bulan', 'umur_hari',
+            'tanggal_kunjungan', 'poli_id', 'carapembayaran_id', 'selectedPasienId',
+            'search_provinsi', 'prov_name', 'provinsiOptions',
+            'search_kabupaten', 'kab_name', 'kabupatenOptions',
+            'search_kecamatan', 'kec_name', 'kecamatanOptions',
+            'search_kelurahan', 'kel_name', 'kelurahanOptions',
+            'sama_domisili',
+            'search_domisili_prov', 'domisili_prov_id', 'domisili_prov_nama', 'domisiliProvinsiOptions',
+            'search_domisili_kab', 'domisili_kab_id', 'domisili_kab_nama', 'domisiliKabupatenOptions',
+            'search_domisili_kec', 'domisili_kec_id', 'domisili_kec_nama', 'domisiliKecamatanOptions',
+            'search_domisili_kel', 'domisili_kel_id', 'domisili_kel_nama', 'domisiliKelurahanOptions',
+            'halaman', 'pekerjaan_lainnya', 'carapembayaran_lainnya'
+        ]);
+        $this->halaman = 1;
     }
 }

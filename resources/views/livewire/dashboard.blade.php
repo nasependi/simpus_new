@@ -121,14 +121,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </div>
 
+@script
 <script>
-    document.addEventListener('livewire:navigated', function() {
-        initCharts();
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        initCharts();
-    });
+    initCharts();
 
     function initCharts() {
         // Trend Kunjungan Chart
@@ -143,10 +138,10 @@
             new Chart(ctx1.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: @js($trendKunjunganLabels),
+                    labels: $wire.trendKunjunganLabels,
                     datasets: [{
                         label: 'Kunjungan',
-                        data: @js($trendKunjunganData),
+                        data: $wire.trendKunjunganData,
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
@@ -186,10 +181,10 @@
             new Chart(ctx2.getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: @js($distribusiPoliLabels),
+                    labels: $wire.distribusiPoliLabels,
                     datasets: [{
-                        data: @js($distribusiPoliData),
-                        backgroundColor: @js($distribusiPoliColors)
+                        data: $wire.distribusiPoliData,
+                        backgroundColor: $wire.distribusiPoliColors
                     }]
                 },
                 options: {
@@ -206,3 +201,4 @@
         }
     }
 </script>
+@endscript

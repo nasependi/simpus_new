@@ -63,7 +63,7 @@
                     </flux:table.cell>
                     <flux:table.cell>
                         @if (empty($item->status))
-                        <flux:badge size="sm" color="gray">Pemeriksaan</flux:badge>
+                        <flux:badge size="sm" color="gray"></flux:badge>
                         @elseif ($item->status === 'rawat_inap')
                         <flux:badge size="sm" color="red">Rawat Inap</flux:badge>
                         @elseif ($item->status === 'rujuk')
@@ -82,12 +82,9 @@
                         <flux:tooltip content="Pemeriksaan">
                             <flux:button wire:click="openModalPemeriksaan({{ $item->id }})" icon="funnel" label="Pemeriksaan" class="mr-2" />
                         </flux:tooltip>
-                        <flux:tooltip content="Status">
-                            <flux:button wire:click="openStatusModal({{ $item->id }})" icon="arrow-path" label="Status" class="mr-2" />
-                        </flux:tooltip>
                         @else
                         <flux:tooltip content="General Consent">
-                            <flux:button wire:click="$dispatch('open-modal-generalconsent', { kunjungan_id: {{ $item->id }} })" icon="clipboard" label="Consent" class="mr-2" />
+                            <flux:button wire:click="openGeneralConsent({{ $item->id }})" icon="clipboard" label="Consent" class="mr-2" />
                         </flux:tooltip>
                         @endif
                         <flux:button wire:click="edit({{ $item->id }})" icon="pencil" label="Edit" class="mr-2" />
@@ -120,13 +117,13 @@
                         </flux:tabs>
 
                         <flux:tab.panel name="anamnesis">
-                            @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id])
+                            @livewire('kunjungan.form.anamnesis', ['kunjungan_id' => $kunjungan_id], key('anamnesis-'.$kunjungan_id))
                         </flux:tab.panel>
                         <flux:tab.panel name="fisik">
-                            @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id])
+                            @livewire('kunjungan.form.pemeriksaan-fisik', ['kunjungan_id' => $kunjungan_id], key('fisik-'.$kunjungan_id))
                         </flux:tab.panel>
                         <flux:tab.panel name="psikologis">
-                            @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id])
+                            @livewire('kunjungan.form.pemeriksaan-psikologis', ['kunjungan_id' => $kunjungan_id], key('psikologis-'.$kunjungan_id))
                         </flux:tab.panel>
                     </flux:tab.group>
                     @endif
@@ -189,6 +186,19 @@
                     </flux:tab.group>
                     @endif
                 </flux:tab.panel>
+                
+                {{-- Status Selection --}}
+                <!-- <div class="border-t pt-4 mt-4">
+                    <flux:select wire:model="status_kunjungan" label="Status Pasien (Opsional)" placeholder="Pilih status jika perlu rujuk/rawat inap">
+                        <option value="">Rawat Jalan (Normal)</option>
+                        <option value="rujuk">Rujuk ke RS Lain</option>
+                        <option value="rawat_inap">Rawat Inap</option>
+                    </flux:select>
+                    <flux:text class="text-sm text-zinc-500 mt-1">
+                        * Biarkan kosong untuk rawat jalan normal. Status akan otomatis "Pulang" setelah farmasi memberikan obat.
+                    </flux:text>
+                </div> -->
+                
                 <div class="flex justify-between">
                     <flux:modal.close>
                         <flux:button variant="ghost" variant="filled" class="text-zinc-700! hover:text-zinc-900! dark:text-zinc-300! dark:hover:text-white!">Kembali</flux:button>

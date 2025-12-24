@@ -31,6 +31,7 @@ class GeneralConsent extends Component
     public $kerahasiaan_informasi = false, $pemeriksaan_ke_pihak_penjamin = false, $pemeriksaan_diakses_peserta_didik = false;
     public $anggota_keluarga_dapat_akses, $akses_fasyankes_rujukan = false;
     public $penanggung_jawab, $petugas_pemberi_penjelasan;
+    public $ttd_penanggung_jawab, $ttd_petugas;
 
     public $showModal = false;
     public $kunjungan_id;
@@ -100,6 +101,8 @@ class GeneralConsent extends Component
                 'akses_fasyankes_rujukan' => 'nullable|boolean',
                 'penanggung_jawab' => 'required|string',
                 'petugas_pemberi_penjelasan' => 'required|string',
+                'ttd_penanggung_jawab' => 'nullable|string',
+                'ttd_petugas' => 'nullable|string',
             ]);
 
             ModelsGeneralConsent::updateOrCreate(
@@ -107,8 +110,14 @@ class GeneralConsent extends Component
                 $validated
             );
 
+            // Show toast first
+            Flux::toast(heading: 'Berhasil', text: 'Data General Consent berhasil disimpan.', variant: 'success');
+            
+            // Then close modal
             Flux::modal('consentModal')->close();
-            Flux::toast('Berhasil', 'Data General Consent disimpan.', 'success');
+            
+            // Dispatch event to parent component to refresh
+            $this->dispatch('consent-saved')->to('kunjungan.kunjungan');
 
             $this->resetForm();
         } catch (Throwable $th) {

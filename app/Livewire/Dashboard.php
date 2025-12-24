@@ -30,9 +30,7 @@ class Dashboard extends Component
 
     public function mount()
     {
-        $this->loadStatistics();
-        $this->loadChartData();
-        $this->loadRecentActivities();
+        // Initial load - data will be refreshed in render()
     }
 
     public function loadStatistics()
@@ -107,13 +105,29 @@ class Dashboard extends Component
 
     public function loadRecentActivities()
     {
-        // Ambil 5 kunjungan terbaru
-        $recentKunjungan = Kunjungan::with(['pasien', 'poli'])
-            ->orderBy('created_at', 'desc')
-            ->take(5)
+        $activities = [];
+        
+        // Ambil 3 pasien terbaru
+        $recentPasien = PasienUmum::orderBy('created_at', 'desc')
+            ->take(3)
             ->get();
         
-        $activities = [];
+        foreach ($recentPasien as $pasien) {
+            $activities[] = [
+                'name' => $pasien->nama_lengkap,
+                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($pasien->nama_lengkap) . '&background=random',
+                'description' => 'Mendaftar sebagai pasien baru',
+                'time' => $pasien->created_at->diffForHumans(),
+                'created_at' => $pasien->created_at,
+                'type' => 'pasien'
+            ];
+        }
+        
+        // Ambil 3 kunjungan terbaru
+        $recentKunjungan = Kunjungan::with(['pasien', 'poli'])
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
         
         foreach ($recentKunjungan as $kunjungan) {
             $activities[] = [
@@ -121,14 +135,26 @@ class Dashboard extends Component
                 'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($kunjungan->pasien ? $kunjungan->pasien->nama_lengkap : 'P') . '&background=random',
                 'description' => 'Kunjungan ke ' . ($kunjungan->poli ? $kunjungan->poli->nama : 'Poli'),
                 'time' => $kunjungan->created_at->diffForHumans(),
+                'created_at' => $kunjungan->created_at,
+                'type' => 'kunjungan'
             ];
         }
         
-        $this->recentActivities = $activities;
+        // Sort by created_at descending and take 5 most recent
+        usort($activities, function($a, $b) {
+            return $b['created_at'] <=> $a['created_at'];
+        });
+        
+        $this->recentActivities = array_slice($activities, 0, 5);
     }
 
     public function render()
     {
+        // Reload data setiap kali render dipanggil
+        $this->loadStatistics();
+        $this->loadChartData();
+        $this->loadRecentActivities();
+        
         return view('livewire.dashboard');
     }
 }
