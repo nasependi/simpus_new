@@ -52,7 +52,7 @@
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
@@ -61,6 +61,195 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+/* Custom UI Improvements */
+@layer components {
+
+    /* Soft Green Color Palette - Kalem & Professional */
+    .bg-success-soft {
+        background-color: #D1FAE5;
+        /* Emerald 100 - very soft */
+    }
+
+    .bg-success-soft-dark {
+        background-color: #064E3B;
+        /* Emerald 900 - dark mode */
+    }
+
+    .text-success-soft {
+        color: #059669;
+        /* Emerald 600 - readable */
+    }
+
+    .border-success-soft {
+        border-color: #A7F3D0;
+        /* Emerald 200 */
+    }
+
+    /* Card Improvements - Subtle elevation */
+    .card-improved {
+        @apply bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700;
+        transition: all 0.2s ease;
+    }
+
+    .card-improved:hover {
+        @apply shadow-md;
+    }
+
+    /* Table Improvements - Better readability */
+    .table-improved thead th {
+        @apply bg-neutral-50 dark:bg-neutral-800 font-semibold text-neutral-600 dark:text-neutral-300 text-sm uppercase tracking-wide py-4 px-4;
+    }
+
+    .table-improved tbody tr {
+        @apply border-b border-neutral-100 dark:border-neutral-700 transition-colors;
+    }
+
+    .table-improved tbody tr:hover {
+        @apply bg-neutral-50 dark:bg-neutral-800/50;
+    }
+
+    .table-improved tbody td {
+        @apply py-4 px-4 text-neutral-700 dark:text-neutral-200;
+    }
+
+    /* Badge Improvements - Soft colors */
+    .badge-soft-green {
+        @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+        background-color: #D1FAE5;
+        color: #065F46;
+        border: 1px solid #A7F3D0;
+    }
+
+    .dark .badge-soft-green {
+        background-color: #064E3B;
+        color: #6EE7B7;
+        border-color: #047857;
+    }
+
+    .badge-soft-blue {
+        @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+        background-color: #DBEAFE;
+        color: #1E40AF;
+        border: 1px solid #BFDBFE;
+    }
+
+    .dark .badge-soft-blue {
+        background-color: #1E3A8A;
+        color: #93C5FD;
+        border-color: #2563EB;
+    }
+
+    .badge-soft-yellow {
+        @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+        background-color: #FEF3C7;
+        color: #92400E;
+        border: 1px solid #FDE68A;
+    }
+
+    .dark .badge-soft-yellow {
+        background-color: #78350F;
+        color: #FCD34D;
+        border-color: #F59E0B;
+    }
+
+    .badge-soft-purple {
+        @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+        background-color: #F3E8FF;
+        color: #6B21A8;
+        border: 1px solid #E9D5FF;
+    }
+
+    .dark .badge-soft-purple {
+        background-color: #581C87;
+        color: #D8B4FE;
+        border-color: #9333EA;
+    }
+
+    /* ===== Button Improvements ===== */
+    .btn-primary-improved {
+        @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-medium text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-150 shadow-sm hover:shadow-md;
+    }
+
+    .btn-primary-improved:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary-improved {
+        @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all duration-150 shadow-sm;
+    }
+
+    /* ===== Modal Improvements ===== */
+    .modal-header-improved {
+        @apply border-b border-neutral-200 dark:border-neutral-700 pb-4 mb-6;
+    }
+
+    .modal-footer-improved {
+        @apply border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-6 flex justify-end gap-3;
+    }
+
+    /* ===== Form Input Polish ===== */
+    [data-flux-label] {
+        @apply font-medium text-neutral-700 dark:text-neutral-300;
+    }
+
+    input[data-flux-control]:hover,
+    textarea[data-flux-control]:hover,
+    select[data-flux-control]:hover {
+        @apply border-neutral-400 dark:border-neutral-500;
+    }
+
+    input:focus[data-flux-control],
+    textarea:focus[data-flux-control],
+    select:focus[data-flux-control] {
+        @apply ring-emerald-500 dark:ring-emerald-400;
+    }
+
+    /* ===== Loading States ===== */
+    .skeleton {
+        @apply animate-pulse bg-neutral-200 dark:bg-neutral-700 rounded;
+    }
+
+    .spinner {
+        @apply inline-block w-5 h-5 border-2 border-neutral-300 border-t-emerald-600 rounded-full animate-spin;
+    }
+
+    /* Spacing Consistency */
+    .section-spacing {
+        @apply mb-8;
+    }
+
+    .card-padding {
+        @apply p-6;
+    }
+
+    /* Responsive Grid */
+    .grid-responsive {
+        @apply grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
+    }
+
+    /* ===== Sidebar Improvements ===== */
+    /* Sidebar spacing - lebih breathable */
+    flux-sidebar {
+        @apply p-4;
+    }
+
+    /* Navlist group spacing */
+    flux-navlist-group {
+        @apply mb-4;
+    }
+
+    /* Navlist item spacing */
+    flux-navlist-item {
+        @apply py-2.5 px-3 my-1;
+    }
+
+    /* Sidebar logo/brand spacing */
+    flux-sidebar>a {
+        @apply mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-700;
+    }
+
+    /* Profile dropdown spacing */
+    flux-sidebar flux-dropdown {
+        @apply mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700;
+    }
+}

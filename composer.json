@@ -19,6 +19,7 @@
         "livewire/flux": "*",
         "livewire/flux-pro": "^2.1",
         "livewire/volt": "^1.7.0",
+        "maatwebsite/excel": "*",
         "spatie/laravel-permission": "^6.17"
     },
     "require-dev": {

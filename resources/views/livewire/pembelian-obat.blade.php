@@ -3,8 +3,8 @@
         <div class="flex justify-between mb-4">
             <flux:heading size="xl">Data Pembelian Obat</flux:heading>
             <div class="flex gap-4 items-center">
-                <flux:input wire:model.live="search" placeholder="Cari no faktur..." icon="magnifying-glass" size="md" />
-                <flux:button wire:click="create" variant="primary" icon="plus-circle">Tambah</flux:button>
+                <flux:input wire:model.live="search" placeholder="Cari no faktur..." icon="magnifying-glass" size="sm" />
+                <flux:button wire:click="create" variant="primary" icon="plus-circle" size="sm">Tambah</flux:button>
             </div>
         </div>
 
@@ -126,66 +126,193 @@
             </div>
         </flux:modal>
 
-        {{-- Modal Detail Pembelian --}}
-        <flux:modal name="detailPembelianModal" class="w-full max-w-screen-xl h-[85vh] overflow-y-auto">
-            <div class="p-6">
-
-                {{-- Detail Item Pembelian --}}
+        {{-- Modal Detail Pembelian - Nota Style --}}
+        <flux:modal name="detailPembelianModal" class="w-full max-w-4xl">
+            <div class=" p-8">
                 @if(empty($detailPembelian))
-                <p class="text-gray-500 text-center py-6">Tidak ada detail untuk pembelian ini.</p>
+                <p class="text-neutral-500 text-center py-6">Tidak ada detail untuk pembelian ini.</p>
                 @else
-                {{-- Informasi Umum Pembelian --}}
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                        <p class="text-sm text-gray-500">No Faktur</p>
-                        <p class="font-semibold text-gray-800">{{ $pembelian['no_faktur'] ?? '-' }}</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                        <p class="text-sm text-gray-500">Total Harga Bersih</p>
-                        <p class="font-semibold text-green-600">
-                            Rp {{ number_format($pembelian['harga_beli_bersih'] ?? 0, 0, ',', '.') }}
-                        </p>
+                
+                {{-- Header Nota --}}
+                <div class="border-b-2 border-neutral-800 dark:border-neutral-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">NOTA PEMBELIAN OBAT</h1>
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">SIMPUS - Sistem Informasi Puskesmas</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400">No. Faktur</p>
+                            <p class="text-2xl font-bold text-emerald-600">{{ $pembelian['no_faktur'] ?? '-' }}</p>
+                        </div>
                     </div>
                 </div>
-                <div class="overflow-x-auto rounded-lg shadow">
-                    <table class="min-w-full text-sm border border-gray-200">
-                        <thead class="bg-gray-100 text-gray-700">
-                            <tr>
-                                <th class="px-4 py-3 border">Nama Obat</th>
-                                <th class="px-4 py-3 border text-center">Kuantitas</th>
-                                <th class="px-4 py-3 border text-right">Harga Beli</th>
-                                <th class="px-4 py-3 border text-right">Jumlah</th>
-                                <th class="px-4 py-3 border text-center">Kadaluarsa</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($detailPembelian as $d)
-                            <tr class="">
-                                <td class="px-4 py-2 border">{{ $d['nama_obat'] }}</td>
-                                <td class="px-4 py-2 border text-center">{{ $d['kuantitas'] }}</td>
-                                <td class="px-4 py-2 border text-right">
-                                    Rp {{ number_format($d['harga_beli'], 0, ',', '.') }}
-                                </td>
-                                <td class="px-4 py-2 border text-right">
-                                    Rp {{ number_format($d['jumlah'], 0, ',', '.') }}
-                                </td>
-                                <td class="px-4 py-2 border text-center">{{ $d['kadaluarsa'] }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot class="bg-gray-50 font-semibold">
-                            <tr>
-                                <td colspan="3" class="px-4 py-2 text-right border">Total</td>
-                                <td class="px-4 py-2 text-right border">
+
+                {{-- Informasi Pembelian --}}
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">INFORMASI PEMBELIAN</h3>
+                        <div class="space-y-1 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">Tanggal:</span>
+                                <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ \Carbon\Carbon::parse($pembelian['tanggal'] ?? now())->format('d F Y') }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">Total Item:</span>
+                                <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ count($detailPembelian) }} item</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">Total Kuantitas:</span>
+                                <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ array_sum(array_column($detailPembelian, 'kuantitas')) }} unit</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">RINGKASAN BIAYA</h3>
+                        <div class="space-y-1 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">Harga Kotor:</span>
+                                <span class="font-medium text-neutral-900 dark:text-neutral-100">Rp {{ number_format($pembelian['harga_beli_kotor'] ?? 0, 0, ',', '.') }}</span>
+                            </div>
+                            @if(isset($pembelian['ppn']) && $pembelian['ppn'] > 0)
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">PPN ({{ $pembelian['ppn'] }}%):</span>
+                                <span class="font-medium text-neutral-900 dark:text-neutral-100">Rp {{ number_format(($pembelian['harga_beli_kotor'] * $pembelian['ppn'] / 100), 0, ',', '.') }}</span>
+                            </div>
+                            @endif
+                            @if(isset($pembelian['pph']) && $pembelian['pph'] > 0)
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">PPH ({{ $pembelian['pph'] }}%):</span>
+                                <span class="font-medium text-red-600">- Rp {{ number_format(($pembelian['harga_beli_kotor'] * $pembelian['pph'] / 100), 0, ',', '.') }}</span>
+                            </div>
+                            @endif
+                            @if(isset($pembelian['diskon']) && $pembelian['diskon'] > 0)
+                            <div class="flex justify-between">
+                                <span class="text-neutral-600 dark:text-neutral-400">Diskon:</span>
+                                <span class="font-medium text-red-600">- Rp {{ number_format($pembelian['diskon'], 0, ',', '.') }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tabel Detail Item --}}
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">DETAIL ITEM PEMBELIAN</h3>
+                    <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-neutral-100 dark:bg-neutral-800">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-semibold text-neutral-700 dark:text-neutral-300">No</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-neutral-700 dark:text-neutral-300">Nama Obat</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-neutral-700 dark:text-neutral-300">Qty</th>
+                                    <th class="px-4 py-3 text-right font-semibold text-neutral-700 dark:text-neutral-300">Harga Satuan</th>
+                                    <th class="px-4 py-3 text-right font-semibold text-neutral-700 dark:text-neutral-300">Subtotal</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-neutral-700 dark:text-neutral-300">Kadaluarsa</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
+                                @foreach($detailPembelian as $index => $d)
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
+                                    <td class="px-4 py-3 text-neutral-900 dark:text-neutral-100">{{ $index + 1 }}</td>
+                                    <td class="px-4 py-3 text-neutral-900 dark:text-neutral-100 font-medium">{{ $d['nama_obat'] }}</td>
+                                    <td class="px-4 py-3 text-center text-neutral-900 dark:text-neutral-100">{{ $d['kuantitas'] }}</td>
+                                    <td class="px-4 py-3 text-right text-neutral-900 dark:text-neutral-100">
+                                        Rp {{ number_format($d['harga_beli'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right text-neutral-900 dark:text-neutral-100 font-medium">
+                                        Rp {{ number_format($d['jumlah'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400 text-xs">
+                                        {{ \Carbon\Carbon::parse($d['kadaluarsa'])->format('d/m/Y') }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Total Akhir --}}
+                <div class="border-t-2 border-neutral-800 dark:border-neutral-200 pt-4">
+                    <div class="flex justify-end">
+                        <div class="w-80">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-neutral-600 dark:text-neutral-400">Subtotal:</span>
+                                <span class="font-medium text-neutral-900 dark:text-neutral-100">
                                     Rp {{ number_format(array_sum(array_column($detailPembelian, 'jumlah')), 0, ',', '.') }}
-                                </td>
-                                <td class="border"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center py-3 border-t border-neutral-300 dark:border-neutral-600">
+                                <span class="text-lg font-bold text-neutral-900 dark:text-neutral-100">TOTAL PEMBAYARAN:</span>
+                                <span class="text-2xl font-bold text-emerald-600">
+                                    Rp {{ number_format($pembelian['harga_beli_bersih'] ?? 0, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {{-- Footer Nota --}}
+                <div class="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                    <div class="flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">
+                        <p>Dicetak pada: {{ now()->format('d F Y, H:i') }}</p>
+                        <p>Terima kasih atas pembelian Anda</p>
+                    </div>
+                </div>
+
+                {{-- Tombol Aksi --}}
+                <div class="flex justify-end gap-2 mt-6">
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Tutup</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="primary" icon="printer" onclick="window.print()">Cetak Nota</flux:button>
+                </div>
+
                 @endif
             </div>
+
+            {{-- Print Styling --}}
+            <style>
+                @media print {
+                    /* Hide buttons */
+                    button {
+                        display: none !important;
+                    }
+                    
+                    /* Full width */
+                    body {
+                        background: white !important;
+                    }
+                    
+                    /* Black text and borders */
+                    * {
+                        color: #000 !important;
+                        box-shadow: none !important;
+                    }
+                    
+                    .border,
+                    .border-t,
+                    .border-b,
+                    .border-t-2,
+                    .border-b-2 {
+                        border-color: #000 !important;
+                    }
+                    
+                    table {
+                        border-collapse: collapse;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #000 !important;
+                        padding: 6px !important;
+                    }
+                    
+                    /* Page breaks */
+                    table, tr {
+                        page-break-inside: avoid;
+                    }
+                }
+            </style>
         </flux:modal>
 
 

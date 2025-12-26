@@ -1,7 +1,13 @@
-<div class="p-6" wire:poll.5s>
-    <flux:card class="shadow-lg rounded-lg">
-        <div class="flex justify-between mb-4">
-            <flux:heading size="xl">Daftar Farmasi</flux:heading>
+<div class="px-4 sm:px-6 pt-2 pb-4 sm:pb-6" wire:poll.5s>
+    <flux:card class="card-improved">
+        {{-- Header Section --}}
+        <div class="pb-4 border-b border-neutral-200 dark:border-neutral-700">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100">Daftar Farmasi</h1>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Kelola resep obat dan status farmasi</p>
+                </div>
+            </div>
         </div>
 
         <flux:table :paginate="$kunjungan">
@@ -62,9 +68,9 @@
                     {{-- Status Resep --}}
                     <flux:table.cell>
                         @if($item->obatResep && $item->obatResep->where('status_resep', 0)->count() > 0)
-                        <flux:badge variant="secondary">-</flux:badge>
+                        <flux:badge color="red" size="sm">Pending</flux:badge>
                         @else
-                        <flux:badge variant="success">Sudah</flux:badge>
+                        <flux:badge color="green" size="sm">Sudah</flux:badge>
                         @endif
                     </flux:table.cell>
 

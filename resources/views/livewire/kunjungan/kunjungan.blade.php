@@ -1,7 +1,13 @@
-<div class="p-6" wire:poll.5s>
-    <flux:card class="shadow-lg rounded-lg">
-        <div class="flex justify-between mb-4">
-            <flux:heading size="xl">Data Kunjungan</flux:heading>
+<div class="px-4 sm:px-6 pt-2 pb-4 sm:pb-6" wire:poll.5s>
+    <flux:card class="card-improved">
+        {{-- Header Section --}}
+        <div class="pb-4 border-b border-neutral-200 dark:border-neutral-700">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100">Data Kunjungan</h1>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Kelola data kunjungan pasien</p>
+                </div>
+            </div>
         </div>
 
         <flux:table :paginate="$data">
@@ -73,7 +79,7 @@
                         @elseif ($item->status === 'rujuk')
                             <flux:badge size="sm" color="yellow">Rujuk</flux:badge>
                         @elseif ($item->status === 'pulang')
-                            <flux:badge size="sm" color="green">Pulang</flux:badge>
+                            <flux:badge color="green" size="sm">Pulang</flux:badge>
                         @else
                             <flux:badge size="sm"></flux:badge>
                         @endif

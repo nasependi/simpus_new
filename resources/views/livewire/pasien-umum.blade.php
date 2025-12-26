@@ -1,7 +1,7 @@
-<div class="p-2 sm:p-4">
-    <flux:card class="shadow-lg rounded-xl border-0">
+<div class="px-4 sm:px-6 pt-2 pb-4 sm:pb-6">
+    <flux:card class="card-improved">
         {{-- Header Section --}}
-        <div class="pt-2 pb-4 sm:pt-4 border-b border-neutral-200 dark:border-neutral-700">
+        <div class="pb-4 border-b border-neutral-200 dark:border-neutral-700">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <flux:heading size="xl" class="text-neutral-900 dark:text-neutral-100">

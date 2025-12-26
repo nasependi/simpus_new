@@ -270,9 +270,23 @@ class PembelianObat extends Component
     // === DETAIL VIEW ===
 
     public $detailPembelian = [];
+    public $pembelian = [];
 
     public function showDetail($pembelianId)
     {
+        // Load data pembelian header
+        $pembelianModel = PembelianObatModel::findOrFail($pembelianId);
+        $this->pembelian = [
+            'no_faktur'         => $pembelianModel->no_faktur,
+            'tanggal'           => $pembelianModel->created_at,
+            'harga_beli_kotor'  => $pembelianModel->harga_beli_kotor,
+            'harga_beli_bersih' => $pembelianModel->harga_beli_bersih,
+            'ppn'               => $pembelianModel->ppn ?? 0,
+            'pph'               => $pembelianModel->pph ?? 0,
+            'diskon'            => $pembelianModel->diskon ?? 0,
+        ];
+
+        // Load detail items (JANGAN format di sini, biar di view)
         $this->detailPembelian = DetailPembelianObatModel::with('obat')
             ->where('pembelian_id', $pembelianId)
             ->get()
@@ -280,9 +294,9 @@ class PembelianObat extends Component
                 return [
                     'nama_obat'  => $d->obat->nama_obat ?? '-',
                     'kuantitas'  => $d->kuantitas,
-                    'harga_beli' => number_format($d->harga_beli, 0, ',', '.'),
-                    'jumlah'     => number_format($d->jumlah, 0, ',', '.'),
-                    'kadaluarsa' => \Carbon\Carbon::parse($d->kadaluarsa)->format('d-m-Y'),
+                    'harga_beli' => $d->harga_beli,
+                    'jumlah'     => $d->jumlah,
+                    'kadaluarsa' => $d->kadaluarsa,
                 ];
             })
             ->toArray();
