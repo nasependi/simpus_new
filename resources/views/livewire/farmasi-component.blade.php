@@ -1,4 +1,4 @@
-<div class="p-6">
+<div class="p-6" wire:poll.5s>
     <flux:card class="shadow-lg rounded-lg">
         <div class="flex justify-between mb-4">
             <flux:heading size="xl">Daftar Farmasi</flux:heading>
@@ -62,7 +62,7 @@
                     {{-- Status Resep --}}
                     <flux:table.cell>
                         @if($item->obatResep && $item->obatResep->where('status_resep', 0)->count() > 0)
-                        <flux:badge variant="secondary"></flux:badge>
+                        <flux:badge variant="secondary">-</flux:badge>
                         @else
                         <flux:badge variant="success">Sudah</flux:badge>
                         @endif
@@ -173,7 +173,7 @@
                                 <td class="px-4 py-2 border text-center">
                                     <flux:button
                                         wire:click="updateStatusResep({{ $obat->id }})"
-                                        variant="outline"
+                                        variant="{{ $obat->status_resep == 0 ? 'outline' : 'primary' }}"
                                         size="xs"
                                         icon="arrow-path">
                                         {{ $obat->status_resep == 0 ? 'Pending' : 'Selesai' }}

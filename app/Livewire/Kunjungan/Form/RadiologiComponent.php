@@ -139,59 +139,101 @@ class RadiologiComponent extends Component
 
     public function save()
     {
-        $this->validate([
-            'kunjungan_id' => 'required|exists:kunjungan,id',
-            'state.nama_pemeriksaan' => 'required|string|max:255',
-            'state.jenis_pemeriksaan' => 'required|string|max:255',
-            'state.nomor_pemeriksaan' => 'required|string|max:255',
-            'state.tanggal_permintaan' => 'required|date',
-            'state.jam_permintaan' => 'required',
-            'state.dokter_pengirim' => 'required|string|max:255',
-            'state.nomor_telepon_dokter' => 'required|regex:/^[0-9]{9,15}$/',
-            'state.nama_fasilitas_radiologi' => 'required|string',
-            'state.unit_pengirim_radiologi' => 'required|string',
-            'state.prioritas_pemeriksaan_radiologi' => 'required|string',
-            'state.diagnosis_kerja' => 'required|string',
-            'state.catatan_permintaan' => 'required|string',
-            'state.metode_penyampaian_pemeriksaan' => 'required|string',
-            'state.status_alergi' => 'required',
-            'state.status_kehamilan' => 'required|string',
-            'state.tanggal_pemeriksaan' => 'required|date',
-            'state.jam_pemeriksaan' => 'required',
-            'state.jenis_bahan_kontras' => 'required|string',
-            'attachments.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'state.nama_dokter_pemeriksaan' => 'required|string',
-            'state.interpretasi_radiologi' => 'required|string',
-        ]);
-
-        $fotoPaths = [];
-        if (!empty($this->attachments)) {
-            foreach ($this->attachments as $file) {
-                $fotoPaths[] = $file->store('radiologi/foto-hasil', 'public');
+        try {
+            // Skip if no exams selected
+            if (empty($this->selectedExams)) {
+                Flux::toast(
+                    heading: 'Peringatan',
+                    text: 'Pilih minimal satu jenis pemeriksaan',
+                    variant: 'warning'
+                );
+                return false;
             }
+
+            // Gabungkan selected exams jadi string
+            $this->state['jenis_pemeriksaan'] = implode(', ', $this->selectedExams);
+
+            $this->validate([
+                'kunjungan_id' => 'required|exists:kunjungan,id',
+                'state.nama_pemeriksaan' => 'required|string|max:255',
+                'state.jenis_pemeriksaan' => 'required|string|max:255',
+                'state.nomor_pemeriksaan' => 'required|string|max:255',
+                'state.tanggal_permintaan' => 'required|date',
+                'state.jam_permintaan' => 'required',
+                'state.dokter_pengirim' => 'required|string|max:255',
+                'state.nomor_telepon_dokter' => 'required|regex:/^[0-9]{9,15}$/',
+                'state.nama_fasilitas_radiologi' => 'required|string',
+                'state.unit_pengirim_radiologi' => 'required|string',
+                'state.prioritas_pemeriksaan_radiologi' => 'required|string',
+                'state.diagnosis_kerja' => 'required|string',
+                'state.catatan_permintaan' => 'required|string',
+                'state.metode_penyampaian_pemeriksaan' => 'required|string',
+                'state.status_alergi' => 'required',
+                'state.status_kehamilan' => 'required|string',
+                'state.tanggal_pemeriksaan' => 'required|date',
+                'state.jam_pemeriksaan' => 'required',
+                'state.jenis_bahan_kontras' => 'required|string',
+                'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+                'state.nama_dokter_pemeriksaan' => 'required|string',
+                'state.interpretasi_radiologi' => 'required|string',
+            ]);
+
+            $fotoPaths = [];
+            if (!empty($this->attachments)) {
+                foreach ($this->attachments as $file) {
+                    $fotoPaths[] = $file->store('radiologi/foto-hasil', 'public');
+                }
+            }
+
+            $updateData = array_merge($this->state, [
+                'kunjungan_id' => $this->kunjungan_id,
+                'nomor_telepon_dokter' => '+62' . ltrim($this->state['nomor_telepon_dokter'], '0'),
+            ]);
+
+            if (!empty($fotoPaths)) {
+                $updateData['foto_hasil'] = json_encode($fotoPaths);
+            } elseif (isset($this->state['foto_hasil'])) {
+                $updateData['foto_hasil'] = $this->state['foto_hasil'];
+            }
+
+            $radiologi = Radiologi::updateOrCreate(
+                ['kunjungan_id' => $this->kunjungan_id],
+                $updateData
+            );
+
+            // Reload data setelah save
+            $this->editId = $radiologi->id;
+            $this->state = $radiologi->fresh()->toArray();
+            $this->selectedExams = array_filter(explode(', ', $radiologi->jenis_pemeriksaan));
+            $this->refreshExamList();
+
+            // Clear attachments after successful upload
+            $this->attachments = [];
+
+            Flux::toast(
+                heading: 'Berhasil',
+                text: 'Data Radiologi berhasil disimpan.',
+                variant: 'success'
+            );
+
+            return true;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Validation errors will be shown automatically
+            return false;
+        } catch (\Exception $e) {
+            logger()->error('Radiologi save error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            Flux::toast(
+                heading: 'Error',
+                text: 'Gagal menyimpan data: ' . $e->getMessage(),
+                variant: 'danger'
+            );
+
+            return false;
         }
-
-        $updateData = array_merge($this->state, [
-            'kunjungan_id' => $this->kunjungan_id,
-            'nomor_telepon_dokter' => '+62' . ltrim($this->state['nomor_telepon_dokter'], '0'),
-        ]);
-
-        if (!empty($fotoPaths)) {
-            $updateData['foto_hasil'] = json_encode($fotoPaths);
-        } elseif (isset($this->state['foto_hasil'])) {
-            $updateData['foto_hasil'] = $this->state['foto_hasil'];
-        }
-
-        Radiologi::updateOrCreate(
-            ['kunjungan_id' => $this->kunjungan_id],
-            $updateData
-        );
-
-        Flux::toast(
-            heading: 'Berhasil',
-            text: 'Data Radiologi berhasil disimpan.',
-            variant: 'success'
-        );
     }
 
     public function render()

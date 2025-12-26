@@ -1,4 +1,4 @@
-<div class="p-6">
+<div class="p-6" wire:poll.5s>
     <flux:card class="shadow-lg rounded-lg">
         <div class="flex justify-between mb-4">
             <flux:heading size="xl">Data Kunjungan</flux:heading>
@@ -62,16 +62,20 @@
                         {{ $item->umur_tahun }} th, {{ $item->umur_bulan }} bln, {{ $item->umur_hari }} hr
                     </flux:table.cell>
                     <flux:table.cell>
-                        @if (empty($item->status))
-                        <flux:badge size="sm" color="gray"></flux:badge>
+                        {{-- Status Kunjungan - Cek resep obat juga --}}
+                        @if($item->obatResep && $item->obatResep->where('status_resep', 0)->count() > 0)
+                            {{-- Ada obat pending --}}
+                            <flux:badge size="sm" color="gray"></flux:badge>
+                        @elseif (empty($item->status))
+                            <flux:badge size="sm" color="gray"></flux:badge>
                         @elseif ($item->status === 'rawat_inap')
-                        <flux:badge size="sm" color="red">Rawat Inap</flux:badge>
+                            <flux:badge size="sm" color="red">Rawat Inap</flux:badge>
                         @elseif ($item->status === 'rujuk')
-                        <flux:badge size="sm" color="yellow">Rujuk</flux:badge>
+                            <flux:badge size="sm" color="yellow">Rujuk</flux:badge>
                         @elseif ($item->status === 'pulang')
-                        <flux:badge size="sm" color="green">Pulang</flux:badge>
+                            <flux:badge size="sm" color="green">Pulang</flux:badge>
                         @else
-                        <flux:badge size="sm"></flux:badge>
+                            <flux:badge size="sm"></flux:badge>
                         @endif
                     </flux:table.cell>
                     <flux:table.cell>
@@ -253,7 +257,10 @@
                 <flux:modal.close>
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
-                <flux:button wire:click="save" variant="primary">Simpan</flux:button>
+                <flux:button wire:click="save" variant="primary" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="save">Simpan</span>
+                    <span wire:loading wire:target="save">Menyimpan...</span>
+                </flux:button>
             </div>
         </flux:modal>
 
@@ -280,7 +287,12 @@
             <div class="space-y-6">
                 <div>
                     <flux:heading size="lg">Hapus Data Kunjungan?</flux:heading>
-                    <flux:text>Data yang dihapus tidak dapat dikembalikan.</flux:text>
+                    @if($deletePasienNama)
+                        <!-- <flux:text>Anda akan menghapus kunjungan pasien: <strong>{{ $deletePasienNama }}</strong></flux:text> -->
+                        <flux:text class="text-sm text-zinc-500 mt-2">Data yang dihapus tidak dapat dikembalikan.</flux:text>
+                    @else
+                        <flux:text>Data yang dihapus tidak dapat dikembalikan.</flux:text>
+                    @endif
                 </div>
                 <div class="flex justify-end gap-2">
                     <flux:modal.close>

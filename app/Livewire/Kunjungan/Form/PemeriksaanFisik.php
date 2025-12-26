@@ -82,18 +82,31 @@ class PemeriksaanFisik extends Component
 
     public function save()
     {
-        $this->validate([
-            'form.kunjungan_id' => 'required|exists:kunjungan,id',
-            'form.tingkatkesadaran_id' => 'required|exists:tingkat_kesadaran,id',
-            'gambar_anatomitubuh' => $this->editingId ? 'nullable|image|max:2048' : 'required|image|max:2048',
-            'form.denyut_jantung' => 'required|numeric',
-        ]);
-
         try {
+            $this->validate([
+                'form.kunjungan_id' => 'required|exists:kunjungan,id',
+                'form.tingkatkesadaran_id' => 'required|exists:tingkat_kesadaran,id',
+                'gambar_anatomitubuh' => $this->editingId ? 'nullable|image|mimes:jpeg,jpg,png|max:5120' : 'nullable|image|mimes:jpeg,jpg,png|max:5120',
+                'form.denyut_jantung' => 'required|numeric',
+                'form.pernapasan' => 'nullable|numeric',
+                'form.sistole' => 'nullable|numeric',
+                'form.diastole' => 'nullable|numeric',
+                'form.suhu_tubuh' => 'nullable|numeric',
+            ]);
+
             // Upload gambar jika ada
             if ($this->gambar_anatomitubuh) {
-                $path = $this->gambar_anatomitubuh->store('anatomi', 'public');
-                $this->form['gambar_anatomitubuh'] = $path;
+                try {
+                    $path = $this->gambar_anatomitubuh->store('anatomi', 'public');
+                    $this->form['gambar_anatomitubuh'] = $path;
+                } catch (\Exception $e) {
+                    Flux::toast(
+                        heading: 'Error Upload',
+                        text: 'Gagal upload gambar: ' . $e->getMessage(),
+                        variant: 'danger'
+                    );
+                    return false;
+                }
             }
 
             ModelPemeriksaanFisik::updateOrCreate(
@@ -101,9 +114,29 @@ class PemeriksaanFisik extends Component
                 $this->form
             );
 
-            Flux::toast('Sukses', 'Data berhasil disimpan.', 'success');
+            Flux::toast(
+                heading: 'Sukses',
+                text: 'Data pemeriksaan fisik berhasil disimpan.',
+                variant: 'success'
+            );
+
+            return true;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Validation errors will be shown automatically by Livewire
+            return false;
         } catch (\Exception $e) {
-            Flux::toast('Error', 'Terjadi kesalahan: ' . $e->getMessage(), 'danger');
+            Flux::toast(
+                heading: 'Error',
+                text: 'Terjadi kesalahan: ' . $e->getMessage(),
+                variant: 'danger'
+            );
+            
+            logger()->error('PemeriksaanFisik save error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return false;
         }
     }
 

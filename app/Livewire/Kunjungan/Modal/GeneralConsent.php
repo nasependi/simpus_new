@@ -161,6 +161,8 @@ class GeneralConsent extends Component
             'akses_fasyankes_rujukan',
             'penanggung_jawab',
             'petugas_pemberi_penjelasan',
+            'ttd_penanggung_jawab',
+            'ttd_petugas',
             'editId'
         ]);
     }

@@ -92,18 +92,20 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 justify-items-between">
-            {{-- Penanggung Jawab --}}
             <div class="w-full">
                 <flux:input wire:model="penanggung_jawab" label="Nama Penanggung Jawab" required class="mb-3" />
                 
                 <div x-data="signaturePad(@entangle('ttd_penanggung_jawab'))" class="w-full">
-                    <label class="block text-sm font-medium mb-1">Tanda Tangan Penanggung Jawab</label>
-                    <div>
-                        <canvas x-ref="signature_canvas" class="border rounded shadow touch-none"></canvas>
+                    <label class="block text-sm font-medium mb-1">Tanda Tangan Penanggung Jawab <span class="text-red-500">*</span></label>
+                    <div class="border-2 rounded" :class="value ? 'border-green-500' : 'border-gray-300'">
+                        <canvas x-ref="signature_canvas" width="300" height="150" class="rounded shadow touch-none w-full"></canvas>
                     </div>
                     <div class="flex items-center gap-2 mt-2">
-                        <button type="button" class="text-sm text-green-600 hover:underline" @click="sync()">Simpan</button>
-                        <button type="button" class="text-sm text-red-600 hover:underline" @click="clear()">Clear</button>
+                        <button type="button" class="text-sm text-green-600 hover:underline font-medium" @click="sync()">
+                            <span x-show="value">✓ Tersimpan</span>
+                            <span x-show="!value">Simpan</span>
+                        </button>
+                        <button type="button" class="text-sm text-red-600 hover:underline" @click="clear()">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -113,13 +115,16 @@
                 <flux:input wire:model="petugas_pemberi_penjelasan" label="Nama Petugas Pemberi Penjelasan" required class="mb-3" />
                 
                 <div x-data="signaturePad(@entangle('ttd_petugas'))" class="w-full">
-                    <label class="block text-sm font-medium mb-1">Tanda Tangan Petugas Pemberi Penjelasan</label>
-                    <div>
-                        <canvas x-ref="signature_canvas" class="border rounded shadow touch-none"></canvas>
+                    <label class="block text-sm font-medium mb-1">Tanda Tangan Petugas Pemberi Penjelasan <span class="text-red-500">*</span></label>
+                    <div class="border-2 rounded" :class="value ? 'border-green-500' : 'border-gray-300'">
+                        <canvas x-ref="signature_canvas" width="300" height="150" class="rounded shadow touch-none w-full"></canvas>
                     </div>
                     <div class="flex items-center gap-2 mt-2">
-                        <button type="button" class="text-sm text-green-600 hover:underline" @click="sync()">Simpan</button>
-                        <button type="button" class="text-sm text-red-600 hover:underline" @click="clear()">Clear</button>
+                        <button type="button" class="text-sm text-green-600 hover:underline font-medium" @click="sync()">
+                            <span x-show="value">✓ Tersimpan</span>
+                            <span x-show="!value">Simpan</span>
+                        </button>
+                        <button type="button" class="text-sm text-red-600 hover:underline" @click="clear()">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -133,6 +138,8 @@
         </div>
     </flux:modal>
 
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
     <script>
         function syncConsentSignatures() {
             // Trigger sync for all signature pads in the consent modal
@@ -142,6 +149,52 @@
                 }
             });
         }
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('signaturePad', (value) => ({
+                signaturePadInstance: null,
+                value: value,
+                init() {
+                    // Set canvas size explicitly
+                    const canvas = this.$refs.signature_canvas;
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width;
+                    canvas.height = rect.height;
+                    
+                    this.signaturePadInstance = new SignaturePad(canvas, {
+                        backgroundColor: 'rgb(255, 255, 255)',
+                        penColor: 'rgb(0, 0, 0)'
+                    });
+
+                    this.signaturePadInstance.addEventListener("endStroke", () => {
+                        this.sync();
+                    });
+
+                    // Load existing signature if available
+                    if (this.value) {
+                        this.loadSignature();
+                    }
+                },
+                loadSignature() {
+                    const img = new Image();
+                    img.onload = () => {
+                        const ctx = this.$refs.signature_canvas.getContext("2d");
+                        ctx.clearRect(0, 0, this.$refs.signature_canvas.width, this.$refs.signature_canvas.height);
+                        ctx.drawImage(img, 0, 0, this.$refs.signature_canvas.width, this.$refs.signature_canvas.height);
+                    };
+                    img.src = this.value;
+                },
+                sync() {
+                    if (!this.signaturePadInstance.isEmpty()) {
+                        this.value = this.signaturePadInstance.toDataURL('image/png');
+                    }
+                },
+                clear() {
+                    this.signaturePadInstance.clear();
+                    this.value = null;
+                }
+            }));
+        });
     </script>
 
     {{-- Modal Konfirmasi Hapus --}}

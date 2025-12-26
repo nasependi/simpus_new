@@ -24,6 +24,7 @@ class Kunjungan extends Component
     public $search = '';
     public $sortField = 'tanggal_kunjungan';
     public $sortDirection = 'desc';
+    public $deletePasienNama = '';
 
     // Data referensi dropdown
     public $listPasien = [];
@@ -50,7 +51,9 @@ class Kunjungan extends Component
         'poli_id' => 'required|exists:poli,id',
         'carapembayaran_id' => 'required|exists:cara_pembayaran,id',
         'tanggal_kunjungan' => 'required|date',
-        'umur' => 'required|integer|min:0',
+        'umur_tahun' => 'required|integer|min:0',
+        'umur_bulan' => 'required|integer|min:0|max:11',
+        'umur_hari' => 'required|integer|min:0|max:31',
     ];
 
     public function mount()
@@ -182,7 +185,9 @@ class Kunjungan extends Component
                     'poli_id' => $this->poli_id,
                     'carapembayaran_id' => $this->carapembayaran_id,
                     'tanggal_kunjungan' => $this->tanggal_kunjungan,
-                    'umur' => $this->umur,
+                    'umur_tahun' => $this->umur_tahun,
+                    'umur_bulan' => $this->umur_bulan,
+                    'umur_hari' => $this->umur_hari,
                 ]
             );
 
@@ -196,7 +201,9 @@ class Kunjungan extends Component
 
     public function deleteConfirm($id)
     {
+        $kunjungan = KunjunganModel::with('pasien')->findOrFail($id);
         $this->deleteId = $id;
+        $this->deletePasienNama = $kunjungan->pasien->nama_lengkap ?? 'Tidak diketahui';
         Flux::modal('delete-kunjungan')->show();
     }
 
@@ -237,12 +244,12 @@ class Kunjungan extends Component
 
     public function resetForm()
     {
-        $this->reset(['pasien_id', 'poli_id', 'carapembayaran_id', 'tanggal_kunjungan', 'umur', 'editId']);
+        $this->reset(['pasien_id', 'poli_id', 'carapembayaran_id', 'tanggal_kunjungan', 'umur_tahun', 'umur_bulan', 'umur_hari', 'editId']);
     }
 
     public function render()
     {
-        $query = KunjunganModel::with(['pasien', 'poli', 'caraPembayaran'])
+        $query = KunjunganModel::with(['pasien', 'poli', 'caraPembayaran', 'obatResep'])
             ->when($this->filterTanggal, fn($q) => $q->whereDate('tanggal_kunjungan', $this->filterTanggal))
             ->when($this->filterPasien, fn($q) => $q->whereHas('pasien', fn($p) => $p->where('nama_lengkap', 'like', '%' . $this->filterPasien . '%')))
             ->when($this->filterPoli, fn($q) => $q->where('poli_id', $this->filterPoli))

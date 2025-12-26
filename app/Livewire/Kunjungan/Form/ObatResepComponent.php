@@ -101,7 +101,7 @@ class ObatResepComponent extends Component
         $this->state['tanggal_penulisan_resep'] = now()->toDateString();
         $this->state['jam_penulisan_resep']   = now()->toTimeString();
         $this->state['ttd_dokter']            = auth()->user()->signature ?? '-';
-        $this->state['status_resep']          = $this->state['status_resep'] ?? 'Pending';
+        $this->state['status_resep']          = 0; // Default: 0 = Pending, 1 = Selesai
         $this->state['pengkajian_resep']      = 'Pengkajian awal';
 
         // Simpan tb & bb ke session
@@ -134,7 +134,7 @@ class ObatResepComponent extends Component
                 'state.tanggal_penulisan_resep' => 'required|date',
                 'state.jam_penulisan_resep'  => 'required',
                 'state.ttd_dokter'           => 'required|string',
-                'state.status_resep'         => 'required|string',
+                'state.status_resep'         => 'required|integer|in:0,1', // 0 = Pending, 1 = Selesai
                 'state.pengkajian_resep'     => 'required|string',
             ]);
 

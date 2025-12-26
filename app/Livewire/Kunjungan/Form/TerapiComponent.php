@@ -92,16 +92,15 @@ class TerapiComponent extends Component
                     text: 'Pilih minimal satu tindakan',
                     variant: 'warning'
                 );
-                return;
+                return false;
             }
 
             // Gabungkan tindakan yang dipilih jadi satu string
             $this->state['nama_tindakan'] = implode(', ', $this->selectedTindakan);
             $this->state['kunjungan_id'] = $this->kunjungan_id;
 
-            // Validasi
+            // Validasi - REMOVED obat_id validation as it's not needed for terapi/tindakan
             $this->validate([
-                'state.obat_id' => 'required|exists:obat_resep,id',
                 'state.nama_tindakan' => 'required|string|max:500',
                 'state.petugas' => 'required|string|max:255',
                 'state.tanggal_pelaksanaan_tindakan' => 'required|date',
@@ -111,12 +110,16 @@ class TerapiComponent extends Component
                 'state.bmhp' => 'required|string',
             ]);
 
-            // Remove the dd() statement that was here
-
             // Simpan / Update
             Terapi::updateOrCreate(
                 ['kunjungan_id' => $this->kunjungan_id],
                 $this->state
+            );
+
+            Flux::toast(
+                heading: 'Berhasil',
+                text: 'Data terapi berhasil disimpan',
+                variant: 'success'
             );
 
             return true; // Return true for successful save
@@ -128,7 +131,7 @@ class TerapiComponent extends Component
 
             Flux::toast(
                 heading: 'Error',
-                text: 'Gagal menyimpan data terapi' . $e->getMessage(),
+                text: 'Gagal menyimpan data terapi: ' . $e->getMessage(),
                 variant: 'error'
             );
 
