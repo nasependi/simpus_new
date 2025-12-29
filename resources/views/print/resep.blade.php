@@ -5,56 +5,124 @@
     <meta charset="UTF-8">
     <title>Resep Obat</title>
     <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            font-size: 12px;
-            margin: 10px;
+            font-size: 11px;
+            margin: 0;
+            padding: 0;
         }
 
         .resep-container {
             width: 100%;
-            margin: auto;
-            padding: 10px;
-            border: 1px solid #000;
-            box-sizing: border-box;
+            max-width: 800px;
+            margin: 15px;
+            padding: 15px;
         }
 
-        .header,
-        .footer {
-            text-align: center;
-            margin-bottom: 10px;
+        .header-section {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
         }
 
-        .header p,
-        .footer p {
-            margin: 2px 0;
+        .logo-area {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #4A90E2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
         }
 
-        .alamat {
-            margin-bottom: 10px;
-            text-align: left;
+        .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
         }
 
-        .tanggal {
+        .header-info {
+            flex: 1;
+        }
+
+        .header-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .header-details {
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .resep-title {
             text-align: right;
-            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 10px;
+        }
+
+        .info-item {
+            margin-bottom: 3px;
+        }
+
+        .info-label {
+            display: inline-block;
+            width: 100px;
         }
 
         .resep {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 15px;
         }
 
         .resep p {
-            margin: 2px 0;
+            margin: 5px 0;
+            line-height: 1.6;
         }
 
         .signature {
-            margin: 15px 0;
+            margin: 30px 0 20px 0;
             text-align: left;
         }
 
         .patient-info {
-            margin-top: 5px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        .patient-info p {
+            margin: 5px 0;
+        }
+
+        .footer-section {
+            text-align: right;
+            font-size: 10px;
+        }
+
+        .signature-area {
+            margin-top: 60px;
         }
     </style>
 </head>
@@ -84,50 +152,100 @@
 
     <div class="resep-container">
 
-        <!-- Header Dokter -->
-        <div class="header">
-            <p>dr. </p>
-            <p>SIP. 11</p>
+        <!-- Header Section with Logo -->
+        <div class="header-section">
+            <div class="logo-area">
+                <div class="logo-text">R</div>
+            </div>
+            <div class="header-info">
+                <div class="header-title">{{ $kunjungan->puskesmas->nama ?? 'UPT PUSKESMAS SELAAWI' }}</div>
+                <div class="header-details">
+                    Jl. Raya Selaawi No. 49, Desa Selaawi, Kecamatan Selaawi, Kabupaten Garut, Jawa Barat<br>
+                    Telp. (0262) 431540 <br>
+                    Email : puskesmas.selaawi@gmail.com 
+                </div>
+            </div>
         </div>
 
-        <!-- Alamat Pasien -->
-        <div class="alamat">
-            <p>Alamat rumah/praktek:</p>
-            <p>{{ $kunjungan->pasien->alamat_lengkap }}</p>
-            <hr>
+        <!-- Patient and Prescription Info Grid -->
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <span class="info-label">No. Resep</span>: {{ $kunjungan->id ?? '-' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Nama. Pasien</span>: {{ $kunjungan->pasien->nama_lengkap ?? '-' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Umur</span>: {{ $kunjungan->umur_tahun ?? $kunjungan->pasien->umur ?? '-' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Alamat</span>: {{ $kunjungan->pasien->alamat_lengkap ?? '-' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">No. Telp</span>: {{ $kunjungan->pasien->no_hp ?? '-' }}
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <span class="info-label">Kasir</span>: {{ $kunjungan->kasir ?? 'afif' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tanggal</span>: {{ $kunjungan->created_at->format('d M Y H:i:s') ?? date('d M Y H:i:s') }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Apoteker</span>: {{ $kunjungan->apoteker ?? 'Afif Firmansyah, S.Farm., Apt' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">No.SIK/No.SIPA</span>: {{ $kunjungan->puskesmas->sipa ?? '441.82/1147-DPMPTSP/OL/2021' }}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">No.STRA</span>: {{ $kunjungan->puskesmas->stra ?? '-' }}
+                </div>
+            </div>
         </div>
 
-        <!-- Tanggal Resep -->
-        <div class="tanggal">
-            <p>{{ $kunjungan->created_at->translatedFormat('l, d F Y') }}</p>
-        </div>
-
-        <!-- Daftar Obat -->
+        <!-- Daftar Obat (Format Resep Tradisional) -->
         <div class="resep">
+            <div class="footer-section">
+            <div>{{ $kunjungan->puskesmas->kota ?? 'Kab. Garut' }}, {{ $kunjungan->created_at->format('d M Y') ?? date('d M Y') }}</div>
+        </div>
             @foreach($kunjungan->obatResep as $obat)
             <p>
-                R/ {{ $obat->obat->nama_obat ?? '-' }}
+                <strong>R/</strong> {{ $obat->nama_obat ?? $obat->obat->nama_obat ?? '-' }}
                 {{ isset($obat->jumlah_obat) ? toRoman($obat->jumlah_obat) : '-' }}
             </p>
-            @if($obat->aturan_tambahan)
-            <p>{{ $obat->aturan_tambahan }} ({{ $obat->sediaan ?? '' }})</p>
+            @if($obat->aturan_tambahan || $obat->sediaan)
+            <p style="margin-left: 20px;">
+                {{ $obat->aturan_tambahan ?? '' }}
+                @if($obat->sediaan)
+                ({{ $obat->sediaan }})
+                @endif
+            </p>
             @endif
             @if($obat->catatan_resep)
-            <p>{{ $obat->catatan_resep }}</p>
+            <p style="margin-left: 20px; font-style: italic;">{{ $obat->catatan_resep }}</p>
             @endif
             @endforeach
         </div>
 
         <!-- Tanda Tangan -->
-        <div class="signature">
-            <p>________________________</p>
-        </div>
+        <!-- <div class="signature">
+            <p>_________________________________</p>
+        </div> -->
 
         <!-- Info Pasien -->
-        <div class="patient-info">
-            <p>Pro: {{ $kunjungan->pasien->nama_lengkap }} ({{ $kunjungan->pasien->bb_pasien }} kg)</p>
-            <p>Umur: {{ $kunjungan->umur_tahun ?? '' }} tahun</p>
-        </div>
+        <!-- <div class="patient-info">
+            <p><strong>Pro:</strong> {{ $kunjungan->pasien->nama_lengkap }} 
+                @if($kunjungan->pasien->bb_pasien)
+                ({{ $kunjungan->pasien->bb_pasien }} kg)
+                @endif
+            </p>
+            <p><strong>Umur:</strong> {{ $kunjungan->umur_tahun ?? $kunjungan->pasien->umur ?? '-' }} tahun</p>
+        </div> -->
+
+        <!-- Footer -->
+        
 
     </div>
 

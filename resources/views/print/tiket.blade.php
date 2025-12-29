@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -12,37 +13,65 @@
 
         body {
             font-family: "Arial", sans-serif;
-            font-size: 11px;
+            font-size: 8px;
             margin: 0;
-            padding: 5px;
+            padding: 3px;
         }
 
         .label {
-            border: 1px solid #000;
-            padding: 4px;
+            border: 2px solid #000;
+            padding: 3px;
             width: 100%;
             height: 100%;
             box-sizing: border-box;
         }
 
-        .center {
+        .header {
             text-align: center;
-        }
-
-        .bold {
             font-weight: bold;
+            font-size: 8px;
+            margin-bottom: 1px;
         }
 
-        .row {
+        .subheader {
+            text-align: center;
+            font-size: 5px;
+            line-height: 1.2;
             margin-bottom: 2px;
         }
 
-        .small {
-            font-size: 10px;
+        .divider {
+            border-top: 1px solid #000;
+            margin: 2px 0;
         }
 
-        hr {
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 6px;
+            margin-bottom: 2px;
+        }
+
+        .patient-name {
+            text-align: center;
+            font-weight: bold;
+            font-size: 9px;
             margin: 3px 0;
+        }
+
+        .medicine-instruction {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            margin: 3px 0;
+            line-height: 1.1;
+        }
+
+        .additional-info {
+            text-align: center;
+            font-size: 7px;
+            margin-top: 2px;
+            line-height: 1.2;
         }
     </style>
 </head>
@@ -51,32 +80,37 @@
 
     @foreach($kunjungan->obatResep as $obat)
     <div class="label">
-        <!-- Nama Puskesmas -->
-        <div class="center bold">{{ $kunjungan->puskesmas->nama ?? 'UPT PUSKESMAS' }}</div>
-
-        <!-- Nama Pasien -->
-        <div class="center small">{{ strtoupper($kunjungan->pasien->nama_lengkap) }}</div>
-
-        <!-- Umur Pasien -->
-        <div class="center small">{{ $kunjungan->pasien->umur ?? '-' }}</div>
-
-        <hr>
-
-        <!-- Aturan Tambahan + Catatan Tambahan -->
-        <div class="center small">
-            {{ $obat->aturan_tambahan ?? '' }} {{ $obat->catatan_tambahan ?? '' }}
+        <!-- Header: Nama Puskesmas -->
+        <div class="header">{{ $kunjungan->puskesmas->nama ?? 'UPT PUSKESMAS SELAAWI' }}</div>
+        
+        <!-- Subheader: Alamat, Apoteker, SIPA -->
+        <div class="subheader">
+            {{ $kunjungan->puskesmas->alamat ?? 'Jl. Raya Selaawi No. 49, Desa Selaawi, Kecamatan Selaawi, Kabupaten Garut, Jawa Barat' }}<br>
+            Apoteker : {{ $kunjungan->dokter->nama ?? 'Budi, S. Farm, Apt.' }}<br>
+            SIPA : {{ $kunjungan->puskesmas->sipa ?? '120/PER/XII/2017' }}
         </div>
 
-        <!-- Nama Obat + Sediaan -->
-        <div class="center bold">
-            {{ strtoupper($obat->nama_obat) }} {{ $obat->sediaan ?? '' }}
+        <div class="divider"></div>
+
+        <!-- Info Resep dan Tanggal -->
+        <div class="info-row">
+            <span>No Resep : {{ $kunjungan->id ?? '-' }}</span>
+            <span>tanggal : {{ $kunjungan->created_at->format('d M Y') ?? date('d M Y') }}</span>
         </div>
 
-        <!-- Jumlah Obat -->
-        <div class="row">JUMLAH OBAT: {{ $obat->jumlah_obat }}</div>
+        <!-- Nama Pasien (Prominent) -->
+        <div class="patient-name">{{ $kunjungan->pasien->nama_lengkap ?? 'Nama Pasien' }}</div>
 
-        <!-- Exp Date Obat -->
-        <div class="row">EXP DATE: {{ $obat->exp_date ?? '-' }}</div>
+        <!-- Instruksi Obat (Bold, Large, Prominent) -->
+        <div class="medicine-instruction">
+            {{ $obat->catatan_resep ?? 'Sehari 3 x 1 sendok teh' }}
+        </div>
+
+        <!-- Info Tambahan -->
+        <div class="additional-info">
+            {{ $obat->aturan_tambahan ?? 'Kocok dahulu, dihabiskan, antibiotik' }}
+            {{ $obat->catatan_tambahan ?? 'Semoga lekas sembuh' }}<br>
+        </div>
     </div>
 
     <!-- Page break jika masih ada obat -->
