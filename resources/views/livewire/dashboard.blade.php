@@ -8,52 +8,52 @@
     {{-- Statistik Cards with Soft Colors --}}
     <div class="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         @php
-            $cards = [
-                [
-                    'title' => 'Pasien Baru Hari Ini',
-                    'value' => number_format($totalPasien),
-                    'icon' => 'users',
-                    'color' => 'blue',
-                    'bgClass' => 'bg-blue-50 dark:bg-blue-900/20',
-                    'iconBgClass' => 'bg-blue-100 dark:bg-blue-900/40',
-                    'iconClass' => 'text-blue-600 dark:text-blue-400',
-                    'valueClass' => 'text-blue-700 dark:text-blue-400',
-                    'description' => 'Pasien terdaftar hari ini'
-                ],
-                [
-                    'title' => 'Kunjungan Hari Ini',
-                    'value' => $kunjunganHariIni,
-                    'icon' => 'clipboard-list',
-                    'color' => 'emerald',
-                    'bgClass' => 'bg-emerald-50 dark:bg-emerald-900/20',
-                    'iconBgClass' => 'bg-emerald-100 dark:bg-emerald-900/40',
-                    'iconClass' => 'text-emerald-600 dark:text-emerald-400',
-                    'valueClass' => 'text-emerald-700 dark:text-emerald-400',
-                    'description' => 'Total kunjungan hari ini'
-                ],
-                [
-                    'title' => 'Pembelian Obat Hari Ini',
-                    'value' => $stokObatMenipis,
-                    'icon' => 'medical-cross',
-                    'color' => 'amber',
-                    'bgClass' => 'bg-amber-50 dark:bg-amber-900/20',
-                    'iconBgClass' => 'bg-amber-100 dark:bg-amber-900/40',
-                    'iconClass' => 'text-amber-600 dark:text-amber-400',
-                    'valueClass' => 'text-amber-700 dark:text-amber-400',
-                    'description' => 'Transaksi pembelian obat'
-                ],
-                [
-                    'title' => 'Antrian Saat Ini',
-                    'value' => $antrianSaatIni,
-                    'icon' => 'queue-list',
-                    'color' => 'purple',
-                    'bgClass' => 'bg-purple-50 dark:bg-purple-900/20',
-                    'iconBgClass' => 'bg-purple-100 dark:bg-purple-900/40',
-                    'iconClass' => 'text-purple-600 dark:text-purple-400',
-                    'valueClass' => 'text-purple-700 dark:text-purple-400',
-                    'description' => 'Antrian saat ini'
-                ],
-            ];
+        $cards = [
+        [
+        'title' => 'Pasien Baru Hari Ini',
+        'value' => number_format($totalPasien),
+        'icon' => 'user-group',
+        'color' => 'blue',
+        'bgClass' => 'bg-blue-50 dark:bg-blue-900/20',
+        'iconBgClass' => 'bg-blue-100 dark:bg-blue-900/40',
+        'iconClass' => 'text-blue-600 dark:text-blue-400',
+        'valueClass' => 'text-blue-700 dark:text-blue-400',
+        'description' => 'Pasien terdaftar hari ini'
+        ],
+        [
+        'title' => 'Kunjungan Hari Ini',
+        'value' => $kunjunganHariIni,
+        'icon' => 'clipboard-document-list',
+        'color' => 'emerald',
+        'bgClass' => 'bg-emerald-50 dark:bg-emerald-900/20',
+        'iconBgClass' => 'bg-emerald-100 dark:bg-emerald-900/40',
+        'iconClass' => 'text-emerald-600 dark:text-emerald-400',
+        'valueClass' => 'text-emerald-700 dark:text-emerald-400',
+        'description' => 'Total kunjungan hari ini'
+        ],
+        [
+        'title' => 'Pembelian Obat Hari Ini',
+        'value' => $stokObatMenipis,
+        'icon' => 'shopping-cart',
+        'color' => 'amber',
+        'bgClass' => 'bg-amber-50 dark:bg-amber-900/20',
+        'iconBgClass' => 'bg-amber-100 dark:bg-amber-900/40',
+        'iconClass' => 'text-amber-600 dark:text-amber-400',
+        'valueClass' => 'text-amber-700 dark:text-amber-400',
+        'description' => 'Transaksi pembelian obat'
+        ],
+        [
+        'title' => 'Antrian Saat Ini',
+        'value' => $antrianSaatIni,
+        'icon' => 'queue-list',
+        'color' => 'purple',
+        'bgClass' => 'bg-purple-50 dark:bg-purple-900/20',
+        'iconBgClass' => 'bg-purple-100 dark:bg-purple-900/40',
+        'iconClass' => 'text-purple-600 dark:text-purple-400',
+        'valueClass' => 'text-purple-700 dark:text-purple-400',
+        'description' => 'Antrian saat ini'
+        ],
+        ];
         @endphp
 
         @foreach ($cards as $card)
@@ -72,7 +72,7 @@
                 </div>
                 <div class="flex-shrink-0 ml-4">
                     <div class="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl {{ $card['iconBgClass'] }} shadow-sm">
-                        <flux:icon.{{ $card['icon'] }} class="size-6 sm:size-7 {{ $card['iconClass'] }}" />
+                        <flux:icon icon="{{ $card['icon'] }}" class="size-6 sm:size-7 {{ $card['iconClass'] }}" />
                     </div>
                 </div>
             </div>

@@ -23,18 +23,13 @@ class ObatResepComponent extends Component
     {
         $this->kunjungan_id = $kunjungan_id;
 
-        // Ambil ID obat yang sudah dipakai pada kunjungan ini
-        $usedObatIds = ObatResep::where('kunjungan_id', $kunjungan_id)
-            ->pluck('id_obat')
-            ->toArray();
-
         // Ambil list obat dengan eager loading dan perhitungan stok
         $this->obatList = Obat::with(['detailPembelian' => function ($query) {
             $query->where('kadaluarsa', '>', now())
                 ->select('obat_id', DB::raw('SUM(kuantitas) as total_stok'))
                 ->groupBy('obat_id');
         }])
-            ->whereNotIn('id', $usedObatIds)
+            ->orderBy('nama_obat', 'asc')
             ->get()
             ->map(function ($obat) {
                 $obat->stok_total = $obat->detailPembelian->sum('total_stok') ?? 0;
@@ -114,13 +109,7 @@ class ObatResepComponent extends Component
                 'state.bb_pasien'            => 'required|string|max:255',
                 'state.id_resep'             => 'required|max:255',
                 'state.nama_obat'            => 'required|string|max:255',
-                'state.id_obat'              => [
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('obat_resep', 'id_obat')
-                        ->where('kunjungan_id', $this->kunjungan_id)
-                ],
+                'state.id_obat'              => 'required|string|max:255',
                 'state.sediaan'              => 'required|string|max:255',
                 'state.jumlah_obat'          => 'required|integer|min:1',
                 'state.metode_pemberian'     => 'required|string',
@@ -166,10 +155,7 @@ class ObatResepComponent extends Component
 
     private function listObat()
     {
-        return $this->obatList = Obat::whereNotIn(
-            'id',
-            ObatResep::where('kunjungan_id', $this->kunjungan_id)->pluck('id_obat')
-        )->get();
+        return $this->obatList = Obat::orderBy('nama_obat', 'asc')->get();
     }
 
     public function delete($id)

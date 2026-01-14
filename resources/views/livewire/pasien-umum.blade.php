@@ -12,15 +12,15 @@
                     </p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <flux:input 
-                        wire:model.live="search" 
+                    <flux:input
+                        wire:model.live="search"
                         size="sm"
-                        placeholder="Cari nama, NIK, atau No. RM..." 
+                        placeholder="Cari nama, NIK, atau No. RM..."
                         class="w-full sm:w-64"
                         icon="magnifying-glass" />
-                    <flux:button 
-                        wire:click="create" 
-                        variant="primary" 
+                    <flux:button
+                        wire:click="create"
+                        variant="primary"
                         size="sm"
                         icon="plus"
                         class="w-full sm:w-auto">
@@ -99,7 +99,7 @@
                     @endforeach
                 </flux:select>
             </div>
-            
+
             {{-- Show input field if "Asuransi Lainnya" is selected - inline with select --}}
             @if($carapembayaran_id && $cara_pembayaran->where('id', $carapembayaran_id)->first()?->nama && str_contains(strtolower($cara_pembayaran->where('id', $carapembayaran_id)->first()->nama), 'lainnya'))
             <div>
@@ -117,12 +117,12 @@
 
         {{-- Modal Tambah/Edit --}}
         <flux:modal name="pasienModal" class="space-y-4 w-3/4 !max-w-none overflow-y-auto max-h-[85vh]">
-            <flux:heading class="text-lg font-semibold">
+            <flux:heading class="text-lg font-semibold" size="lg">
                 {{ $editId ? 'Edit' : 'Tambah' }} Pasien
             </flux:heading>
 
+            @if ($halaman === 1)
             <div class="grid grid-cols-2 gap-4">
-                @if ($halaman === 1)
                 <flux:input wire:model="nama_lengkap" label="Nama Lengkap" maxlength="30" required />
                 <flux:input wire:model="no_rekamedis" label="No Rekam Medis" required />
                 <flux:input wire:model="nik" label="NIK" maxlength="16" required />
@@ -166,7 +166,7 @@
                         @endforeach
                     </flux:select>
                 </div>
-                
+
                 {{-- Show input field if "Lainnya" is selected - inline with select --}}
                 @if($pekerjaan_id && $pekerjaan->where('id', $pekerjaan_id)->first()?->nama_pekerjaan && str_contains(strtolower($pekerjaan->where('id', $pekerjaan_id)->first()->nama_pekerjaan), 'lainnya'))
                 <div>
@@ -182,182 +182,179 @@
                 <flux:input wire:model="suku" label="Suku" required />
                 <flux:input wire:model="bahasa_dikuasai" label="Bahasa yang dikuasai" required />
                 <flux:input wire:model="no_hp" label="No Handphone" required />
-                <flux:textarea wire:model="alamat_lengkap" label="Alamat Lengkap" required />
-                @endif
-                @if ($halaman === 2)
+            </div>
+            @endif
+            @if ($halaman === 2)
+            <flux:textarea wire:model="alamat_lengkap" label="Alamat Lengkap" required />
+            <div class="grid grid-cols-2 gap-4">
+
                 <div class="grid grid-cols-3 gap-3 items-center">
                     <flux:input wire:model="rt" label="RT" required />
                     <flux:input wire:model="rw" label="RW" required />
                     <flux:input wire:model="no_rumah" label="Nomor Rumah" required />
-
                 </div>
                 {{-- PROVINSI --}}
-                <flux:autocomplete 
-                    wire:model.live.debounce.500ms="search_provinsi" 
+                <flux:autocomplete
+                    wire:model.live.debounce.500ms="search_provinsi"
                     label="Provinsi"
                     placeholder="Ketik nama provinsi...">
                     @if ($provinsiOptions)
-                        @foreach ($provinsiOptions as $provinsi)
-                        <flux:autocomplete.item wire:click="selectProvinsi({{ $provinsi['id'] }}, '{{ $provinsi['name'] }}')">
-                            {{ $provinsi['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($provinsiOptions as $provinsi)
+                    <flux:autocomplete.item wire:click="selectProvinsi({{ $provinsi['id'] }}, '{{ $provinsi['name'] }}')">
+                        {{ $provinsi['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
 
                 {{-- KABUPATEN --}}
                 @if ($prov_id)
-                <flux:autocomplete 
-                    wire:model.live.debounce.500ms="search_kabupaten" 
+                <flux:autocomplete
+                    wire:model.live.debounce.500ms="search_kabupaten"
                     label="Kabupaten/Kota"
                     placeholder="Ketik nama kabupaten...">
                     @if ($kabupatenOptions)
-                        @foreach ($kabupatenOptions as $kabupaten)
-                        <flux:autocomplete.item wire:click="selectKabupaten({{ $kabupaten['id'] }}, '{{ $kabupaten['name'] }}')">
-                            {{ $kabupaten['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($kabupatenOptions as $kabupaten)
+                    <flux:autocomplete.item wire:click="selectKabupaten({{ $kabupaten['id'] }}, '{{ $kabupaten['name'] }}')">
+                        {{ $kabupaten['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
                 @endif
 
                 {{-- KECAMATAN --}}
                 @if ($kab_id)
-                <flux:autocomplete 
-                    wire:model.live.debounce.300ms="search_kecamatan" 
+                <flux:autocomplete
+                    wire:model.live.debounce.300ms="search_kecamatan"
                     label="Kecamatan"
                     placeholder="Ketik nama kecamatan...">
                     @if ($kecamatanOptions)
-                        @foreach ($kecamatanOptions as $kecamatan)
-                        <flux:autocomplete.item wire:click="selectKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
-                            {{ $kecamatan['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($kecamatanOptions as $kecamatan)
+                    <flux:autocomplete.item wire:click="selectKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
+                        {{ $kecamatan['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
                 @endif
 
                 {{-- KELURAHAN --}}
                 @if ($kec_id)
-                <flux:autocomplete 
-                    wire:model.live.debounce.300ms="search_kelurahan" 
+                <flux:autocomplete
+                    wire:model.live.debounce.300ms="search_kelurahan"
                     label="Kelurahan/Desa"
                     placeholder="Ketik nama kelurahan...">
                     @if ($kelurahanOptions)
-                        @foreach ($kelurahanOptions as $kelurahan)
-                        <flux:autocomplete.item wire:click="selectKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
-                            {{ $kelurahan['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($kelurahanOptions as $kelurahan)
+                    <flux:autocomplete.item wire:click="selectKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
+                        {{ $kelurahan['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
                 @endif
 
                 <flux:input wire:model="kodepos_id" label="Kode Pos" />
-                @endif
-                @if ($halaman === 3)
-                <flux:input wire:model="alamat_domisili" label="Alamat Domisili" />
+
+                <flux:input wire:model="alamat_domisili" label="Alamat Domisili" required />
                 <div class="grid grid-cols-2 gap-3 item-center">
-                    <flux:input wire:model="domisili_rt" label="Domisil RT" />
-                    <flux:input wire:model="domisili_rw" label="Domisil RW" />
+                    <flux:input wire:model="domisili_rt" label="Domisili RT" required />
+                    <flux:input wire:model="domisili_rw" label="Domisili RW" required />
                 </div>
+
                 <flux:field variant="inline">
                     <flux:checkbox wire:model.live="sama_domisili" />
-
                     <flux:label>Samakan dengan alamat yang sudah diisi</flux:label>
-
                 </flux:field>
 
                 @if (!$sama_domisili)
                 {{-- DOMISILI PROVINSI --}}
-                <flux:autocomplete 
-                    wire:model.live.debounce.300ms="search_domisili_prov" 
+                <flux:autocomplete
+                    wire:model.live.debounce.300ms="search_domisili_prov"
                     label="Provinsi Domisili"
                     placeholder="Ketik nama provinsi...">
                     @if ($domisiliProvinsiOptions)
-                        @foreach ($domisiliProvinsiOptions as $provinsi)
-                        <flux:autocomplete.item wire:click="selectDomisiliProvinsi({{ $provinsi['id'] }}, '{{ $provinsi['name'] }}')">
-                            {{ $provinsi['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($domisiliProvinsiOptions as $provinsi)
+                    <flux:autocomplete.item wire:click="selectDomisiliProvinsi({{ $provinsi['id'] }}, '{{ $provinsi['name'] }}')">
+                        {{ $provinsi['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
 
                 {{-- DOMISILI KABUPATEN --}}
                 @if ($domisili_prov_id)
-                <flux:autocomplete 
-                    wire:model.live.debounce.300ms="search_domisili_kab" 
+                <flux:autocomplete
+                    wire:model.live.debounce.300ms="search_domisili_kab"
                     label="Kabupaten/Kota Domisili"
                     placeholder="Ketik nama kabupaten...">
                     @if ($domisiliKabupatenOptions)
-                        @foreach ($domisiliKabupatenOptions as $kabupaten)
-                        <flux:autocomplete.item wire:click="selectDomisiliKabupaten({{ $kabupaten['id'] }}, '{{ $kabupaten['name'] }}')">
-                            {{ $kabupaten['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($domisiliKabupatenOptions as $kabupaten)
+                    <flux:autocomplete.item wire:click="selectDomisiliKabupaten({{ $kabupaten['id'] }}, '{{ $kabupaten['name'] }}')">
+                        {{ $kabupaten['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
                 @endif
 
                 {{-- DOMISILI KECAMATAN --}}
                 @if ($domisili_kab_id)
-                <flux:autocomplete 
-                    wire:model.live.debounce.300ms="search_domisili_kec" 
+                <flux:autocomplete
+                    wire:model.live.debounce.300ms="search_domisili_kec"
                     label="Kecamatan Domisili"
                     placeholder="Ketik nama kecamatan...">
                     @if ($domisiliKecamatanOptions)
-                        @foreach ($domisiliKecamatanOptions as $kecamatan)
-                        <flux:autocomplete.item wire:click="selectDomisiliKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
-                            {{ $kecamatan['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($domisiliKecamatanOptions as $kecamatan)
+                    <flux:autocomplete.item wire:click="selectDomisiliKecamatan({{ $kecamatan['id'] }}, '{{ $kecamatan['name'] }}')">
+                        {{ $kecamatan['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
                 @endif
 
                 {{-- DOMISILI KELURAHAN --}}
                 @if ($domisili_kec_id)
-                <flux:autocomplete 
-                    wire:model.live.debounce.300ms="search_domisili_kel" 
+                <flux:autocomplete
+                    wire:model.live.debounce.300ms="search_domisili_kel"
                     label="Kelurahan/Desa Domisili"
                     placeholder="Ketik nama kelurahan...">
                     @if ($domisiliKelurahanOptions)
-                        @foreach ($domisiliKelurahanOptions as $kelurahan)
-                        <flux:autocomplete.item wire:click="selectDomisiliKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
-                            {{ $kelurahan['name'] }}
-                        </flux:autocomplete.item>
-                        @endforeach
+                    @foreach ($domisiliKelurahanOptions as $kelurahan)
+                    <flux:autocomplete.item wire:click="selectDomisiliKelurahan({{ $kelurahan['id'] }}, '{{ $kelurahan['name'] }}')">
+                        {{ $kelurahan['name'] }}
+                    </flux:autocomplete.item>
+                    @endforeach
                     @endif
                 </flux:autocomplete>
                 @endif
 
                 @endif
-                <flux:input wire:model="domisili_kodepos" label="Kode Pos Domisili" />
-                <flux:input wire:model="domisili_negara" label="Negara Domisili" />
+                <flux:input wire:model="domisili_kodepos" label="Kode Pos Domisili" required />
+                <flux:input wire:model="domisili_negara" label="Negara Domisili" required />
                 @endif
-            </div>
-            <div class="flex justify-between">
-                <div class="flex gap-3">
-                    @if ($halaman === 1)
-                    <flux:button wire:click="next" wire:key="btn-next-1" class="hover:cursor-pointer">Selanjutnya</flux:button>
-                    @elseif ($halaman === 2)
-                    <flux:button wire:click="back" wire:key="btn-back-2" class="hover:cursor-pointer">Sebelumnya</flux:button>
-                    <flux:button wire:click="next" wire:key="btn-next-2" class="hover:cursor-pointer">Selanjutnya</flux:button>
-                    @elseif ($halaman === 3)
-                    <flux:button wire:click="back" wire:key="btn-back-3" class="hover:cursor-pointer">Sebelumnya</flux:button>
-                    @endif
-                </div>
-                <div class="flex justify-end gap-2">
-                    <flux:modal.close>
-                        <flux:button variant="ghost">Batal</flux:button>
-                    </flux:modal.close>
 
-                    @if ($halaman === 3)
-                    <flux:button wire:click="save" variant="primary">Simpan</flux:button>
-                    @endif
+                <div class="flex justify-between">
+                    <div class="flex gap-3">
+                        @if ($halaman === 1)
+                        <flux:button wire:click="next" wire:key="btn-next-1" class="hover:cursor-pointer">Selanjutnya</flux:button>
+                        @elseif ($halaman === 2)
+                        <flux:button wire:click="back" wire:key="btn-back-2" class="hover:cursor-pointer">Sebelumnya</flux:button>
+                        @endif
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <flux:modal.close>
+                            <flux:button variant="ghost">Batal</flux:button>
+                        </flux:modal.close>
+    
+                        @if ($halaman === 2)
+                        <flux:button wire:click="save" variant="primary">Simpan</flux:button>
+                        @endif
+                    </div>
                 </div>
             </div>
-
         </flux:modal>
 
         {{-- Modal Konfirmasi Hapus --}}

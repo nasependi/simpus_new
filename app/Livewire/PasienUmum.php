@@ -30,7 +30,7 @@ class PasienUmum extends Component
     public $tanggal_lahir, $jk_id, $agama_id, $suku, $bahasa_dikuasai, $alamat_lengkap;
     public $rt, $rw, $kel_id, $kec_id, $kab_id, $kodepos_id, $prov_id;
     public $alamat_domisili, $domisili_rt, $domisili_rw, $domisili_kel, $domisili_kec, $domisili_kab, $domisili_kodepos, $domisili_prov, $domisili_negara;
-    public $no_rumah, $no_hp, $pendidikan_id, $pekerjaan_id, $statusnikah_id;
+    public $no_rumah, $no_hp, $pendidikan_id, $pekerjaan_id, $pekerjaan_lainnya, $statusnikah_id;
 
 
     protected $rules = [
@@ -60,6 +60,7 @@ class PasienUmum extends Component
         'no_hp' => 'required|max:20',
         'pendidikan_id' => 'required',
         'pekerjaan_id' => 'required',
+        'pekerjaan_lainnya' => 'nullable|string|max:100',
         'statusnikah_id' => 'required',
     ];
 
@@ -149,6 +150,6 @@ class PasienUmum extends Component
     public function resetForm()
     {
         $this->reset(array_keys($this->rules));
-        $this->reset(['paspor', 'suku', 'bahasa_dikuasai', 'kodepos_id', 'domisili_kodepos', 'no_rumah', 'editId']);
+        $this->reset(['paspor', 'suku', 'bahasa_dikuasai', 'kodepos_id', 'domisili_kodepos', 'no_rumah', 'pekerjaan_lainnya', 'editId']);
     }
 }

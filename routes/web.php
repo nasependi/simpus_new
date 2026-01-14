@@ -84,4 +84,16 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
 
+// Social Authentication Routes
+use App\Http\Controllers\Auth\SocialAuthController;
+
+Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
+Route::get('/auth/facebook', [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback']);
+
+Route::get('/auth/apple', [SocialAuthController::class, 'redirectToApple'])->name('auth.apple');
+Route::get('/auth/apple/callback', [SocialAuthController::class, 'handleAppleCallback']);
+
 require __DIR__ . '/auth.php';
